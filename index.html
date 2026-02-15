@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzeria Pub St. Sisinius</title>
+    <style>
+        :root { --red: #d32f2f; --dark: #1a1a1a; --light: #f4f4f4; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: var(--dark); padding-bottom: 180px; }
+        header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }
+        .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red); }
+        h1 { margin: 0; font-size: 1.6rem; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000; }
+        .tabs { display: flex; flex-wrap: wrap; }
+        .tab-btn { background: none; border: none; color: white; cursor: pointer; padding: 12px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
+        .tab-btn.active { color: var(--red); border-bottom: 3px solid var(--red); }
+        .lang-switch { display: flex; gap: 5px; }
+        .lang-btn { background: #444; border: 1px solid #666; color: white; padding: 4px 10px; cursor: pointer; border-radius: 3px; }
+        .lang-btn.active { background: var(--red); border-color: var(--red); }
+        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+        #content-area { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 850px) { #content-area.grid-mode { grid-template-columns: repeat(3, 1fr); } }
+        .entry { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; border: 1px solid #ddd; }
+        .entry-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .entry-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
+        .price { color: var(--red); white-space: nowrap; margin-left: 10px; }
+        .desc { font-size: 0.9rem; color: #555; font-style: italic; flex-grow: 1; }
+        .item-img { width: 100%; height: 180px; object-fit: cover; }
+        .admin-only { display: none; }
+        body.admin-mode .admin-only { display: block; }
+        .admin-panel { background: #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed #999; }
+        .admin-panel div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .admin-panel input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
+        footer { position: fixed; bottom: 0; width: 100%; background: #1a1a1a; color: white; padding: 20px 0; border-top: 4px solid var(--red); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="logo.jpg" class="logo" alt="Logo">
+    <h1>Pizzeria Pub St. Sisinius</h1>
+</header>
+
+<div class="nav-container">
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-start" onclick="setTab('start')">Start</button>
+        <button class="tab-btn" id="tab-pizzas" onclick="setTab('pizzas')">Pizzakarte</button>
+        <button class="tab-btn" id="tab-events" onclick="setTab('events')">Events</button>
+        <button class="tab-btn" id="tab-tv" onclick="setTab('tv')">TV-Sport</button>
+    </div>
+    <div class="lang-switch">
+        <button class="lang-btn active" id="btn-de" onclick="setLang('DE')">DE</button>
+        <button class="lang-btn" id="btn-it" onclick="setLang('IT')">IT</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="admin-panel admin-only">
+        <strong>Admin-Konsole</strong>
+        <div>
+            <input type="text" id="inNameDE" placeholder="Name (DE)">
+            <input type="text" id="inNameIT" placeholder="Nome (IT)">
+            <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
+            <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
+            <input type="text" id="inRight" placeholder="Preis / Datum">
+            <input type="text" id="inImg" placeholder="Bild-URL (.jpg)">
+        </div>
+        <button onclick="addItem()" style="background: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Eintrag speichern</button>
+    </div>
+    <div id="content-area"></div>
+</div>
+
+<footer>
+    <div><strong>Pizzeria St. Sisinius</strong></div>
+    <div>Tel: <a href="tel:+393898334004" style="color:white; text-decoration:none;">+39 389 833 4004</a></div>
+    <div>Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00</div>
+</footer>
+
+<script>
+    let data = { start: {}, pizzas: [], events: [], tv: [] };
+    let currentTab = 'start';
+    let lang = 'DE';
+    const editMode = new URLSearchParams(window.location.search).get('edit') === 'true';
+    if(editMode) document.body.classList.add('admin-mode');
+
+    async function load() {
+        const res = await fetch('/api/data');
+        data = await res.json();
+        render();
+    }
+
+    async function save() {
+        await fetch('/api/data', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        render();
+    }
+
+    function setTab(t) { 
+        currentTab = t; 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
+        render(); 
+    }
+
+    function setLang(l) { 
+        lang = l; 
+        document.getElementById('btn-de').classList.toggle('active', l==='DE');
+        document.getElementById('btn-it').classList.toggle('active', l==='IT');
+        render(); 
+    }
+
+    function render() {
+        const area = document.getElementById('content-area');
+        area.innerHTML = '';
+
+        if(currentTab === 'start') {
+            area.classList.remove('grid-mode');
+            const s = data.start;
+            area.innerHTML = `
+                <div style="text-align:center;">
+                    <img src="${s.img}" style="width:100%; max-width:800px; border-radius:10px;">
+                    <p style="white-space: pre-wrap; font-size: 1.2rem; padding: 20px;">${lang === 'DE' ? s.textDE : s.textIT}</p>
+                    <div class="admin-only"><button onclick="editStart()">Text bearbeiten</button></div>
+                </div>`;
+        } else {
+            area.classList.add('grid-mode');
+            data[currentTab].forEach((item, idx) => {
+                area.innerHTML += `
+                    <div class="entry">
+                        ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
+                        <div class="entry-content">
+                            <div class="entry-header">
+                                <span>${lang === 'DE' ? item.nameDE : item.nameIT}</span>
+                                <span class="price">${item.right}${currentTab==='pizzas'?'€':''}</span>
+                            </div>
+                            <div class="desc">${lang === 'DE' ? item.descDE : item.descIT}</div>
+                            <div class="btn-row admin-only">
+                                <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+                                <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+                                <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    function addItem() {
+        const nameDE = document.getElementById('inNameDE').value;
+        const nameIT = document.getElementById('inNameIT').value;
+        const descDE = document.getElementById('inDescDE').value;
+        const descIT = document.getElementById('inDescIT').value;
+        const right = document.getElementById('inRight').value;
+        const img = document.getElementById('inImg').value;
+        
+        if(nameDE || nameIT) {
+            data[currentTab].push({ nameDE, nameIT, descDE, descIT, right, img });
+            save();
+            document.querySelectorAll('.admin-panel input').forEach(i => i.value = '');
+        }
+    }
+
+    function move(index, dir) {
+        const list = data[currentTab];
+        if (index + dir >= 0 && index + dir < list.length) {
+            [list[index], list[index + dir]] = [list[index + dir], list[index]];
+            save();
+        }
+    }
+
+    function remove(idx) {
+        if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); save(); }
+    }
+
+    function editStart() {
+        const txt = prompt("Text eingeben / Inserire testo:", lang === 'DE' ? data.start.textDE : data.start.textIT);
+        if(txt !== null) {
+            if(lang === 'DE') data.start.textDE = txt; else data.start.textIT = txt;
+            save();
+        }
+    }
+
+    load();
+</script>
+</body>
+</html>
