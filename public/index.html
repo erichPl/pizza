@@ -317,7 +317,7 @@
         }
     }
 
-    function addItem() {
+    /*function addItem() {
         const nameDE = document.getElementById('inNameDE').value;
         const nameIT = document.getElementById('inNameIT').value;
         const descDE = document.getElementById('inDescDE').value;
@@ -330,7 +330,38 @@
             save();
             document.querySelectorAll('.admin-panel input').forEach(i => i.value = '');
         }
+    }*/
+
+
+    async function addItem() {
+    // 1. Daten aus den Feldern lesen (dein bestehender Code)
+    const newItem = {
+        nameDE: document.getElementById('inNameDE').value,
+        // ... alle anderen Felder ...
+    };
+
+    // 2. In die lokale Liste schieben
+    data[currentTab].push(newItem);
+
+    // 3. ABSCHICKEN an den Server (WICHTIG!)
+    try {
+        const response = await fetch('/api/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data) // Schickt das komplette Daten-Objekt
+        });
+
+        if (response.ok) {
+            alert("Erfolg! Änderungen gespeichert.");
+            render(); // Seite neu zeichnen
+        } else {
+            alert("Fehler beim Speichern in der Cloud.");
+        }
+    } catch (e) {
+        console.error("Netzwerkfehler:", e);
     }
+}
+    
 
     function move(index, dir) {
         const list = data[currentTab];
@@ -356,6 +387,7 @@
 </script>
 </body>
 </html>
+
 
 
 
