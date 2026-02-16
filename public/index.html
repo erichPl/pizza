@@ -235,7 +235,7 @@
         
    else {
             area.classList.add('grid-mode');
-            data[currentTab].forEach((item, idx) => {
+            /*data[currentTab].forEach((item, idx) => {
                 area.innerHTML += `
                     <div class="entry">
                         ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
@@ -263,7 +263,31 @@
                 }
 
                 
-            });
+            });*/
+
+    data[currentTab].forEach((item, idx) => {
+        area.innerHTML += `
+            <div class="entry">
+                ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
+                <div class="entry-content">
+                    <div class="entry-header">
+                        <span>${lang === 'DE' ? item.nameDE : item.nameIT}</span>
+                        <span class="price">${item.right}${currentTab==='pizzas'?'€':''}</span>
+                    </div>
+                    <div class="desc">${lang === 'DE' ? item.descDE : item.descIT}</div>
+                    
+                    <div class="btn-row admin-only">
+                        <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+                        <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+                        <!-- Hier kommt der neue Ändern-Button rein: -->
+                        <button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
+                        <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+            
         }
     }
 
@@ -306,6 +330,7 @@
 </script>
 </body>
 </html>
+
 
 
 
