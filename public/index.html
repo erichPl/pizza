@@ -384,6 +384,34 @@
 
             
         }
+    
+    
+    if (currentTab === 'tv') {
+    data.tv.forEach((item, idx) => {
+        area.innerHTML += `
+            <div class="event-card">
+                <div class="event-date">${item.descIT || 'Datum fehlt'}</div> 
+                <hr class="event-line">
+                <div class="event-grid">
+                    <div class="event-time">${item.right}</div>
+                    <div class="event-teams">${item.nameDE}</div>
+                    <div class="event-league">${item.descDE}</div>
+                </div>
+                
+                <!-- Admin-Buttons bleiben wie gewohnt -->
+                <div class="btn-row admin-only" style="margin-top:15px; justify-content: flex-end;">
+                    <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+                    <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+                    <button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
+                    <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
+                </div>
+            </div>`;
+    });
+}
+    
+    
+    
+    
     }
 
     /*function addItem() {
@@ -490,6 +518,7 @@
 </script>
 </body>
 </html>
+
 
 
 
