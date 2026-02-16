@@ -333,7 +333,7 @@
     }*/
 
 
-    async function addItem() {
+    /*async function addItem() {
     // 1. Daten aus den Feldern lesen (dein bestehender Code)
     const newItem = {
         nameDE: document.getElementById('inNameDE').value,
@@ -359,6 +359,40 @@
         }
     } catch (e) {
         console.error("Netzwerkfehler:", e);
+    }
+}*/
+
+
+    async function addItem() {
+    const nDE = document.getElementById('inNameDE').value;
+    const nIT = document.getElementById('inNameIT').value;
+    const dDE = document.getElementById('inDescDE').value;
+    const dIT = document.getElementById('inDescIT').value;
+    const pri = document.getElementById('inRight').value;
+    const img = document.getElementById('inImg') ? document.getElementById('inImg').value : "";
+
+    // WICHTIG: Die Namen links müssen exakt so heißen wie in deiner render() Schleife!
+    const newItem = {
+        nameDE: nDE,
+        nameIT: nIT,
+        descDE: dDE,
+        descIT: dIT,
+        right: pri,
+        img: img
+    };
+
+    data[currentTab].push(newItem);
+
+    // Ab an den Server (Render)
+    const res = await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        alert("Pizza erfolgreich aktualisiert!");
+        render();
     }
 }
     
@@ -387,6 +421,7 @@
 </script>
 </body>
 </html>
+
 
 
 
