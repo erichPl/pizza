@@ -51,6 +51,61 @@
         .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
         .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
         footer { position: fixed; bottom: 0; width: 100%; background: #1a1a1a; color: white; padding: 20px 0; border-top: 4px solid var(--red); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; font-size: 0.85rem; }
+    
+    
+    /* Rahmen für das gesamte Event */
+.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0; /* Cremiger Hintergrund */
+}
+
+/* Datum als Überschrift */
+.event-date {
+    color: #8B4513;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+/* Die braune Linie */
+.event-line {
+    border: none;
+    height: 2px;
+    background-color: #8B4513;
+    margin-bottom: 15px;
+}
+
+/* 3-Spalten-Layout */
+.event-grid {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px; /* Zeit, Teams, League */
+    gap: 15px;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.event-time {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.event-teams {
+    font-weight: bold;
+    color: #333;
+}
+
+.event-league {
+    text-align: right;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+}
+    
+    
     </style>
 </head>
 <body>
@@ -435,6 +490,7 @@
 </script>
 </body>
 </html>
+
 
 
 
