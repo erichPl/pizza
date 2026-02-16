@@ -149,18 +149,22 @@
         return;
     }
 
+if (currentTab === 'start') {
+    // Falls data.start noch nicht existiert, nehmen wir Standardwerte
+    const s = data.start || { img: 'start.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
+    
+    area.innerHTML = `
+        <div class="start-content">
+            <img src="${s.img}" class="main-img" style="width:100%; max-width:600px; border-radius:15px;">
+            <h1 style="margin-top:20px;">${lang === 'de' ? s.textDE : s.textIT}</h1>
+            <p>Pizzeria Pub St. Sisinius</p>
+        </div>
+    `;
+}
 
         
-        if(currentTab === 'start') {
-            area.classList.remove('grid-mode');
-            const s = data.start;
-            area.innerHTML = `
-                <div style="text-align:center;">
-                    <img src="${s.img}" style="width:100%; max-width:800px; border-radius:10px;">
-                    <p style="white-space: pre-wrap; font-size: 1.2rem; padding: 20px;">${lang === 'DE' ? s.textDE : s.textIT}</p>
-                    <div class="admin-only"><button onclick="editStart()">Text bearbeiten</button></div>
-                </div>`;
-        } else {
+        
+   else {
             area.classList.add('grid-mode');
             data[currentTab].forEach((item, idx) => {
                 area.innerHTML += `
@@ -222,6 +226,7 @@
 </script>
 </body>
 </html>
+
 
 
 
