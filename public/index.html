@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzeria Pub St. Sisinius</title>
     <style>
-        /* Grundsätzlich verstecken */
-        .admin-only, .btn-ctrl, .btn-row { 
+    /* Nur die Admin-Elemente standardmäßig ausblenden */
+        .admin-only, .btn-ctrl, .admin-panel { 
             display: none !important; 
         }
         
-        /* Nur im Admin-Modus einblenden */
+        /* Nur einblenden, wenn die Klasse am body aktiv ist */
         body.admin-mode .admin-only, 
-        body.admin-mode .btn-ctrl,
-        body.admin-mode .btn-row { 
-            display: flex !important; 
+        body.admin-mode .btn-ctrl, 
+        body.admin-mode .admin-panel { 
+            display: block !important; 
+        }
+        
+        /* Spezialfall für die Button-Reihe (Flex-Layout erhalten) */
+        body.admin-mode .btn-row.admin-only {
+            display: flex !important;
         }
         
         :root { --red: #d32f2f; --dark: #1a1a1a; --light: #f4f4f4; --white: #ffffff; }
@@ -207,5 +212,6 @@
 </script>
 </body>
 </html>
+
 
 
