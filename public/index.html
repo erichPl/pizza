@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzeria Pub St. Sisinius</title>
     <style>
+        /* Grundsätzlich verstecken */
+        .admin-only, .btn-ctrl, .btn-row { 
+            display: none !important; 
+        }
+        
+        /* Nur im Admin-Modus einblenden */
+        body.admin-mode .admin-only, 
+        body.admin-mode .btn-ctrl,
+        body.admin-mode .btn-row { 
+            display: flex !important; 
+        }
+        
         :root { --red: #d32f2f; --dark: #1a1a1a; --light: #f4f4f4; --white: #ffffff; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: var(--dark); padding-bottom: 180px; }
         header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }
@@ -195,4 +207,5 @@
 </script>
 </body>
 </html>
+
 
