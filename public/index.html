@@ -133,14 +133,24 @@
     function render() {
 
     const area = document.getElementById('content-area');
+    if (!area) return;
     area.innerHTML = '';
 
-    // WICHTIG: Hier wird entschieden, ob die Buttons sichtbar sind
+    // Modus-Prüfung: Setzt die Klasse für das CSS
     if (editMode) {
         document.body.classList.add('admin-mode');
     } else {
         document.body.classList.remove('admin-mode');
     }
+
+    // Prüfen, ob Daten überhaupt geladen wurden
+    if (!data[currentTab]) {
+        area.innerHTML = '<p>Lade Daten... / Caricamento...</p>';
+        return;
+    }
+
+
+        
         if(currentTab === 'start') {
             area.classList.remove('grid-mode');
             const s = data.start;
@@ -212,6 +222,7 @@
 </script>
 </body>
 </html>
+
 
 
 
