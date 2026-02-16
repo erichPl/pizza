@@ -150,16 +150,21 @@
     }
 
 if (currentTab === 'start') {
-    // Falls data.start noch nicht existiert, nehmen wir Standardwerte
+  if (currentTab === 'start') {
+    // Falls in der DB noch nichts für Start steht, nutzen wir feste Standardwerte
     const s = data.start || { img: 'start.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
     
     area.innerHTML = `
-        <div class="start-content">
-            <img src="${s.img}" class="main-img" style="width:100%; max-width:600px; border-radius:15px;">
-            <h1 style="margin-top:20px;">${lang === 'de' ? s.textDE : s.textIT}</h1>
-            <p>Pizzeria Pub St. Sisinius</p>
+        <div class="start-content" style="text-align: center; padding: 20px;">
+            <img src="${s.img}" class="main-img" style="width:100%; max-width:600px; border-radius:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <h1 style="margin-top:20px; color: #2c3e50;">${lang === 'de' ? s.textDE : s.textIT}</h1>
+            <p style="font-style: italic; color: #7f8c8d;">Pizzeria Pub St. Sisinius</p>
         </div>
     `;
+    
+    // HINWEIS: Hier fehlen die Admin-Eingabefelder absichtlich!
+    // Dadurch bleibt die Startseite im Admin-Modus genauso sauber wie für Kunden.
+}
 }
 
         
@@ -226,6 +231,7 @@ if (currentTab === 'start') {
 </script>
 </body>
 </html>
+
 
 
 
