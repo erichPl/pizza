@@ -252,6 +252,17 @@
                             </div>
                         </div>
                     </div>`;
+
+                if (editMode) {
+                    html += `
+                        <div class="edit-controls" style="margin-top: 10px;">
+                            <button onclick="editItem(${index})" style="background: #ffa000; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✎ Ändern</button>
+                            <button onclick="deleteItem(${index})" style="background: #d32f2f; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin-left: 10px; cursor: pointer;">Löschen</button>
+                        </div>
+                    `;
+                }
+
+                
             });
         }
     }
@@ -295,6 +306,7 @@
 </script>
 </body>
 </html>
+
 
 
 
