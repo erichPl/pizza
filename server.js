@@ -1,4 +1,4 @@
-onst express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const app = express();
@@ -40,4 +40,5 @@ app.post('/api/data', async (req, res) => {
 // START
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+
 
