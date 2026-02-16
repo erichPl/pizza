@@ -114,9 +114,16 @@
     }
 
     function render() {
-        const area = document.getElementById('content-area');
-        area.innerHTML = '';
 
+    const area = document.getElementById('content-area');
+    area.innerHTML = '';
+
+    // WICHTIG: Hier wird entschieden, ob die Buttons sichtbar sind
+    if (editMode) {
+        document.body.classList.add('admin-mode');
+    } else {
+        document.body.classList.remove('admin-mode');
+    }
         if(currentTab === 'start') {
             area.classList.remove('grid-mode');
             const s = data.start;
@@ -188,3 +195,4 @@
 </script>
 </body>
 </html>
+
