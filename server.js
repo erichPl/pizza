@@ -29,4 +29,12 @@ app.post('/api/data', (req, res) => {
     });
 });
 
+// Absolute Pfade sicherstellen
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+
+// Explizite Route für die Startseite
+app.get('/', (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+});
 app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));
