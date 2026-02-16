@@ -103,12 +103,28 @@
     if(editMode) document.body.classList.add('admin-mode');
 
     async function load() {
+    try {
         const res = await fetch('/api/data');
-        data = await res.json();
+        const fetchedData = await res.json();
+        
+        // Sicherstellen, dass 'data' immer die richtige Struktur hat
+        data = fetchedData || {};
+        if (!data.pizzas) data.pizzas = [];
+        if (!data.events) data.events = [];
+        if (!data.start) data.start = { img: 'logo.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
+
+        render(); // Jetzt wird die Seite garantiert gezeichnet
+    } catch (e) {
+        console.error("Fehler beim Laden der Daten:", e);
+        // Notfall-Plan: Leere Struktur, damit die Seite nicht hängen bleibt
+        data = { start: { img: 'logo.jpg', textDE: 'Willkommen' }, pizzas: [], events: [] };
         render();
     }
+}
 
     async function save() {
+        // Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
+        if (currentTab === 'start') return; 
         await fetch('/api/data', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -231,6 +247,7 @@
 </script>
 </body>
 </html>
+
 
 
 
