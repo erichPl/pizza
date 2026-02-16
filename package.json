@@ -1,4 +1,4 @@
-
+{
   "name": "pizza",
   "version": "1.0.0",
   "description": "Pizzeria Website mit Node.js und MongoDB",
@@ -13,4 +13,5 @@
   "engines": {
     "node": ">=18.0.0"
   }
+
 }
