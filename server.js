@@ -1,40 +1,43 @@
-const express = require('express');
-const fs = require('fs');
+onst express = require('express');
+const mongoose = require('mongoose');
 const path = require('path');
 const app = express();
-const PORT = 3000;
 
 app.use(express.json());
 app.use(express.static('public'));
 
-const DATA_FILE = path.join(__dirname, 'data.json');
+// DIE FEHLENDE VERBINDUNG:
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("==> MongoDB verbunden!"))
+    .catch(err => console.error("Verbindungsfehler:", err));
 
-// Initialdaten falls Datei fehlt
-if (!fs.existsSync(DATA_FILE)) {
-    const initial = { 
-        start: { img: "start.jpg", textDE: "Willkommen!", textIT: "Benvenuti!" },
-        pizzas: [], events: [], tv: [] 
-    };
-    fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2));
-}
+// DATEN-SCHEMA
+const DataSchema = new mongoose.Schema({
+    type: { type: String, default: "main_data" },
+    start: { img: String, textDE: String, textIT: String },
+    pizzas: Array,
+    events: Array,
+    tv: Array
+});
+const DataModel = mongoose.model('PizzaData', DataSchema);
 
-app.get('/api/data', (req, res) => {
-    res.sendFile(DATA_FILE);
+// API ENDPUNKTE
+app.get('/api/data', async (req, res) => {
+    try {
+        let data = await DataModel.findOne({ type: "main_data" });
+        if (!data) data = { start: {}, pizzas: [], events: [], tv: [] };
+        res.json(data);
+    } catch (e) { res.status(500).send(e); }
 });
 
-app.post('/api/data', (req, res) => {
-    fs.writeFile(DATA_FILE, JSON.stringify(req.body, null, 2), (err) => {
-        if (err) return res.status(500).send("Fehler");
-        res.send({ status: "ok" });
-    });
+app.post('/api/data', async (req, res) => {
+    try {
+        await DataModel.findOneAndUpdate({ type: "main_data" }, req.body, { upsert: true });
+        res.json({ status: "Erfolg" });
+    } catch (e) { res.status(500).send(e); }
 });
 
-// Absolute Pfade sicherstellen
-const publicPath = path.join(__dirname, 'public');
-app.use(express.static(publicPath));
+// START
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
 
-// Explizite Route für die Startseite
-app.get('/', (req, res) => {
-    res.sendFile(path.join(publicPath, 'index.html'));
-});
-app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`));
