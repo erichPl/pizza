@@ -107,7 +107,7 @@
     if(editMode) document.body.classList.add('admin-mode');
 
 
-   function editItem(index) {
+  /* function editItem(index) {
     let list;
     if (currentTab === 'pizzas') list = data.pizzas;
     else if (currentTab === 'events') list = data.events;
@@ -127,7 +127,33 @@
     
     render();
     window.scrollTo(0, 0); // Nach oben zum Formular springen
+}*/
+
+    function editItem(idx) {
+    const list = data[currentTab];
+    const item = list[idx];
+
+    // 1. Erst das Item entfernen
+    list.splice(idx, 1);
+    
+    // 2. Die Seite neu zeichnen (das erstellt die Eingabefelder frisch)
+    render();
+
+    // 3. JETZT erst die Daten in die frisch gezeichneten Felder schreiben
+    setTimeout(() => {
+        document.getElementById('inNameDE').value = item.nameDE || "";
+        document.getElementById('inNameIT').value = item.nameIT || "";
+        document.getElementById('inDescDE').value = item.descDE || "";
+        document.getElementById('inDescIT').value = item.descIT || "";
+        document.getElementById('inRight').value = item.right || "";
+        if(document.getElementById('inImg')) document.getElementById('inImg').value = item.img || "";
+        
+        // Sanft nach oben scrollen
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50); // Kleiner Moment Pause für den Browser
 }
+
+    
 
     
     async function load() {
@@ -330,6 +356,7 @@
 </script>
 </body>
 </html>
+
 
 
 
