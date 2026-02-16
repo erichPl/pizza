@@ -151,19 +151,19 @@
 
 
   if (currentTab === 'start') {
-    // Falls in der DB noch nichts für Start steht, nutzen wir feste Standardwerte
+    // 1. Daten-Sicherung: Wenn die DB leer ist, nimm diese Werte
     const s = data.start || { img: 'start.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
     
+    // 2. Anzeige: Nur das Bild und die Texte (KEIN admin-panel!)
     area.innerHTML = `
         <div class="start-content" style="text-align: center; padding: 20px;">
-            <img src="${s.img}" class="main-img" style="width:100%; max-width:600px; border-radius:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-            <h1 style="margin-top:20px; color: #2c3e50;">${lang === 'de' ? s.textDE : s.textIT}</h1>
-            <p style="font-style: italic; color: #7f8c8d;">Pizzeria Pub St. Sisinius</p>
+            <img src="${s.img}" class="main-img" style="width:100%; max-width:600px; border-radius:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <h1 style="margin-top:20px; color: #333;">${lang === 'de' ? s.textDE : s.textIT}</h1>
+            <p style="font-style: italic; color: #666;">Pizzeria Pub St. Sisinius</p>
         </div>
     `;
     
-    // HINWEIS: Hier fehlen die Admin-Eingabefelder absichtlich!
-    // Dadurch bleibt die Startseite im Admin-Modus genauso sauber wie für Kunden.
+    // HINWEIS: Das "if (editMode)" für Eingabefelder wurde hier gelöscht!
 }
 
 
@@ -231,6 +231,7 @@
 </script>
 </body>
 </html>
+
 
 
 
