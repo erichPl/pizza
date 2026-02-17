@@ -330,7 +330,17 @@
         
         
    else {
-            area.classList.add('grid-mode');
+            
+
+        // Weiche für das Layout:
+            if (currentTab === 'pizzas' || currentTab === 'start') {
+                area.className = 'grid-mode'; // 3 Spalten auf Desktop
+            } else {
+                area.className = 'list-mode'; // 1 Spalte = volle Breite (für Events & TV)
+            }
+ 
+
+       
             /*data[currentTab].forEach((item, idx) => {
                 area.innerHTML += `
                     <div class="entry">
@@ -519,6 +529,7 @@
 </script>
 </body>
 </html>
+
 
 
 
