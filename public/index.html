@@ -425,13 +425,13 @@ header h1 {
         data = fetchedData || {};
         if (!data.pizzas) data.pizzas = [];
         if (!data.events) data.events = [];
-        if (!data.start) data.start = { img: 'logo.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
+        if (!data.start) data.start = { img: 'lokal.webp', textDE: 'Willkommen', textIT: 'Benvenuti' };
 
         render(); // Jetzt wird die Seite garantiert gezeichnet
     } catch (e) {
         console.error("Fehler beim Laden der Daten:", e);
         // Notfall-Plan: Leere Struktur, damit die Seite nicht hängen bleibt
-        data = { start: { img: 'logo.jpg', textDE: 'Willkommen' }, pizzas: [], events: [] };
+        data = { start: { img: 'lokal.webp', textDE: 'Willkommen' }, pizzas: [], events: [] };
         render();
     }
 }
@@ -815,6 +815,7 @@ function clearFields() {
 </script>
 </body>
 </html>
+
 
 
 
