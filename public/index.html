@@ -105,7 +105,158 @@
     color: #666;
     font-size: 0.9rem;
 }
-    
+
+
+
+
+        /* HERO SECTION */
+.hero {
+    position: relative;
+    height: 450px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2rem;
+    border-radius: 10px;
+    backdrop-filter: blur(3px);
+    max-width: 80%;
+}
+
+.hero-overlay h2 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+/* ABOUT SECTION (Bild & Text) */
+.about-section {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    margin: 40px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.about-image {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+}
+
+/* INFO CARDS (Kontakt & Öffnungszeiten) */
+.info-section-compact {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.contact-card-large, .hours-card-large {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    border-top: 5px solid var(--red);
+}
+
+.contact-icon, .hours-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.phone-number {
+    font-size: 1.5rem;
+    color: var(--red);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    margin: 15px 0;
+}
+
+.hours-list {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+}
+
+.hours-item:last-child { border-bottom: none; }
+
+.pizza-note {
+    background: #fff0f0;
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--red);
+    font-weight: bold;
+}
+
+/* RESPONSIVE */
+@media (max-width: 850px) {
+    .about-content, .info-section-compact {
+        grid-template-columns: 1fr;
+    }
+    .hero { height: 300px; }
+    .hero-overlay h2 { font-size: 1.8rem; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
     </style>
 </head>
@@ -558,6 +709,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
