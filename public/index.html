@@ -855,6 +855,8 @@ function renderAdminButtons(idx) {
 }
 
 
+
+/*    
     async function addItem() {
     const nDE = document.getElementById('inNameDE').value;
     const nIT = document.getElementById('inNameIT').value;
@@ -886,9 +888,19 @@ function renderAdminButtons(idx) {
         alert("Pizza erfolgreich aktualisiert!");
         render();
     }
-}
+}*/
     
-
+// Hilfsfunktion zum Leeren der Felder
+function clearFields() {
+    document.getElementById('inNameDE').value = "";
+    document.getElementById('inNameIT').value = "";
+    document.getElementById('inDescDE').value = "";
+    document.getElementById('inDescIT').value = "";
+    document.getElementById('inRight').value = "";
+    if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
+    const title = document.getElementById('admin-title');
+    if(title) title.innerText = "Neuen Eintrag hinzufügen";
+}
     function move(index, dir) {
         const list = data[currentTab];
         if (index + dir >= 0 && index + dir < list.length) {
@@ -913,6 +925,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
