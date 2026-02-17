@@ -259,6 +259,25 @@
 
     function setLang(l) { 
         lang = l; 
+         // Tab-Buttons übersetzen
+        const btnStart = document.getElementById('btn-tab-start');
+        const btnPizzas = document.getElementById('btn-tab-pizzas');
+        const btnEvents = document.getElementById('btn-tab-events');
+        const btnTV = document.getElementById('btn-tab-tv');
+
+    if (lang === 'DE') {
+        if(btnStart) btnStart.innerText = "Start";
+        if(btnPizzas) btnPizzas.innerText = "Pizzakarte";
+        if(btnEvents) btnEvents.innerText = "Events";
+        if(btnTV) btnTV.innerText = "TV-Sport";
+    } else {
+        if(btnStart) btnStart.innerText = "Inizio";
+        if(btnPizzas) btnPizzas.innerText = "Menu Pizza";
+        if(btnEvents) btnEvents.innerText = "Eventi";
+        if(btnTV) btnTV.innerText = "Sport TV";
+    }
+        
+        
         document.getElementById('btn-de').classList.toggle('active', l==='DE');
         document.getElementById('btn-it').classList.toggle('active', l==='IT');
         render(); 
@@ -453,6 +472,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
