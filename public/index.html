@@ -612,19 +612,32 @@ function render() {
 }*/
 
 
-if (currentTab === 'start') {
+function render() {
+    const area = document.getElementById('content-area');
+    if (!area) return;
+    area.innerHTML = '';
+
+    // Modus-Prüfung: Setzt die Klasse für das CSS
+    if (editMode) {
+        document.body.classList.add('admin-mode');
+    } else {
+        document.body.classList.remove('admin-mode');
+    }
+
+    // 1. STARTSEITE (Sonderlayout)
+    if (currentTab === 'start') {
         const s = data.start || { 
             img: 'lokal.webp', 
-            nameDE: 'Willkommen bei Pizzeria Pub St. Sisinius', 
-            nameIT: 'Benvenuti alla Pizzeria Pub St. Sisinius'
+            textDE: 'Willkommen bei Pizzeria Pub St. Sisinius', 
+            textIT: 'Benvenuti alla Pizzeria Pub St. Sisinius' 
         };
-
+        
         area.className = 'list-mode';
         area.innerHTML = `
             <!-- Hero Bereich -->
             <div class="hero" style="height: 500px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
-                <img src="${s.img || 'lokal.webp'}" class="hero-image" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
-                <div class="hero-overlay" style="position: relative; z-index: 2; text-align: center; background: none; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
+                <img src="${s.img || 'lokal.webp'}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+                <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
                     <h2 style="font-size: 3rem; margin-bottom: 10px; text-transform: none;">
                         ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
                     </h2>
@@ -635,9 +648,10 @@ if (currentTab === 'start') {
             </div>
 
             <div class="container">
-                <!-- About Sektion -->
+                <!-- About Sektion (Bild links, Text rechts) -->
                 <div class="about-section" style="display: flex; align-items: center; gap: 30px; background: white; padding: 30px; border-radius: 15px; margin: 40px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <img src="pizza.webp" alt="Pizza" style="width: 300px; height: auto; border-radius: 10px; object-fit: cover;">
+                    
                     <div class="about-text" style="flex: 1; font-size: 1.1rem; line-height: 1.6; color: #333;">
                         ${lang === 'DE' ? `
                             <p>Genießen Sie frische Pizza in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
@@ -645,44 +659,76 @@ if (currentTab === 'start') {
                             <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>
                         ` : `
                             <p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizza italiana autentica con ingredienti freschi e molta attenzione ai dettagli.</p>
-                            <p>Godetevi le nostre deliziose pizze in un'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>
+                            <p>Godetevi le nostre deliziose pizze in un'atmosfera accogliente mentre seguite i più importantes eventi sportivi sui nostri schermi.</p>
                             <p><strong>Non vediamo l'ora di darvi il benvenuto!</strong></p>
                         `}
                     </div>
                 </div>
 
                 <!-- Info Sektion (Kontakt & Öffnungszeiten) -->
-                <div class="info-section-compact" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                    <div class="contact-card-large" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">
-                        <div class="contact-icon" style="font-size: 2rem;">📞</div>
-                        <h3>${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-                        <a href="tel:+393898334004" class="phone-number" style="font-size: 1.5rem; font-weight: bold; color: #8B2332; text-decoration: none; display: block; margin: 10px 0;">+39 389 833 4004</a>
+                <div class="info-section-compact">
+                    <div class="contact-card-large">
+                        <div class="contact-icon">📞</div>
+                        <h3 style="color:var(--red)">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+                        <a href="tel:+393898334004" class="phone-number">+39 389 833 4004</a>
                         <p>${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}</p>
                     </div>
 
-                    <div class="hours-card-large" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                        <h3 style="text-align: center;">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
+                    <div class="hours-card-large">
+                        <div class="hours-icon">🕐</div>
+                        <h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
                         <div class="hours-list">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>${lang === 'DE' ? 'Montag' : 'Lunedì'}</span> <span>${lang === 'DE' ? 'Geschlossen' : 'Chiuso'}</span></div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Di - Do / Mar - Gio</span> <span>16:00 – 00:00</span></div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Fr / Ven</span> <span>16:00 – 01:00</span></div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
-                            <div style="display: flex; justify-content: space-between;"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
+                            <div class="hours-item"><span>${lang === 'DE' ? 'Montag' : 'Lunedì'}</span> <span>${lang === 'DE' ? 'Geschlossen' : 'Chiuso'}</span></div>
+                            <div class="hours-item"><span>Di - Do / Mar - Gio</span> <span>16:00 – 00:00</span></div>
+                            <div class="hours-item"><span>Fr / Ven</span> <span>16:00 – 01:00</span></div>
+                            <div class="hours-item"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
+                            <div class="hours-item"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
                         </div>
+                        <p class="pizza-note">🍕 Pizza ${lang === 'DE' ? 'ab 17:00 Uhr' : 'dalle ore 17:00'}</p>
                     </div>
                 </div>
             </div>
             
-            ${editMode ? `<div style="text-align:center; margin-top:20px;"><button class="btn-ctrl" onclick="editItem(0)">✎ Startseite bearbeiten</button></div>` : ''}
+            ${editMode ? `<div style="text-align:center; margin:20px;"><button class="btn-ctrl" onclick="editItem(0)">✎ Startseite bearbeiten</button></div>` : ''}
         `;
+        return; // Ende für Start-Tab
     } 
-    else {
-        // Layout für Pizzas (Grid) oder Rest (Liste)
-        area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
 
-        data[currentTab].forEach((item, idx) => {
-            if (currentTab === 'tv') {
-                area.innerHTML += `
+    // 2. ADMIN-KONSOLE FÜR ANDERE TABS
+    if (editMode) {
+        let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+        area.innerHTML += `
+            <div class="admin-panel admin-only" style="display: block; margin-bottom: 20px;">
+                <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
+                <div class="input-grid">
+                    <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+                    <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+                    <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
+                    <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
+                    <input type="text" id="inRight" placeholder="${label}">
+                </div>
+                <button onclick="addItem()" style="flex: 3; background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
+                  Eintrag speichern
+                </button>
+                <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
+                   Abbrechen
+                </button>
+            </div>
+        `;
+    }
+
+    if (!data[currentTab]) {
+        area.innerHTML = '<p>Lade Daten... / Caricamento...</p>';
+        return;
+    }
+
+    // 3. LAYOUT-UMSCHALTUNG UND LISTEN-RENDERING
+    area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
+
+    data[currentTab].forEach((item, idx) => {
+        if (currentTab === 'tv') {
+            // BRAUNES TV-SPORT LAYOUT
+            area.innerHTML += `
                 <div class="event-card">
                     <div class="event-date">${lang === 'DE' ? (item.descDE || 'Datum fehlt') : (item.descIT || 'Data mancante')}</div> 
                     <hr class="event-line">
@@ -693,8 +739,9 @@ if (currentTab === 'start') {
                     </div>
                     ${renderAdminButtons(idx)}
                 </div>`;
-            } else {
-                area.innerHTML += `
+        } else {
+            // STANDARD LAYOUT (Pizzas & Events)
+            area.innerHTML += `
                 <div class="entry">
                     ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
                     <div class="entry-content">
@@ -706,33 +753,15 @@ if (currentTab === 'start') {
                         ${renderAdminButtons(idx)}
                     </div>
                 </div>`;
-            }
-        });
-    }
-             else {
-                // STANDARD LAYOUT (Pizzas & Events)
-                area.innerHTML += `
-                    <div class="entry">
-                        ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
-                        <div class="entry-content">
-                            <div class="entry-header">
-                                <span>${lang === 'DE' ? item.nameDE : item.nameIT}</span>
-                                <span class="price">${item.right || ''}${currentTab === 'pizzas' ? ' €' : ''}</span>
-                            </div>
-                            <div class="desc">${lang === 'DE' ? item.descDE : item.descIT}</div>
-                            ${renderAdminButtons(idx)}
-                        </div>
-                    </div>`;
-            }
-        });
-    }
+        }
+    });
 }
 
- // Hilfsfunktion: Admin-Buttons (Pfeile, Edit, Löschen)
+// Hilfsfunktion für Admin-Buttons (muss außerhalb von render existieren)
 function renderAdminButtons(idx) {
     if (!editMode) return '';
     return `
-        <div class="btn-row admin-only" style="display: flex !important; gap: 5px; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px;">
+        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">
             <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
             <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
             <button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
@@ -917,6 +946,7 @@ function clearFields() {
 </script>
 </body>
 </html>
+
 
 
 
