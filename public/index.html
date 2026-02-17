@@ -342,6 +342,7 @@ header h1 {
 </footer>
 
 <script>
+    let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
     let data = { start: {}, pizzas: [], events: [], tv: [] };
     let currentTab = 'start';
     let lang = 'DE';
@@ -371,7 +372,7 @@ header h1 {
     window.scrollTo(0, 0); // Nach oben zum Formular springen
 }*/
 
-    function editItem(idx) {
+/*    function editItem(idx) {
     const list = data[currentTab];
     const item = list[idx];
 
@@ -395,6 +396,22 @@ header h1 {
     }, 50); // Kleiner Moment Pause für den Browser
 }
 
+*/
+
+ function editItem(idx) {
+    const item = data[currentTab][idx];
+    
+    document.getElementById('inNameDE').value = item.nameDE || "";
+    document.getElementById('inNameIT').value = item.nameIT || "";
+    document.getElementById('inDescDE').value = item.descDE || "";
+    document.getElementById('inDescIT').value = item.descIT || "";
+    document.getElementById('inRight').value = item.right || "";
+    if(document.getElementById('inImg')) document.getElementById('inImg').value = item.img || "";
+
+    editIndex = idx; // Position speichern!
+    document.getElementById('admin-title').innerText = "Eintrag bearbeiten (Position: " + (idx + 1) + ")";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}   
     
 
     
@@ -718,7 +735,7 @@ function renderAdminButtons(idx) {
         </div>`;
 }
 
-    async function addItem() {
+/*    async function addItem() {
     const newItem = {
         nameDE: document.getElementById('inNameDE').value,
         nameIT: document.getElementById('inNameIT').value,
@@ -740,8 +757,38 @@ function renderAdminButtons(idx) {
         alert("Erfolgreich gespeichert!");
         render();
     }
-}
+}*/
+async function addItem() {
+    const newItem = {
+        nameDE: document.getElementById('inNameDE').value,
+        nameIT: document.getElementById('inNameIT').value,
+        descDE: document.getElementById('inDescDE').value,
+        descIT: document.getElementById('inDescIT').value,
+        right: document.getElementById('inRight').value,
+        img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+    };
 
+    if (editIndex !== null) {
+        // Bearbeitung: Ersetze das Element am alten Platz
+        data[currentTab][editIndex] = newItem;
+        editIndex = null; // Reset
+    } else {
+        // Neu: Ans Ende schieben
+        data[currentTab].push(newItem);
+    }
+
+    // Speichern in MongoDB (wie bisher)
+    const res = await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        alert("Datenbank aktualisiert!");
+        render();
+    }
+}
 
     async function addItem() {
     const nDE = document.getElementById('inNameDE').value;
@@ -801,6 +848,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
