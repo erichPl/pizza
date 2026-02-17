@@ -22,9 +22,22 @@
             display: flex !important;
         }
         
-        :root { --red: #d32f2f; --dark: #1a1a1a; --light: #f4f4f4; --white: #ffffff; }
+       
+:root { 
+    --red: rgb(144, 41, 50); /* Dein neues dunkles Rot */
+    --dark: #1a1a1a; 
+    --light: #f4f4f4; 
+    --white: #ffffff; 
+}
+
+/* Stelle sicher, dass die Überschrift im Header keinen Schatten von alten Styles hat */
+header h1 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+        
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: var(--dark); padding-bottom: 180px; }
-        header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }
+        header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }        
         .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red); }
         h1 { margin: 0; font-size: 1.6rem; }
         .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000; }
@@ -261,12 +274,16 @@
     </style>
 </head>
 <body>
-
-<header>
-    <img src="logo.jpg" class="logo" alt="Logo">
-    <h1>Pizzeria Pub St. Sisinius</h1>
+    
+<header style="background-color: rgb(144, 41, 50); color: white; padding: 15px 20px; display: flex; align-items: center; border-bottom: none;">
+    <img src="logo.webp" class="logo" alt="Logo" style="width: 85px; height: 85px; border: 2px solid white;">
+    <div style="margin-left: 20px;">
+        <h1 style="margin: 0; font-size: 2.2rem; line-height: 1.1; color: white;">Pizzeria Pub St. Sisinius</h1>
+        <p style="margin: 5px 0 0 0; font-size: 1rem; opacity: 0.9; color: white; letter-spacing: 1px;">Laas - Vinschgau</p>
+    </div>
 </header>
 
+    
 <div class="nav-container">
     <div class="tabs">
         <button class="tab-btn active" id="tab-start" onclick="setTab('start')">Start</button>
@@ -778,6 +795,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
