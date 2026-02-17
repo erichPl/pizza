@@ -771,7 +771,7 @@ function renderAdminButtons(idx) {
         render();
     }
 }*/
-async function addItem() {
+/*async function addItem() {
     const newItem = {
         nameDE: document.getElementById('inNameDE').value,
         nameIT: document.getElementById('inNameIT').value,
@@ -801,7 +801,59 @@ async function addItem() {
         alert("Datenbank aktualisiert!");
         render();
     }
+}*/
+    async function addItem() {
+    // 1. Werte aus den Feldern holen
+    const newItem = {
+        nameDE: document.getElementById('inNameDE').value,
+        nameIT: document.getElementById('inNameIT').value,
+        descDE: document.getElementById('inDescDE').value,
+        descIT: document.getElementById('inDescIT').value,
+        right: document.getElementById('inRight').value,
+        img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+    };
+
+    // Sicherheitscheck: Falls Name leer ist
+    if (!newItem.nameDE && currentTab !== 'start') {
+        alert("Bitte Namen eingeben!");
+        return;
+    }
+
+    // 2. ENTSCHEIDUNG: Bearbeiten oder Neu?
+    if (editIndex !== null) {
+        // BEARBEITEN: Bestehenden Index überschreiben
+        data[currentTab][editIndex] = newItem;
+        console.log("Eintrag an Position " + editIndex + " bearbeitet.");
+        editIndex = null; // WICHTIG: Index nach Erfolg zurücksetzen!
+    } else {
+        // NEU: Nur wenn kein editIndex gesetzt ist, wird gepusht
+        if (currentTab === 'start') {
+            data.start = [newItem]; // Bei Start meist nur ein Eintrag
+        } else {
+            data[currentTab].push(newItem);
+            console.log("Neuer Eintrag am Ende hinzugefügt.");
+        }
+    }
+
+    // 3. SYNCHRONISATION MIT SERVER
+    try {
+        const res = await fetch('/api/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            // Felder leeren für nächsten Eintrag
+            clearFields();
+            alert("Erfolgreich gespeichert!");
+            render();
+        }
+    } catch (e) {
+        alert("Fehler beim Speichern!");
+    }
 }
+
 
     async function addItem() {
     const nDE = document.getElementById('inNameDE').value;
@@ -861,6 +913,7 @@ async function addItem() {
 </script>
 </body>
 </html>
+
 
 
 
