@@ -322,17 +322,23 @@ function render() {
         data[currentTab].forEach((item, idx) => {
             if (currentTab === 'tv') {
                 // BRAUNES TV-SPORT LAYOUT
-                area.innerHTML += `
+               if (currentTab === 'tv') {
+                // TV-SPORT LAYOUT (Braune Karte)
+                    area.innerHTML += `
                     <div class="event-card">
-                        <div class="event-date">${item.descIT || 'Datum fehlt'}</div> 
+                        <!-- Datum: schaltet jetzt korrekt um -->
+                        <div class="event-date">${lang === 'DE' ? (item.descDE || 'Datum fehlt') : (item.descIT || 'Data mancante')}</div> 
                         <hr class="event-line">
                         <div class="event-grid">
                             <div class="event-time">${item.right || ''}</div>
-                            <div class="event-teams">${item.nameDE || ''}</div>
-                            <div class="event-league">${item.descDE || ''}</div>
+                            <!-- Teams: schaltet jetzt korrekt um -->
+                            <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
+                            <!-- Liga: optionaler Zusatz (z.B. Serie A) -->
+                            <div class="event-league">LIVE</div>
                         </div>
                         ${renderAdminButtons(idx)}
                     </div>`;
+                 }
             } else {
                 // STANDARD LAYOUT (Pizzas & Events)
                 area.innerHTML += `
@@ -447,6 +453,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
