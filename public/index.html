@@ -339,13 +339,16 @@ function render() {
         `;
     }
 
+
+  
+
     if (!data[currentTab]) {
         area.innerHTML = '<p>Lade Daten... / Caricamento...</p>';
         return;
     }
 
     // 2. LOGIK FÜR STARTSEITE
-    if (currentTab === 'start') {
+/*    if (currentTab === 'start') {
         const s = data.start || { img: 'start.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
         area.innerHTML = `
             <div class="start-content" style="text-align: center; padding: 20px;">
@@ -354,7 +357,68 @@ function render() {
                 <p style="font-style: italic; color: #666;">Pizzeria Pub St. Sisinius</p>
             </div>
         `;
-    } 
+    } */
+if (currentTab === 'start') {
+    // Falls Daten vorhanden sind, nehmen wir den ersten Eintrag, sonst Standardwerte
+    const s = data.start[0] || { 
+        img: 'lokal.webp', 
+        nameDE: 'Willkommen', nameIT: 'Benvenuti', 
+        descDE: 'Frische Pizza...', descIT: 'Pizza autentica...' 
+    };
+
+    area.className = 'list-mode'; // Volle Breite
+    area.innerHTML = `
+        <!-- Hero Bereich -->
+        <div class="hero">
+            <img src="${s.img}" alt="Pizzeria Pub St. Sisinius" class="hero-image">
+            <div class="hero-overlay">
+                <h2>${lang === 'DE' ? s.nameDE : s.nameIT}</h2>
+                <p>${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza italiana autentica nel cuore di Lasa'}</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- About Sektion -->
+            <div class="about-section">
+                <div class="about-content">
+                    <img src="pizza.webp" alt="Pizza" class="about-image">
+                    <div class="about-text">
+                        <p>${lang === 'DE' ? s.descDE : s.descIT}</p>
+                        <p data-i18n="about.visit">${lang === 'DE' ? 'Wir freuen uns auf Ihren Besuch!' : 'Non vediamo l\'ora di darvi il benvenuto!'}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Sektion (Kontakt & Öffnungszeiten) -->
+            <div class="info-section-compact">
+                <div class="contact-card-large">
+                    <div class="contact-icon">📞</div>
+                    <h3 data-i18n="contact.title">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+                    <a href="tel:+393898334004" class="phone-number">+39 389 833 4004</a>
+                    <p class="contact-note">${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}</p>
+                </div>
+
+                <div class="hours-card-large">
+                    <div class="hours-icon">🕐</div>
+                    <h3 data-i18n="hours.title">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
+                    <div class="hours-list">
+                        <!-- Hier nutzen wir statische Texte oder du ziehst sie aus dem Footer-Code -->
+                        <div class="hours-item"><span>${lang === 'DE' ? 'Montag' : 'Lunedì'}</span> <span>${lang === 'DE' ? 'Geschlossen' : 'Chiuso'}</span></div>
+                        <div class="hours-item"><span>Di - Do / Mar - Gio</span> <span>16:00 – 00:00</span></div>
+                        <div class="hours-item"><span>Fr / Ven</span> <span>16:00 – 01:00</span></div>
+                        <div class="hours-item"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
+                        <div class="hours-item"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
+                    </div>
+                    <p class="pizza-note">🍕 Pizza ${lang === 'DE' ? 'ab 17:00 Uhr' : 'dalle ore 17:00'}</p>
+                </div>
+            </div>
+        </div>
+        
+        ${editMode ? `<button class="btn-ctrl" onclick="editItem(0)">✎ Startseite bearbeiten</button>` : ''}
+    `;
+    return; // Wichtig, damit die restliche Schleife nicht läuft
+}
+        
     // 3. LOGIK FÜR PIZZAS, EVENTS & TV
     else {
         // Layout-Umschaltung: Pizza = Grid (3 Spalten), Rest = List (1 Spalte)
@@ -494,6 +558,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
