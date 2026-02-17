@@ -158,9 +158,13 @@
 </div>-->
 
 <footer>
-    <div><strong>Pizzeria St. Sisinius</strong></div>
+    <div><strong>Pizzeria Pub St. Sisinius</strong></div>
+    <div id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</div>
     <div>Tel: <a href="tel:+393898334004" style="color:white; text-decoration:none;">+39 389 833 4004</a></div>
-    <div>Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00</div>
+    <!-- Diese ID nutzen wir für die Sprachumschaltung -->
+    <div id="footer-hours">
+        Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00
+    </div>
 </footer>
 
 <script>
@@ -277,6 +281,24 @@
         if(btnTV) btnTV.innerText = "Sport TV";
     }
         
+    // Footer-Elemente übersetzen
+    const footerHours = document.getElementById('footer-hours');
+    const footerAddress = document.getElementById('footer-address');
+
+    if (lang === 'DE') {
+        if (footerHours) {
+            footerHours.innerHTML = "Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00";
+        }
+        // Adresse (optional, falls "Vinschgaustraße" übersetzt werden soll)
+        if (footerAddress) footerAddress.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+    } else {
+        if (footerHours) {
+            footerHours.innerHTML = "Lunedì giorno di riposo<br>Mar-Gio: 16:00-00:00<br>Ven-Dom: 16:00-01:00";
+        }
+        if (footerAddress) footerAddress.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+    }
+
+
         
         document.getElementById('btn-de').classList.toggle('active', l==='DE');
         document.getElementById('btn-it').classList.toggle('active', l==='IT');
@@ -472,6 +494,7 @@ function renderAdminButtons(idx) {
 </script>
 </body>
 </html>
+
 
 
 
