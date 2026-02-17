@@ -502,122 +502,7 @@ function render() {
     if (!area) return;
     area.innerHTML = '';
 
-    // Admin-Klasse setzen
-    if (editMode) {
-        document.body.classList.add('admin-mode');
-    } else {
-        document.body.classList.remove('admin-mode');
-    }
-
-    // 1. ADMIN-KONSOLE (Eingabefelder oben)
-    if (editMode && currentTab !== 'start') {
-        let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
-        area.innerHTML += `
-            <div class="admin-panel admin-only" style="display: block; margin-bottom: 20px;">
-                <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
-                <div class="input-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
-                    <input type="text" id="inNameDE" placeholder="${currentTab === 'tv' ? 'Teams (Inter - Milan)' : 'Name/Titel (DE)'}">
-                    <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
-                    <input type="text" id="inDescDE" placeholder="${currentTab === 'tv' ? 'Liga (Serie A)' : 'Beschreibung (DE)'}">
-                    <input type="text" id="inDescIT" placeholder="${currentTab === 'tv' ? 'Datum (Sa, 15.02.)' : 'Descrizione (IT)'}">
-                    <input type="text" id="inRight" placeholder="${label}">
-                    <input type="text" id="inImg" placeholder="Bild-URL (.jpg) - nur für Pizza/Events" style="${currentTab === 'tv' ? 'display:none' : ''}">
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="()" style="flex: 3; background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Eintrag speichern</button>
-                    <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
-                </div>
-            </div>
-        `;
-    }
-
-
-  
-
-    if (!data[currentTab]) {
-        area.innerHTML = '<p>Lade Daten... / Caricamento...</p>';
-        return;
-    }
-
-    // 2. LOGIK FÜR STARTSEITE
-/*    if (currentTab === 'start') {
-        const s = data.start || { img: 'start.jpg', textDE: 'Willkommen', textIT: 'Benvenuti' };
-        area.innerHTML = `
-            <div class="start-content" style="text-align: center; padding: 20px;">
-                <img src="${s.img}" class="main-img" style="width:100%; max-width:600px; border-radius:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                <h1 style="margin-top:20px; color: #333;">${lang === 'DE' ? s.textDE : s.textIT}</h1>
-                <p style="font-style: italic; color: #666;">Pizzeria Pub St. Sisinius</p>
-            </div>
-        `;
-    } */
-/*if (currentTab === 'start') {
-    // Falls Daten vorhanden sind, nehmen wir den ersten Eintrag, sonst Standardwerte
-    const s = data.start[0] || { 
-        img: 'lokal.webp', 
-        nameDE: 'Willkommen', nameIT: 'Benvenuti', 
-        descDE: 'Frische Pizza...', descIT: 'Pizza autentica...' 
-    };
-
-    area.className = 'list-mode'; // Volle Breite
-    area.innerHTML = `
-        <!-- Hero Bereich -->
-        <div class="hero">
-            <img src="${s.img}" alt="Pizzeria Pub St. Sisinius" class="hero-image">
-            <div class="hero-overlay">
-                <h2>${lang === 'DE' ? s.nameDE : s.nameIT}</h2>
-                <p>${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza italiana autentica nel cuore di Lasa'}</p>
-            </div>
-        </div>
-
-        <div class="container">
-            <!-- About Sektion -->
-            <div class="about-section">
-                <div class="about-content">
-                    <img src="pizza.webp" alt="Pizza" class="about-image">
-                    <div class="about-text">
-                        <p>${lang === 'DE' ? s.descDE : s.descIT}</p>
-                        <p data-i18n="about.visit">${lang === 'DE' ? 'Wir freuen uns auf Ihren Besuch!' : 'Non vediamo l\'ora di darvi il benvenuto!'}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Info Sektion (Kontakt & Öffnungszeiten) -->
-            <div class="info-section-compact">
-                <div class="contact-card-large">
-                    <div class="contact-icon">📞</div>
-                    <h3 data-i18n="contact.title">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-                    <a href="tel:+393898334004" class="phone-number">+39 389 833 4004</a>
-                    <p class="contact-note">${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}</p>
-                </div>
-
-                <div class="hours-card-large">
-                    <div class="hours-icon">🕐</div>
-                    <h3 data-i18n="hours.title">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
-                    <div class="hours-list">
-                        <!-- Hier nutzen wir statische Texte oder du ziehst sie aus dem Footer-Code -->
-                        <div class="hours-item"><span>${lang === 'DE' ? 'Montag' : 'Lunedì'}</span> <span>${lang === 'DE' ? 'Geschlossen' : 'Chiuso'}</span></div>
-                        <div class="hours-item"><span>Di - Do / Mar - Gio</span> <span>16:00 – 00:00</span></div>
-                        <div class="hours-item"><span>Fr / Ven</span> <span>16:00 – 01:00</span></div>
-                        <div class="hours-item"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
-                        <div class="hours-item"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
-                    </div>
-                    <p class="pizza-note">🍕 Pizza ${lang === 'DE' ? 'ab 17:00 Uhr' : 'dalle ore 17:00'}</p>
-                </div>
-            </div>
-        </div>
-        
-        ${editMode ? `<button class="btn-ctrl" onclick="editItem(0)">✎ Startseite bearbeiten</button>` : ''}
-    `;
-    return; // Wichtig, damit die restliche Schleife nicht läuft
-}*/
-
-
-function render() {
-    const area = document.getElementById('content-area');
-    if (!area) return;
-    area.innerHTML = '';
-
-    // Modus-Prüfung: Setzt die Klasse für das CSS
+    // Admin-Modus Klasse am Body umschalten
     if (editMode) {
         document.body.classList.add('admin-mode');
     } else {
@@ -634,7 +519,6 @@ function render() {
         
         area.className = 'list-mode';
         area.innerHTML = `
-            <!-- Hero Bereich -->
             <div class="hero" style="height: 500px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
                 <img src="${s.img || 'lokal.webp'}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
                 <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
@@ -646,12 +530,9 @@ function render() {
                     </p>
                 </div>
             </div>
-
             <div class="container">
-                <!-- About Sektion (Bild links, Text rechts) -->
                 <div class="about-section" style="display: flex; align-items: center; gap: 30px; background: white; padding: 30px; border-radius: 15px; margin: 40px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <img src="pizza.webp" alt="Pizza" style="width: 300px; height: auto; border-radius: 10px; object-fit: cover;">
-                    
                     <div class="about-text" style="flex: 1; font-size: 1.1rem; line-height: 1.6; color: #333;">
                         ${lang === 'DE' ? `
                             <p>Genießen Sie frische Pizza in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
@@ -659,13 +540,11 @@ function render() {
                             <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>
                         ` : `
                             <p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizza italiana autentica con ingredienti freschi e molta attenzione ai dettagli.</p>
-                            <p>Godetevi le nostre deliziose pizze in un'atmosfera accogliente mentre seguite i più importantes eventi sportivi sui nostri schermi.</p>
+                            <p>Godetevi le nostre deliziose pizze in un'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>
                             <p><strong>Non vediamo l'ora di darvi il benvenuto!</strong></p>
                         `}
                     </div>
                 </div>
-
-                <!-- Info Sektion (Kontakt & Öffnungszeiten) -->
                 <div class="info-section-compact">
                     <div class="contact-card-large">
                         <div class="contact-icon">📞</div>
@@ -673,7 +552,6 @@ function render() {
                         <a href="tel:+393898334004" class="phone-number">+39 389 833 4004</a>
                         <p>${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}</p>
                     </div>
-
                     <div class="hours-card-large">
                         <div class="hours-icon">🕐</div>
                         <h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
@@ -684,17 +562,15 @@ function render() {
                             <div class="hours-item"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
                             <div class="hours-item"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
                         </div>
-                        <p class="pizza-note">🍕 Pizza ${lang === 'DE' ? 'ab 17:00 Uhr' : 'dalle ore 17:00'}</p>
                     </div>
                 </div>
             </div>
-            
             ${editMode ? `<div style="text-align:center; margin:20px;"><button class="btn-ctrl" onclick="editItem(0)">✎ Startseite bearbeiten</button></div>` : ''}
         `;
-        return; // Ende für Start-Tab
+        return; 
     } 
 
-    // 2. ADMIN-KONSOLE FÜR ANDERE TABS
+    // 2. ADMIN-KONSOLE
     if (editMode) {
         let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
         area.innerHTML += `
@@ -707,27 +583,22 @@ function render() {
                     <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
                     <input type="text" id="inRight" placeholder="${label}">
                 </div>
-                <button onclick="addItem()" style="flex: 3; background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
-                  Eintrag speichern
-                </button>
-                <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
-                   Abbrechen
-                </button>
+                <button onclick="addItem()" style="background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Eintrag speichern</button>
+                <button onclick="location.reload()" style="background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
             </div>
         `;
     }
 
     if (!data[currentTab]) {
-        area.innerHTML = '<p>Lade Daten... / Caricamento...</p>';
+        area.innerHTML = '<p>Lade Daten...</p>';
         return;
     }
 
-    // 3. LAYOUT-UMSCHALTUNG UND LISTEN-RENDERING
+    // 3. LISTEN RENDERING
     area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
 
     data[currentTab].forEach((item, idx) => {
         if (currentTab === 'tv') {
-            // BRAUNES TV-SPORT LAYOUT
             area.innerHTML += `
                 <div class="event-card">
                     <div class="event-date">${lang === 'DE' ? (item.descDE || 'Datum fehlt') : (item.descIT || 'Data mancante')}</div> 
@@ -737,10 +608,9 @@ function render() {
                         <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
                         <div class="event-league">LIVE</div>
                     </div>
-                    ${renderAdminButtons(idx)}
+                    ${getAdminButtonsHtml(idx)}
                 </div>`;
         } else {
-            // STANDARD LAYOUT (Pizzas & Events)
             area.innerHTML += `
                 <div class="entry">
                     ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
@@ -750,15 +620,15 @@ function render() {
                             <span class="price">${item.right || ''}${currentTab === 'pizzas' ? ' €' : ''}</span>
                         </div>
                         <div class="desc">${lang === 'DE' ? item.descDE : item.descIT}</div>
-                        ${renderAdminButtons(idx)}
+                        ${getAdminButtonsHtml(idx)}
                     </div>
                 </div>`;
         }
     });
 }
 
-// Hilfsfunktion für Admin-Buttons (muss außerhalb von render existieren)
-function renderAdminButtons(idx) {
+// HILFSFUNKTION (Benannt!)
+function getAdminButtonsHtml(idx) {
     if (!editMode) return '';
     return `
         <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">
@@ -768,7 +638,6 @@ function renderAdminButtons(idx) {
             <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
         </div>`;
 }
-
 /*    async function () {
     const newItem = {
         nameDE: document.getElementById('inNameDE').value,
@@ -946,6 +815,7 @@ function clearFields() {
 </script>
 </body>
 </html>
+
 
 
 
