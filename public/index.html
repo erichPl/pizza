@@ -5,6 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzeria Pub St. Sisinius</title>
     <style>
+	
+	footer { 
+    position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
+    width: 100%; 
+    background: #1a1a1a; 
+    color: white; 
+    padding: 30px 0; 
+    border-top: 4px solid var(--red); 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; 
+    text-align: center; 
+    font-size: 0.85rem; 
+    line-height: 1.2 !important; /* Hier wird der Abstand eng gemacht */
+}
+
+.footer-section {
+    display: block !important; /* Verhindert den flex-Abstand (gap) */
+    margin-bottom: 10px;
+}
+
+.footer-section strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--white);
+}
+
+.footer-section a, 
+.footer-section span {
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important; /* Garantiert den engen Abstand wie bei der Adresse */
+}
+
+footer a:hover {
+    color: var(--red);
+    text-decoration: underline;
+}
+	
+	
     /* Nur die Admin-Elemente standardmäßig ausblenden */
         .admin-only, .btn-ctrl, .admin-panel { 
             display: none !important; 
@@ -64,9 +107,7 @@ header h1 {
         .admin-panel input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
         .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
         .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
-        footer { position: fixed; bottom: 0; width: 100%; background: #1a1a1a; color: white; padding: 20px 0; border-top: 4px solid var(--red); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; font-size: 0.85rem; }
-    
-    
+       
     /* Rahmen für das gesamte Event */
 .event-card {
     border: 2px solid #8B4513;
@@ -255,25 +296,6 @@ header h1 {
     .hero-overlay h2 { font-size: 1.8rem; }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
     </style>
 </head>
 <body>
@@ -333,12 +355,22 @@ header h1 {
 </div>-->
 
 <footer>
-    <div><strong>Pizzeria Pub St. Sisinius</strong></div>
-    <div id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</div>
-    <div>Tel: <a href="tel:+393898334004" style="color:white; text-decoration:none;">+39 389 833 4004</a></div>
-    <!-- Diese ID nutzen wir für die Sprachumschaltung -->
-    <div id="footer-hours">
-        Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00
+    <div class="footer-section">
+        <strong>Pizzeria Pub St. Sisinius</strong>
+        Vinschgaustraße 74, 39023 Laas (BZ)<br>
+        Südtirol, Italien
+    </div>
+    
+    <div class="footer-section">
+        <strong>Kontakt</strong>
+        <a href="tel:+393898334004">Tel: +39 389 833 4004</a>
+        <span style="opacity: 0.8; font-size: 0.8rem;">P.IVA / MwSt.-Nr.: IT00000000000</span>
+    </div>
+
+    <div class="footer-section">
+        <strong>Rechtliches</strong>
+        <a href="impressum.html">Impressum / Note Legali</a>
+        <a href="datenschutz.html">Datenschutz / Privacy</a>
     </div>
 </footer>
 
@@ -520,8 +552,9 @@ function render() {
         area.className = 'list-mode';
         area.innerHTML = `
             <div class="hero" style="height: 500px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
-                <img src="${s.img || 'lokal.webp'}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
-                <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
+                <!--<img src="${s.img || 'lokal.webp'}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">-->
+                <img src="lokal.webp" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+				<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
                     <h2 style="font-size: 3rem; margin-bottom: 10px; text-transform: none;">
                         ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
                     </h2>
@@ -815,45 +848,4 @@ function clearFields() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
