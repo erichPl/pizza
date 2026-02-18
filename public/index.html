@@ -217,16 +217,19 @@ h1, h2, h3, p {
 }
 
 /* ABOUT SECTION (Bild & Text) */
+/* Grundstruktur (Handy & PC) */
 .about-section {
+    display: flex;
+    flex-direction: column; /* Handy: Untereinander */
+    align-items: center;
+    gap: 30px;
     background: white;
     padding: 30px;
     border-radius: 15px;
     margin: 40px 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: row; /* Standard für PC: Nebeneinander */
-    align-items: center;
-    gap: 30px;
+    box-sizing: border-box;
+    width: 100%; /* Bleibt innerhalb des Containers */
 }
 
 
@@ -239,12 +242,23 @@ h1, h2, h3, p {
     align-items: center;
 }
 
+.about-image {
+    width: 100%;
+    max-width: 400px; /* Begrenzt das Bild am PC */
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0; /* WICHTIG: Bild darf nicht gestaucht werden */
+}
+
 .about-text {
-    flex: 1;
+    flex: 1; /* Nimmt den restlichen Platz ein, ohne zu drängeln */
     font-size: 1.1rem;
     line-height: 1.6;
     color: #333;
+    min-width: 0; /* Verhindert das Rausragen bei langem Text */
 }
+
 
 .about-text p {
     font-size: 1.1rem;
@@ -307,31 +321,49 @@ h1, h2, h3, p {
 }
 
 /* RESPONSIVE */
+@/* --- EINZIGER REPSONSIVE-BLOCK FÜR DAS HANDY (max-width: 850px) --- */
 @media (max-width: 850px) {
-    .about-content, .info-section-compact {
-        grid-template-columns: 1fr;
+    /* 1. Verhindert seitliches Scrollen am Smartphone */
+    .container { 
+        width: 95% !important; 
+        max-width: 100% !important;
+        padding: 0 !important; 
     }
-    .hero { height: 300px; }
-    .hero-overlay h2 { font-size: 1.8rem; }
-}
-
-
-
-/* NUR DIESE ERGÄNZUNGEN FÜR DAS HANDY */
-
-@media (max-width: 850px) {
-    /* 1. Verhindert das seitliche Scrollen */
-    .container { width: 95% !important; padding: 0 !important; }
 
     /* 2. Stapelt Bild und Text in der About-Sektion untereinander */
-    /* HANDY-KORREKTUR */
-@media (max-width: 850px) {
-    .about-section {
-        flex-direction: column !important; /* Untereinander auf dem Handy */
-        text-align: center;
-        padding: 20px;
-        gap: 20px;
+    .about-section { 
+        flex-direction: column !important; 
+        padding: 20px !important;
+        text-align: center !important;
+        gap: 20px !important;
     }
+
+    /* 3. Verhindert, dass das Pizza-Bild am PC/Handy zu breit wird */
+    .about-image { 
+        width: 100% !important; 
+        max-width: 350px !important; 
+        height: auto !important; 
+    }
+
+    /* 4. Verkleinert die riesige Überschrift "Willkommen..." */
+    .hero-overlay h2 { 
+        font-size: 1.8rem !important; 
+        line-height: 1.2 !important;
+        word-wrap: break-word !important;
+    }
+    .hero-overlay p { font-size: 1.1rem !important; }
+
+    /* 5. Stapelt Kontakt und Öffnungszeiten untereinander */
+    .info-section-compact { 
+        grid-template-columns: 1fr !important; 
+    }
+
+    /* 6. TV-Events einspaltig machen */
+    .event-grid { 
+        grid-template-columns: 1fr !important; 
+        text-align: center !important;
+    }
+}
     .about-image {
         width: 100% !important; /* Volle Breite auf dem Handy */
         max-width: 400px;
