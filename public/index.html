@@ -79,7 +79,7 @@ header h1 {
 }
 
         
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light); color: var(--dark); padding-bottom: 180px; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);}
         header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }        
         .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red); }
         h1 { margin: 0; font-size: 1.6rem; }
@@ -375,6 +375,7 @@ header h1 {
 </footer>
 
 <script>
+    
     let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
     let data = { start: {}, pizzas: [], events: [], tv: [] };
     let currentTab = 'start';
@@ -383,53 +384,47 @@ header h1 {
     if(editMode) document.body.classList.add('admin-mode');
 
 
-  /* function editItem(index) {
-    let list;
-    if (currentTab === 'pizzas') list = data.pizzas;
-    else if (currentTab === 'events') list = data.events;
-    else if (currentTab === 'tv') list = data.tv;
-
-    const item = list[index];
-
-    // Felder befüllen
-    document.getElementById('inNameDE').value = item.nameDE || item.titleDE || "";
-    document.getElementById('inNameIT').value = item.nameIT || item.titleIT || "";
-    document.getElementById('inDescDE').value = item.descDE || "";
-    document.getElementById('inDescIT').value = item.descIT || "";
-    document.getElementById('inRight').value = item.right || item.price || "";
-
-    // Das alte Item aus der Liste entfernen (wird beim Speichern neu hinzugefügt)
-    list.splice(index, 1);
-    
-    render();
-    window.scrollTo(0, 0); // Nach oben zum Formular springen
-}*/
-
-/*    function editItem(idx) {
-    const list = data[currentTab];
-    const item = list[idx];
-
-    // 1. Erst das Item entfernen
-    list.splice(idx, 1);
-    
-    // 2. Die Seite neu zeichnen (das erstellt die Eingabefelder frisch)
-    render();
-
-    // 3. JETZT erst die Daten in die frisch gezeichneten Felder schreiben
-    setTimeout(() => {
-        document.getElementById('inNameDE').value = item.nameDE || "";
-        document.getElementById('inNameIT').value = item.nameIT || "";
-        document.getElementById('inDescDE').value = item.descDE || "";
-        document.getElementById('inDescIT').value = item.descIT || "";
-        document.getElementById('inRight').value = item.right || "";
-        if(document.getElementById('inImg')) document.getElementById('inImg').value = item.img || "";
-        
-        // Sanft nach oben scrollen
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 50); // Kleiner Moment Pause für den Browser
+  // ZEILE LÖSCHEN
+function deleteTime(index) {
+    if (confirm("Möchten Sie diese Öffnungszeit wirklich löschen?")) {
+        // Entfernt das Element an der Position 'index'
+        data.start.zeiten.splice(index, 1);
+        saveHoursToDB(data.start.zeiten);
+    }
 }
 
-*/
+// ZEILE VERSCHIEBEN (Richtung: -1 für hoch, 1 für runter)
+function moveTime(index, direction) {
+    const arr = data.start.zeiten;
+    const newIndex = index + direction;
+
+    // Prüfen, ob Verschieben möglich ist (nicht über die Grenzen hinaus)
+    if (newIndex >= 0 && newIndex < arr.length) {
+        // Tauscht die beiden Elemente im Array aus
+        const temp = arr[index];
+        arr[index] = arr[newIndex];
+        arr[newIndex] = temp;
+        
+        saveHoursToDB(arr);
+    }
+}
+
+// EINZELNE ZEILE BEARBEITEN (✎)
+function editSingleTime(index) {
+    const item = data.start.zeiten[index];
+    const neuerTag = prompt("Tag ändern:", item.tag);
+    const neueZeit = prompt("Zeit ändern:", item.zeit);
+    
+    if (neuerTag !== null && neueZeit !== null) {
+        data.start.zeiten[index] = { tag: neuerTag, zeit: neueZeit };
+        saveHoursToDB(data.start.zeiten);
+    }
+}
+  
+  
+  
+  
+  
 
  function editItem(idx) {
     const item = data[currentTab][idx];
@@ -450,7 +445,7 @@ header h1 {
     
     async function load() {
     try {
-        const res = await fetch('/api/data');
+        const res = await fetch('/api/data?pw=leon2208');
         const fetchedData = await res.json();
         
         // Sicherstellen, dass 'data' immer die richtige Struktur hat
@@ -471,7 +466,7 @@ header h1 {
     async function save() {
         // Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
         if (currentTab === 'start') return; 
-        await fetch('/api/data', {
+        await fetch('/api/data?pw=leon2208', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -550,9 +545,9 @@ function render() {
         };
         
         area.className = 'list-mode';
-        area.innerHTML = `
+      
+		area.innerHTML = `
             <div class="hero" style="height: 500px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
-                <!--<img src="${s.img || 'lokal.webp'}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">-->
                 <img src="lokal.webp" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
 				<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
                     <h2 style="font-size: 3rem; margin-bottom: 10px; text-transform: none;">
@@ -567,16 +562,16 @@ function render() {
                 <div class="about-section" style="display: flex; align-items: center; gap: 30px; background: white; padding: 30px; border-radius: 15px; margin: 40px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     <img src="pizza.webp" alt="Pizza" style="width: 300px; height: auto; border-radius: 10px; object-fit: cover;">
                     <div class="about-text" style="flex: 1; font-size: 1.1rem; line-height: 1.6; color: #333;">
-                        ${lang === 'DE' ? `
-                            <p>Genießen Sie frische Pizza in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
-                            <p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live‑Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und bieten verschiedene Events und Specials für noch mehr Abwechslung in der Pizzeria St. Sisinius.</p>
-                            <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>
-                        ` : `
-                            <p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizza italiana autentica con ingredienti freschi e molta attenzione ai dettagli.</p>
-                            <p>Godetevi le nostre deliziose pizze in un'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>
-                            <p><strong>Non vediamo l'ora di darvi il benvenuto!</strong></p>
-                        `}
-                    </div>
+						${lang === 'DE' ? 
+							'<p>Genießen Sie frische Pizza in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
+							'<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live‑Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und bieten verschiedene Events und Specials für noch mehr Abwechslung in der Pizzeria St. Sisinius.</p>' +
+							'<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
+							: 
+							'<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizza italiana autentica con ingredienti freschi e molta attenzione ai dettagli.</p>' +
+							'<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
+							'<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
+						}
+					</div>
                 </div>
                 <div class="info-section-compact">
                     <div class="contact-card-large">
@@ -588,26 +583,52 @@ function render() {
                     <div class="hours-card-large">
                         <div class="hours-icon">🕐</div>
                         <h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
-                        <div class="hours-list">
+                        
+						<div class="hours-list">
+							${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
+								data.start.zeiten.map((z, idx) => `
+									<div class="hours-item">
+										<span>${z.tag}</span> 
+										<span>${z.zeit}</span>
+										${editMode ? `
+											<div class="admin-btns-row">
+												<button onclick="moveTime(${idx}, -1)">↑</button>
+												<button onclick="moveTime(${idx}, 1)">↓</button>
+                                                <button onclick="editSingleTime(${idx})" title="Bearbeiten">✎</button>
+												<button onclick="deleteTime(${idx})">X</button>
+											</div>` : ''}
+									</div>
+								`).join('') 
+								: '<p>Keine Öffnungszeiten hinterlegt. Bitte im Admin-Modus hinzufügen.</p>'
+							}
+						</div>
+						
+						<!--<div class="hours-list">
                             <div class="hours-item"><span>${lang === 'DE' ? 'Montag' : 'Lunedì'}</span> <span>${lang === 'DE' ? 'Geschlossen' : 'Chiuso'}</span></div>
                             <div class="hours-item"><span>Di - Do / Mar - Gio</span> <span>16:00 – 00:00</span></div>
                             <div class="hours-item"><span>Fr / Ven</span> <span>16:00 – 01:00</span></div>
                             <div class="hours-item"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
                             <div class="hours-item"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
             </div>
-            ${editMode ? `<div style="text-align:center; margin:20px;"><button class="btn-ctrl" onclick="editItem(0)">✎ Startseite bearbeiten</button></div>` : ''}
+            
+			 ${editMode ? `
+                <div style="text-align:center; margin:20px;">
+                    <button class="btn-ctrl" onclick="addTimeRow()" style="background-color: var(--red); color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        + Neue Öffnungszeit hinzufügen
+                    </button>
+                </div>` : ''}
         `;
-        return; 
-    } 
+        return;
+    }
 
-    // 2. ADMIN-KONSOLE
+     // 2. ADMIN-KONSOLE
     if (editMode) {
         let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
         area.innerHTML += `
-            <div class="admin-panel admin-only" style="display: block; margin-bottom: 20px;">
+            <div class="admin-panel" style="display: block; margin-bottom: 20px;">
                 <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
                 <div class="input-grid">
                     <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
@@ -660,6 +681,7 @@ function render() {
     });
 }
 
+
 // HILFSFUNKTION (Benannt!)
 function getAdminButtonsHtml(idx) {
     if (!editMode) return '';
@@ -671,60 +693,57 @@ function getAdminButtonsHtml(idx) {
             <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
         </div>`;
 }
-/*    async function () {
-    const newItem = {
-        nameDE: document.getElementById('inNameDE').value,
-        nameIT: document.getElementById('inNameIT').value,
-        descDE: document.getElementById('inDescDE').value,
-        descIT: document.getElementById('inDescIT').value,
-        right: document.getElementById('inRight').value,
-        img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+
+// 1. Neue Zeile hinzufügen
+function addTimeRow() {
+    const tag = prompt("Wochentag (z.B. Di - So):");
+    const zeit = prompt("Uhrzeit (z.B. 17:00 - 23:00):");
+    
+    if (tag && zeit) {
+        // Sicherstellen, dass die Struktur existiert
+        if (!data.start) data.start = {};
+        if (!Array.isArray(data.start.zeiten)) data.start.zeiten = [];
+        
+        // Neue Zeile zum Array hinzufügen
+        data.start.zeiten.push({ tag: tag, zeit: zeit });
+        
+        // Ab zum Server (Südtirol MongoDB)
+        saveHoursToDB(data.start.zeiten);
+    }
+}
+
+ 
+
+// 2. In MongoDB speichern
+async function saveHoursToDB(newArray) {
+    const updatedData = {
+        ...data,
+        type: "main_data",
+        start: { 
+            ...data.start, 
+            zeiten: newArray 
+        }
     };
 
-    data[currentTab].push(newItem);
+    try {
+        const response = await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData)
+        });
 
-    const res = await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-        alert("Erfolgreich gespeichert!");
-        render();
+        if (response.ok) {
+            location.reload(); // Seite in Laas neu laden
+        } else {
+            alert("Fehler beim Speichern! Status: " + response.status);
+        }
+    } catch (e) {
+        console.error("Netzwerkfehler:", e);
     }
-}*/
-/*async function () {
-    const newItem = {
-        nameDE: document.getElementById('inNameDE').value,
-        nameIT: document.getElementById('inNameIT').value,
-        descDE: document.getElementById('inDescDE').value,
-        descIT: document.getElementById('inDescIT').value,
-        right: document.getElementById('inRight').value,
-        img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
-    };
+}
 
-    if (editIndex !== null) {
-        // Bearbeitung: Ersetze das Element am alten Platz
-        data[currentTab][editIndex] = newItem;
-        editIndex = null; // Reset
-    } else {
-        // Neu: Ans Ende schieben
-        data[currentTab].push(newItem);
-    }
 
-    // Speichern in MongoDB (wie bisher)
-    const res = await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
 
-    if (res.ok) {
-        alert("Datenbank aktualisiert!");
-        render();
-    }
-}*/
     async function addItem() {
     // 1. Werte aus den Feldern holen
     const newItem = {
@@ -760,7 +779,7 @@ function getAdminButtonsHtml(idx) {
 
     // 3. SYNCHRONISATION MIT SERVER
     try {
-        const res = await fetch('/api/data', {
+        const res = await fetch('/api/data?pw=leon2208', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -777,41 +796,46 @@ function getAdminButtonsHtml(idx) {
     }
 }
 
+async function editStartInfo() {
+    // 1. Neue Zeiten vom User abfragen
+    const neueZeiten = prompt("Geben Sie die neuen Öffnungszeiten ein (z.B. Di-Do 16:00-00:00, Fr-Sa...):");
+    
+    if (neueZeiten) {
+        // 2. Das komplette Datenobjekt vorbereiten (muss zu deiner MongoDB Struktur passen)
+        const updatedData = {
+            ...data, // Behält alle bestehenden Daten (Pizzas, TV etc.) bei
+            type: "main_data",
+            start: {
+                ...data.start,
+                oeffnungszeiten: neueZeiten // Hier wird der neue Wert gesetzt
+            }
+        };
+
+        // 3. An deine bestehende API senden (Passwort in der URL wegen deiner Route)
+        try {
+            const response = await fetch('/api/data?pw=leon2208', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (response.ok) {
+                alert("Öffnungszeiten aktualisiert!");
+                location.reload();
+            } else {
+                alert("Fehler beim Speichern. Passwort korrekt?");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Verbindung zum Server fehlgeschlagen.");
+        }
+    }
+}
+
 
 
     
-   /* async function addItem() {
-    const nDE = document.getElementById('inNameDE').value;
-    const nIT = document.getElementById('inNameIT').value;
-    const dDE = document.getElementById('inDescDE').value;
-    const dIT = document.getElementById('inDescIT').value;
-    const pri = document.getElementById('inRight').value;
-    const img = document.getElementById('inImg') ? document.getElementById('inImg').value : "";
 
-    // WICHTIG: Die Namen links müssen exakt so heißen wie in deiner render() Schleife!
-    const newItem = {
-        nameDE: nDE,
-        nameIT: nIT,
-        descDE: dDE,
-        descIT: dIT,
-        right: pri,
-        img: img
-    };
-
-    data[currentTab].push(newItem);
-
-    // Ab an den Server (Render)
-    const res = await fetch('/api/data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-        alert("Pizza erfolgreich aktualisiert!");
-        render();
-    }
-}*/
     
 // Hilfsfunktion zum Leeren der Felder
 function clearFields() {
@@ -848,5 +872,15 @@ function clearFields() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
