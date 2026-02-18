@@ -379,7 +379,7 @@ header h1 {
     let data = { start: {}, pizzas: [], events: [], tv: [] };
     let currentTab = 'start';
     let lang = 'DE';
-    const editMode = new URLSearchParams(window.location.search).get('edit') === 'true';
+    const editMode = new URLSearchParams(window.location.search).get('pw') === 'leon2208';
     if(editMode) document.body.classList.add('admin-mode');
 
 
@@ -848,4 +848,5 @@ function clearFields() {
 </script>
 </body>
 </html>
+
 
