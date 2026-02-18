@@ -85,6 +85,14 @@ header h1 {
 			padding: 0; 
 		}
 
+/* Verhindert, dass lange Wörter (wie Willkommen) am Handy rauswandern */
+h1, h2, h3, p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);}
         header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }        
         .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red); }
@@ -96,7 +104,7 @@ header h1 {
         .lang-switch { display: flex; gap: 5px; }
         .lang-btn { background: #444; border: 1px solid #666; color: white; padding: 4px 10px; cursor: pointer; border-radius: 3px; }
         .lang-btn.active { background: var(--red); border-color: var(--red); }
-        .container { max-width: 1100px; margin: 20px auto; padding: 0 15px; }
+    
         #content-area { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 850px) { #content-area.grid-mode { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 850px) { #content-area.list-mode { grid-template-columns: 1fr; /* Nur eine Spalte = volle Breite */} }
