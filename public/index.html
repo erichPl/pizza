@@ -320,17 +320,17 @@ h1, h2, h3, p {
     font-weight: bold;
 }
 
-/* RESPONSIVE */
-@/* --- EINZIGER REPSONSIVE-BLOCK FÜR DAS HANDY (max-width: 850px) --- */
+/* --- EINZIGER RESPONSIVE-BLOCK FÜR DAS HANDY (max-width: 850px) --- */
 @media (max-width: 850px) {
-    /* 1. Verhindert seitliches Scrollen am Smartphone */
+    /* 1. Container-Breite korrigieren */
     .container { 
         width: 95% !important; 
         max-width: 100% !important;
         padding: 0 !important; 
+        margin: 10px auto !important;
     }
 
-    /* 2. Stapelt Bild und Text in der About-Sektion untereinander */
+    /* 2. Startseite: Bild und Text untereinander */
     .about-section { 
         flex-direction: column !important; 
         padding: 20px !important;
@@ -338,55 +338,46 @@ h1, h2, h3, p {
         gap: 20px !important;
     }
 
-    /* 3. Verhindert, dass das Pizza-Bild am PC/Handy zu breit wird */
+    /* 3. Pizza-Bild Größe begrenzen */
     .about-image { 
         width: 100% !important; 
         max-width: 350px !important; 
         height: auto !important; 
     }
 
-    /* 4. Verkleinert die riesige Überschrift "Willkommen..." */
-    .hero-overlay h2 { 
-        font-size: 1.8rem !important; 
-        line-height: 1.2 !important;
-        word-wrap: break-word !important;
+    /* 4. FIX für die Überschrift "Willkommen..." */
+    .hero-overlay {
+        width: 90% !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
     }
-    .hero-overlay p { font-size: 1.1rem !important; }
 
-    /* 5. Stapelt Kontakt und Öffnungszeiten untereinander */
+    .hero-overlay h2 { 
+        font-size: 1.6rem !important; /* Deutlich kleiner */
+        line-height: 1.2 !important;
+        white-space: normal !important; /* Erlaubt Umbruch */
+        overflow-wrap: break-word !important; 
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    .hero-overlay p { 
+        font-size: 1.0rem !important; 
+        white-space: normal !important;
+    }
+
+    /* 5. Kontakt & Öffnungszeiten untereinander */
     .info-section-compact { 
         grid-template-columns: 1fr !important; 
+        display: grid !important;
     }
 
-    /* 6. TV-Events einspaltig machen */
+    /* 6. TV-Events einspaltig */
     .event-grid { 
         grid-template-columns: 1fr !important; 
         text-align: center !important;
     }
-}
-    .about-image {
-        width: 100% !important; /* Volle Breite auf dem Handy */
-        max-width: 400px;
-    }
-}
-
-    /* 4. Stapelt Kontakt und Öffnungszeiten untereinander */
-    .info-section-compact { 
-        grid-template-columns: 1fr !important; 
-    }
-
-    /* 5. Verkleinert die riesige Überschrift nur auf dem Handy etwas */
-    .hero-overlay h2 { font-size: 2.2rem !important; }
-    .hero-overlay p { font-size: 1.2rem !important; }
-
-    /* 6. Fix für TV-Events: Teams untereinander wenn es zu eng wird */
-    .event-grid { 
-        grid-template-columns: 1fr !important; 
-        text-align: center;
-    }
-}
-
-
+} /* <--- Nur hier darf die finale Klammer für @media stehen! */
 
 
 
