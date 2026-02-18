@@ -6,6 +6,60 @@
     <title>Pizzeria Pub St. Sisinius</title>
     <style>
 	
+	/* Grunddesign für den Header */
+.main-header {
+    background-color: rgb(144, 41, 50);
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: none;
+}
+
+.main-header .logo {
+    width: 70px; /* Etwas kleiner für mehr Platz */
+    height: 70px;
+    border: 2px solid white;
+    object-fit: cover;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.header-text {
+    margin-left: 15px;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: white;
+    /* WICHTIG: Kein white-space: nowrap mehr! */
+    white-space: normal !important; 
+    overflow-wrap: break-word;
+}
+
+.header-text p {
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    letter-spacing: 1px;
+}
+
+/* HANDY-SPEZIALKORREKTUR */
+@media (max-width: 600px) {
+    .header-text h1 {
+        font-size: 1.2rem !important; /* Kleinerer Text auf dem Handy */
+    }
+    .main-header .logo {
+        width: 55px; /* Kleineres Logo spart Platz */
+        height: 55px;
+    }
+}
+	
+	
+	
+	
 	footer { 
     position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
     width: 100%; 
@@ -378,16 +432,11 @@ h1, h2, h3, p {
 </head>
 <body>
     
-<header style="background-color: rgb(144, 41, 50); color: white; padding: 15px 20px; display: flex; align-items: center; border-bottom: none;">
-    <!-- LOGO hier (oben im roten Balken) -->
-    <img src="logo.webp" class="logo" alt="Logo" style="width: 85px; height: 85px; border: 2px solid white; object-fit: cover; border-radius: 50%;">
-    <div style="margin-left: 20px;">
-        <h1 style="margin: 0; font-size: 1.8rem; line-height: 1.1; color: white; white-space: nowrap;">
-            Willkommen bei Pizzeria Pub St. Sisinius
-        </h1>
-        <p style="margin: 5px 0 0 0; font-size: 1rem; opacity: 0.9; color: white; letter-spacing: 1px;">
-            Laas - Vinschgau
-        </p>
+<header class="main-header">
+    <img src="logo.webp" class="logo" alt="Logo">
+    <div class="header-text">
+        <h1>Willkommen bei Pizzeria Pub St. Sisinius</h1>
+        <p>Laas - Vinschgau</p>
     </div>
 </header>
     
