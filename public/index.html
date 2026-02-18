@@ -274,11 +274,10 @@ h1, h2, h3, p {
     line-height: 1.2;
 }
 
-/* ABOUT SECTION (Bild & Text) */
-/* Grundstruktur (Handy & PC) */
+/* --- ABOUT SECTION (Bild & Text) --- */
 .about-section {
     display: flex;
-    flex-direction: column; /* Handy: Untereinander */
+    flex-direction: column; /* Standard für Handy: Untereinander */
     align-items: center;
     gap: 30px;
     background: white;
@@ -287,62 +286,50 @@ h1, h2, h3, p {
     margin: 40px 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     box-sizing: border-box;
-    width: 100%; /* Bleibt innerhalb des Containers */
-}
-
-/* PC-Anpassung: Ab 850px Breite nebeneinander */
-@media (min-width: 850px) {
-    .about-section {
-        flex-direction: row !important; /* Bild links, Text rechts */
-        align-items: flex-start;       /* Oben bündig ausrichten */
-        text-align: left;              /* Text linksbündig */
-    }
-
-    .about-image {
-        width: 300px !important;       /* Feste Breite für das Bild am PC */
-        flex-shrink: 0;                /* Verhindert, dass das Bild gequetscht wird */
-    }
-
-    .about-text {
-        flex: 1;                       /* Text nimmt den restlichen Platz rechts ein */
-    }
-}
-
-
-
-        
-.about-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: center;
+    width: 100%;
 }
 
 .about-image {
     width: 100%;
-    max-width: 400px; /* Begrenzt das Bild am PC */
+    max-width: 300px;
     height: auto;
     border-radius: 10px;
     object-fit: cover;
-    flex-shrink: 0; /* WICHTIG: Bild darf nicht gestaucht werden */
+    flex-shrink: 0;
 }
 
 .about-text {
-    flex: 1; /* Nimmt den restlichen Platz ein, ohne zu drängeln */
-    font-size: 1.1rem;
-    line-height: 1.6;
+    flex: 1;
     color: #333;
-    min-width: 0; /* Verhindert das Rausragen bei langem Text */
+    text-align: center; /* Handy: Zentriert */
 }
 
+/* WICHTIG: Entfernt den Abstand oberhalb des ersten Absatzes */
+.about-text p:first-child {
+    margin-top: 0 !important;
+}
 
 .about-text p {
     font-size: 1.1rem;
-    line-height: 1.8;
-    color: #444;
+    line-height: 1.6;
+    margin-bottom: 15px;
 }
 
-/* INFO CARDS (Kontakt & Öffnungszeiten) */
+/* PC-ANPASSUNG (Ab 850px) */
+@media (min-width: 850px) {
+    .about-section {
+        flex-direction: row !important; /* Bild links, Text rechts */
+        align-items: flex-start !important; /* Text beginnt ganz oben bündig mit Bild */
+        text-align: left !important;
+    }
+
+    .about-text {
+        text-align: left !important;
+        padding-top: 0 !important;
+    }
+}
+
+/* --- INFO CARDS (Kontakt & Öffnungszeiten) --- */
 .info-section-compact {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
@@ -387,14 +374,6 @@ h1, h2, h3, p {
 }
 
 .hours-item:last-child { border-bottom: none; }
-
-.pizza-note {
-    background: #fff0f0;
-    padding: 10px;
-    border-radius: 5px;
-    color: var(--red);
-    font-weight: bold;
-}
 
 /* --- FINALE HANDY-ANPASSUNG (max-width: 850px) --- */
 @media (max-width: 850px) {
