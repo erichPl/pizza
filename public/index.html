@@ -290,6 +290,24 @@ h1, h2, h3, p {
     width: 100%; /* Bleibt innerhalb des Containers */
 }
 
+/* PC-Anpassung: Ab 850px Breite nebeneinander */
+@media (min-width: 850px) {
+    .about-section {
+        flex-direction: row !important; /* Bild links, Text rechts */
+        align-items: flex-start;       /* Oben bündig ausrichten */
+        text-align: left;              /* Text linksbündig */
+    }
+
+    .about-image {
+        width: 300px !important;       /* Feste Breite für das Bild am PC */
+        flex-shrink: 0;                /* Verhindert, dass das Bild gequetscht wird */
+    }
+
+    .about-text {
+        flex: 1;                       /* Text nimmt den restlichen Platz rechts ein */
+    }
+}
+
 
 
         
