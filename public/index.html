@@ -723,7 +723,11 @@ function render() {
 // 2.1. ADMIN-KONSOLE
     //-------------------------------
 	if (editMode && currentTab !== 'start') {
-        let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+        
+		
+		
+		
+		let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
         area.innerHTML += `
             <div class="admin-panel" style="display: block; margin-bottom: 20px;">
                 <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
@@ -733,15 +737,26 @@ function render() {
                     <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
                     <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
                     <input type="text" id="inRight" placeholder="${label}">
+					   <!-- NEU: Bild-URL Feld -->
+                    <input type="text" id="inImg" placeholder="Bild-URL (z.B. event.jpg)">
                 </div>
 				  
 				<!-- NEU: Kategoriewahl nur für Pizzen anzeigen -->
-                ${currentTab === 'pizzas' ? `
-                <select id="inCat" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%;">
-                    <option value="pizza">Standard Pizza</option>
-                    <option value="bianche">Pizza Bianca</option>
-                    <option value="kinder">Kinderpizza</option>
-                </select>` : ''}
+                ${(currentTab === 'pizzas' || currentTab === 'tv') ? `
+					<div style="margin-top: 10px;">
+						<label>${currentTab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}</label>
+						${currentTab === 'pizzas' ? `
+							<select id="inCat" style="width:100%; padding:8px;">
+								<option value="pizza">Standard Pizza</option>
+								<option value="bianche">Pizza Bianche</option>
+								<option value="kinder">Kinderpizza</option>
+								<option value="extras">Extras</option>
+							</select>
+						` : `
+							<input type="text" id="inCat" placeholder="z.B. Champions League oder Serie A" style="width:100%; padding:8px;">
+						`}
+					</div>
+				` : ''}
 				
 				
 				
@@ -864,7 +879,8 @@ function render() {
         const kats = [
             { id: 'pizza', de: 'Pizza', it: 'Pizza' },
             { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' },
-            { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' }
+            { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' },
+			{ id: 'extras', de: 'Extras', it: 'Extra' } // <--- Das hier hinzufügen!
         ];
 
         kats.forEach(kat => {
@@ -905,7 +921,7 @@ function render() {
                         <div class="event-grid">
                             <div class="event-time">${item.right || ''}</div>
                             <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
-                            <div class="event-league">LIVE</div>
+                            <div class="event-league">${item.cat || 'LIVE'}</div>
                         </div>
                         ${getAdminButtonsHtml(idx)}
                     </div>`;
@@ -1027,12 +1043,18 @@ async function saveHoursToDB(newArray) {
     };
 
    // WICHTIG: Hier wird die Kategorie ausgelesen
-    if (currentTab === 'pizzas') {
+    if (currentTab === 'pizzas' || currentTab === 'tv') {
         const catDropdown = document.getElementById('inCat');
         if (catDropdown) {
             newItem.cat = catDropdown.value; // Nimmt 'pizza', 'bianche' oder 'kinder'
         } else {
-            newItem.cat = 'pizza'; // Sicherheits-Fallback
+			if (currentTab === 'pizzas'){
+              newItem.cat = 'pizza'; // Sicherheits-Fallback
+			}
+			else{
+			  newItem.cat = 'LIVE'; // Sicherheits-Fallback
+			}
+				
         }
     }
 
@@ -1185,7 +1207,7 @@ async function move(index, direction) {
 	
 
     function remove(idx) {
-        if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); save(); }
+        if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); render();save(); }
     }
 
     function editStart() {
@@ -1197,6 +1219,69 @@ async function move(index, direction) {
     }
 
     load();
+	
+	
+	async function importPizzeriaDataComplete() {
+    const fullList = [
+        { n: "Margherita", p: "7.50", dDE: "Tomaten, Fior di Latte, Basilikum", dIT: "Pomodoro, fior di latte, basilico", c: "pizza" },
+        { n: "Marinara", p: "6.50", dDE: "Tomaten, Knoblauch, Olivenöl", dIT: "Pomodoro, aglio, olio d´oliva", c: "pizza" },
+        { n: "Prosciutto", p: "9.00", dDE: "Tomaten, Fior di Latte, Schinken", dIT: "Pomodoro, fior di latte, prosciutto cotto", c: "pizza" },
+        { n: "Prosciutto e funghi", p: "9.50", dDE: "Tomaten, Fior di Latte, Schinken, Champignon", dIT: "Pomodoro, fior di latte, prosciutto cotto, champignon", c: "pizza" },
+        { n: "Capricciosa", p: "10.00", dDE: "Tomaten, Fior di Latte, Schinken, Champignon, Artischocken", dIT: "Pomodoro, fior di latte, prosciutto, champignon, carciofi", c: "pizza" },
+        { n: "Quattro stagioni", p: "10.50", dDE: "Tomaten, Fior di Latte, Schinken, Champignon, Artischocken, Oliven", dIT: "Pomodoro, fior di latte, prosciutto, champignon, carciofi, olive", c: "pizza" },
+        { n: "Diavola", p: "10.00", dDE: "Tomaten, Fior di Latte, scharfe Salami, Lombardi", dIT: "Pomodoro, fior di latte, salame piccante, lombardi", c: "pizza" },
+        { n: "Siciliana", p: "10.00", dDE: "Tomaten, Fior di latte, Oliven, Kapern, Sardellen", dIT: "Pomodoro, fior di latte, olive, capperi, acciughe", c: "pizza" },
+        { n: "Quattro formaggi", p: "11.50", dDE: "Tomaten, Fior di latte, Bufala, Gorgonzola, Parmesan", dIT: "Pomodoro, fior di latte, bufala, gorgonzola, parmigiano", c: "pizza" },
+        { n: "Meeresfrüchte", p: "12.50", dDE: "Tomaten, Fior di latte, Meeresfrüchte, Knoblauch, Petersilie", dIT: "Pomodoro, fior di latte, frutti di mare, aglio, prezzemolo", c: "pizza" },
+        { n: "Tonno", p: "9.50", dDE: "Tomaten, Fior di latte, Thunfisch, Zwiebel", dIT: "Pomodoro, fior di latte, tonno, cipolla", c: "pizza" },
+        { n: "Garnelen", p: "13.00", dDE: "Tomaten, Fior di latte, Garnelen, Cocktailtomaten, Knoblauch", dIT: "Pomodoro, fior di latte, gamberi, pomodorini, aglio", c: "pizza" },
+        { n: "Lachs", p: "12.50", dDE: "Tomaten, Fior di latte, Lachs, Zucchini", dIT: "Pomodoro, fior di latte, salmone, zucchine", c: "pizza" },
+        { n: "Calzone", p: "10.50", dDE: "Tomaten, Fior di latte, Schinken, Champignon", dIT: "Pomodoro, fior di latte, prosciutto, champignon", c: "pizza" },
+        { n: "Bauern", p: "10.00", dDE: "Tomaten, Fior di latte, Speck, Zwiebel, Knoblauch", dIT: "Pomodoro, fior di latte, speck, cipolla, aglio", c: "pizza" },
+        { n: "Bufalina", p: "11.50", dDE: "Tomaten, Bufala, Rucola, Cocktailtomaten, Parmesan", dIT: "Pomodoro, bufala, rucola, pomodorini, parmigiano", c: "pizza" },
+        { n: "Parma", p: "12.50", dDE: "Tomaten, Fior di latte, Rucola, Cocktailtomaten, Rohschinken, Parmesan", dIT: "Pomodoro, fior di latte, rucola, pomodorini, crudo, parmigiano", c: "pizza" },
+        { n: "Gemüse", p: "11.00", dDE: "Tomaten, Fior di latte, Gemüse, Parmesan, Knoblauch", dIT: "Pomodoro, fior di latte, verdure, parmigiano, aglio", c: "pizza" },
+        { n: "Vegana", p: "9.50", dDE: "Tomaten, Gemüse, Knoblauch, Olivenöl", dIT: "Pomodoro, verdura, aglio, olio d’oliva", c: "pizza" },
+        { n: "Parmigiana", p: "10.50", dDE: "Tomaten, Fior di latte, Melanzane, Parmesan", dIT: "Pomodoro, fior di latte, melanzane, parmigiano", c: "pizza" },
+        { n: "Autunno", p: "11.50", dDE: "Tomaten, Fior di latte, Gorgonzola, Speck, Walnüsse", dIT: "Pomodoro, fior di latte, gorgonzola, speck, noci", c: "pizza" },
+        { n: "Parnetz", p: "11.50", dDE: "Tomaten, Fior di latte, Speck, Pfifferlinge, Spinat, Knoblauch", dIT: "Pomodoro, fior di latte, speck, finferli, spinaci, aglio", c: "pizza" },
+        { n: "Primavera", p: "12.00", dDE: "Tomaten, Bufala, Cocktailtomaten, Basilikumpesto, Ricotta", dIT: "Pomodoro, bufala, pomodorini, pesto alla Genovese, ricotta", c: "pizza" },
+        { n: "Rustica", p: "12.00", dDE: "Tomaten, Fior di latte, scharfe Salami, Gorgonzola, Zwiebel, Lombardi", dIT: "Pomodoro, fior di latte, salame piccante, gorgonzola, cipolla, lombardi", c: "pizza" },
+        { n: "Sisinius", p: "12.50", dDE: "Tomaten, Fior di latte, scharfe Salami, Zwiebel, Paprika, Pfifferlinge, Ei", dIT: "Pomodoro, fior di latte, salame piccante, cipolla, peperoni, finferli, uova", c: "pizza" },
+        { n: "Mediterranea", p: "12.00", dDE: "Tomaten, Fior di latte, Artischocken, Cocktailtomaten, Oliven, Ricotta, Parmesan", dIT: "Pomodoro, fior di latte, carciofi, pomodorini, olive, ricotta, parmigiano", c: "pizza" },
+        { n: "Vinschger", p: "13.00", dDE: "Tomaten, Fior di latte, Speck, Zwiebel, Gorgonzola, Pfifferlinge, Parmesan, Knoblauch", dIT: "Pomodoro, fior di latte, speck, cipolla, gorgonzola, finferli, parmigiano, aglio", c: "pizza" },
+        { n: "Italia", p: "13.50", dDE: "Tomaten, Fior di latte, Cocktailtomaten, Rohschinken, Burrata, Basilikum", dIT: "Pomodoro, fior di latte, pomodorini, crudo, burrata, basilico", c: "pizza" },
+
+        // --- PIZZA BIANCHE ---
+        { n: "Genovese", p: "13.00", dDE: "Basilikumpesto, Fior di latte, Cocktailomaten, Rohschinken, Parmesan", dIT: "Pesto alla genovese, fior di latte, pomodorini, crudo, parmigiano", c: "bianche" },
+        { n: "Carbonara", p: "12.00", dDE: "Fior di latte, Speck, Ei, Parmesan, Pfeffer", dIT: "Fior di latte, speck, uova, parmigiano, pepe", c: "bianche" },
+        { n: "Superba", p: "12.00", dDE: "Pesto, Fior di latte, Cocktailtomaten, Burrata, Basilikum", dIT: "Pesto, fior di latte, pomodorini, burrata, basilico", c: "bianche" },
+
+        // --- KINDERPIZZA ---
+        { n: "Micky Maus", p: "5.50", dDE: "Tomaten, Fior di latte", dIT: "Pomodoro, fior di latte", c: "kinder" },
+        { n: "Scooby Doo", p: "6.50", dDE: "Tomaten, Fior di latte, milde Salami, Mais", dIT: "Pomodoro, fior di latte, salame, mais", c: "kinder" },
+        { n: "Nemo", p: "7.00", dDE: "Tomate, Fior di latte, 2 Zutaten nach Wahl", dIT: "Pomodoro, fior di latte, 2 condimenti a scelta", c: "kinder" },
+
+        // --- EXTRAS ---
+        { n: "Kleine Pizza / pizze piccole", p: "1.50", dDE: "Abzug von:", dIT: "meno:", c: "extras" },
+        { n: "Extra Zutaten / aggiunte", p: "4.50", dDE: "max +", dIT: "max +", c: "extras" },
+        { n: "Glutenfreier Teig / impasto senza glutine", p: "3.00", dDE: "+", dIT: "+", c: "extras" },
+        { n: "Laktosefreie Mozarella / mozzarella senza lattosio", p: "2.00", dDE: "+", dIT: "+", c: "extras" }
+    ];
+
+    // Wir nehmen die bestehende Liste (Teil 1) und fügen den Rest hinzu
+    const formatted = fullList.map(p => ({
+        nameDE: p.n, nameIT: p.n, descDE: p.dDE, descIT: p.dIT, right: p.p, cat: p.c, img: ""
+    }));
+
+    data.pizzas = [...data.pizzas, ...formatted]; 
+
+    await save(); 
+    alert("Komplette Speisekarte inklusive Extras erfolgreich importiert!");
+    location.reload();
+}
+	
+	
 </script>
 </body>
 </html>
