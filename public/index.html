@@ -462,35 +462,11 @@ h1, h2, h3, p {
         <button class="lang-btn" id="btn-it" onclick="setLang('IT')">IT</button>
     </div>
 </div>
+
 <div class="container">
     <div id="content-area"></div>
 </div>
     
-<!--
-<div class="container">
-    <div class="admin-panel admin-only">
-        <strong>Admin-Konsole</strong>
-        <div>
-            <input type="text" id="inNameDE" placeholder="Name (DE)">
-            <input type="text" id="inNameIT" placeholder="Nome (IT)">
-            <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
-            <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
-            <input type="text" id="inRight" placeholder="Preis / Datum">
-            <input type="text" id="inImg" placeholder="Bild-URL (.jpg)">
-        </div>
-        
-     <button onclick="()" style="flex: 3; background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
-                Eintrag speichern
-            </button>
-    <button onclick="()" style="background: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Eintrag speichern</button> 
-        <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">
-                Abbrechen
-         </button>
-
-    </div>
-    <div id="content-area"></div>
-</div>-->
-
 <footer>
     <div class="footer-section">
         <strong>Pizzeria Pub St. Sisinius</strong>
@@ -520,7 +496,9 @@ h1, h2, h3, p {
     const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
     if(editMode) document.body.classList.add('admin-mode');
 
-  // ZEILE LÖSCHEN
+//ÖFFNUNGSZEITEN 
+//========================================
+// ZEILE LÖSCHEN
 function deleteTime(index) {
     if (confirm("Möchten Sie diese Öffnungszeit wirklich löschen?")) {
         // Entfernt das Element an der Position 'index'
@@ -556,9 +534,8 @@ function editSingleTime(index) {
         saveHoursToDB(data.start.zeiten);
     }
 }
-  
-  
-  
+
+//-----------------------------------------------------  
   
   
 
@@ -599,7 +576,7 @@ function editSingleTime(index) {
     }
 }
 
-    async function save() {
+   /* async function save() {
         // Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
         if (currentTab === 'start') return; 
         await fetch('/api/data?pw=leon2208', {
@@ -608,7 +585,28 @@ function editSingleTime(index) {
             body: JSON.stringify(data)
         });
         render();
+    }*/
+	
+	
+	async function save() {
+    // Wir entfernen die Start-Sperre, damit auch Öffnungszeiten gespeichert werden!
+    try {
+        const res = await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) {
+            alert("Fehler beim Speichern in der Cloud!");
+        }
+    } catch (e) {
+        console.error("Speicherfehler:", e);
+        alert("Verbindung zum Server fehlgeschlagen.");
     }
+    // Wir rufen hier KEIN render() auf, das machen wir lieber in der 
+    // aufrufenden Funktion (z.B. move oder addItem) nach dem await.
+}
 
     function setTab(t) { 
         currentTab = t; 
@@ -661,7 +659,53 @@ function editSingleTime(index) {
     }
 
 function render() {
-    const area = document.getElementById('content-area');
+    
+		// --- FOOTER SPRACHUMSTELLUNG ---
+
+		// 1. Elemente abgreifen
+		const footerAddr = document.getElementById('footer-address');
+		const footerRegion = document.getElementById('footer-region');
+		const footerContact = document.getElementById('footer-contact');
+		const footerRecht = document.getElementById('footer-rechtliches');
+		const footerImpLink = document.getElementById('footer-impressum-link');
+		const footerDataLink = document.getElementById('footer-datenschutz-link');
+
+		// 2. Texte und Links je nach Sprache setzen
+		if (lang === 'DE') {
+			if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+			if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
+			if (footerContact) footerContact.innerText = "Kontakt";
+			if (footerRecht) footerRecht.innerText = "Rechtliches";
+			
+			if (footerImpLink) {
+				footerImpLink.innerText = "Impressum";
+				footerImpLink.href = "impressumDe.html";
+			}
+			if (footerDataLink) {
+				footerDataLink.innerText = "Datenschutz";
+				footerDataLink.href = "datenschutzDe.html";
+			}
+		} else {
+			// ITALIENISCH (IT)
+			if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+			if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
+			if (footerContact) footerContact.innerText = "Contatto";
+			if (footerRecht) footerRecht.innerText = "Note Legali";
+			
+			if (footerImpLink) {
+				footerImpLink.innerText = "Note Legali"; // In Italien heißt Impressum oft Note Legali
+				footerImpLink.href = "impressumIt.html";
+			}
+			if (footerDataLink) {
+				footerDataLink.innerText = "Privacy";
+				footerDataLink.href = "datenschutzIt.html";
+			}
+		}
+	
+	
+	
+	
+	const area = document.getElementById('content-area');
     if (!area) return;
     area.innerHTML = '';
 
@@ -672,49 +716,40 @@ function render() {
         document.body.classList.remove('admin-mode');
     }
 
-	// --- FOOTER SPRACHUMSTELLUNG ---
-
-// 1. Elemente abgreifen
-const footerAddr = document.getElementById('footer-address');
-const footerRegion = document.getElementById('footer-region');
-const footerContact = document.getElementById('footer-contact');
-const footerRecht = document.getElementById('footer-rechtliches');
-const footerImpLink = document.getElementById('footer-impressum-link');
-const footerDataLink = document.getElementById('footer-datenschutz-link');
-
-// 2. Texte und Links je nach Sprache setzen
-if (lang === 'DE') {
-    if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
-    if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
-    if (footerContact) footerContact.innerText = "Kontakt";
-    if (footerRecht) footerRecht.innerText = "Rechtliches";
-    
-    if (footerImpLink) {
-        footerImpLink.innerText = "Impressum";
-        footerImpLink.href = "impressumDe.html";
-    }
-    if (footerDataLink) {
-        footerDataLink.innerText = "Datenschutz";
-        footerDataLink.href = "datenschutzDe.html";
-    }
-} else {
-    // ITALIENISCH (IT)
-    if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
-    if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
-    if (footerContact) footerContact.innerText = "Contatto";
-    if (footerRecht) footerRecht.innerText = "Note Legali";
-    
-    if (footerImpLink) {
-        footerImpLink.innerText = "Note Legali"; // In Italien heißt Impressum oft Note Legali
-        footerImpLink.href = "impressumIt.html";
-    }
-    if (footerDataLink) {
-        footerDataLink.innerText = "Privacy";
-        footerDataLink.href = "datenschutzIt.html";
-    }
-}
 
 
+
+
+// 2.1. ADMIN-KONSOLE
+    //-------------------------------
+	if (editMode && currentTab !== 'start') {
+        let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+        area.innerHTML += `
+            <div class="admin-panel" style="display: block; margin-bottom: 20px;">
+                <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
+                <div class="input-grid">
+                    <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+                    <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+                    <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
+                    <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
+                    <input type="text" id="inRight" placeholder="${label}">
+                </div>
+				  
+				<!-- NEU: Kategoriewahl nur für Pizzen anzeigen -->
+                ${currentTab === 'pizzas' ? `
+                <select id="inCat" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%;">
+                    <option value="pizza">Standard Pizza</option>
+                    <option value="bianche">Pizza Bianca</option>
+                    <option value="kinder">Kinderpizza</option>
+                </select>` : ''}
+				
+				
+				
+                <button onclick="addItem()" style="background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Eintrag speichern</button>
+                <button onclick="location.reload()" style="background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
+            </div>
+        `;
+    }
 
 
 
@@ -722,6 +757,7 @@ if (lang === 'DE') {
 
 
     // 1. STARTSEITE (Sonderlayout)
+	//=====================================
     if (currentTab === 'start') {
         const s = data.start || { 
             img: 'lokal.webp', 
@@ -731,7 +767,7 @@ if (lang === 'DE') {
         
         area.className = 'list-mode';
       
-		area.innerHTML = `
+		area.innerHTML += `
             <div class="hero" style="height: 500px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
                 <img src="lokal.webp" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
 				<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
@@ -786,15 +822,7 @@ if (lang === 'DE') {
 								`).join('') 
 								: '<p>Keine Öffnungszeiten hinterlegt. Bitte im Admin-Modus hinzufügen.</p>'
 							}
-						</div>
-						
-						<!--<div class="hours-list">
-                            <div class="hours-item"><span>${lang === 'DE' ? 'Montag' : 'Lunedì'}</span> <span>${lang === 'DE' ? 'Geschlossen' : 'Chiuso'}</span></div>
-                            <div class="hours-item"><span>Di - Do / Mar - Gio</span> <span>16:00 – 00:00</span></div>
-                            <div class="hours-item"><span>Fr / Ven</span> <span>16:00 – 01:00</span></div>
-                            <div class="hours-item"><span>Sa / Sab</span> <span>14:00 – 01:00</span></div>
-                            <div class="hours-item"><span>So / Dom</span> <span>14:00 – 23:00</span></div>
-                        </div>-->
+						</div>				
                     </div>
                 </div>
             </div>
@@ -806,68 +834,124 @@ if (lang === 'DE') {
                     </button>
                 </div>` : ''}
         `;
-        return;
+        return;  //bricht render() ab
     }
-
-     // 2. ADMIN-KONSOLE
-    if (editMode) {
-        let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
-        area.innerHTML += `
-            <div class="admin-panel" style="display: block; margin-bottom: 20px;">
-                <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
-                <div class="input-grid">
-                    <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
-                    <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
-                    <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
-                    <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
-                    <input type="text" id="inRight" placeholder="${label}">
-                </div>
-                <button onclick="addItem()" style="background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Eintrag speichern</button>
-                <button onclick="location.reload()" style="background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
-            </div>
-        `;
-    }
+	//---------------------------------------------------------------
+	
+    // 2. ANDERE SEITEN ALS STARTSEITE 
+	//=====================================
+    
 
     if (!data[currentTab]) {
         area.innerHTML = '<p>Lade Daten...</p>';
         return;
     }
 
-    // 3. LISTEN RENDERING
+ // 2.2 LISTEN RENDERING
     area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
+    // area.innerHTML = ''; // Falls du oben am Anfang der Funktion schon leerst, bleibt das auskommentiert
 
-    data[currentTab].forEach((item, idx) => {
-        if (currentTab === 'tv') {
-            area.innerHTML += `
-                <div class="event-card">
-                    <div class="event-date">${lang === 'DE' ? (item.descDE || 'Datum fehlt') : (item.descIT || 'Data mancante')}</div> 
-                    <hr class="event-line">
-                    <div class="event-grid">
-                        <div class="event-time">${item.right || ''}</div>
-                        <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
-                        <div class="event-league">LIVE</div>
-                    </div>
-                    ${getAdminButtonsHtml(idx)}
-                </div>`;
-        } else {
-            area.innerHTML += `
-                <div class="entry">
-                    ${item.img ? `<img src="${item.img}" class="item-img">` : ''}
-                    <div class="entry-content">
-                        <div class="entry-header">
-                            <span>${lang === 'DE' ? item.nameDE : item.nameIT}</span>
-                            <span class="price">${item.right || ''}${currentTab === 'pizzas' ? ' €' : ''}</span>
+    // --- FALL 1: PIZZAS ---
+    if (currentTab === 'pizzas') {
+        area.innerHTML += `
+            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">
+                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">
+                    ${lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza'}
+                </h1>
+            </div>
+        `;
+        
+        const kats = [
+            { id: 'pizza', de: 'Pizza', it: 'Pizza' },
+            { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' },
+            { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' }
+        ];
+
+        kats.forEach(kat => {
+            // Erst filtern...
+            const filtered = data.pizzas.filter(p => (p.cat || 'pizza') === kat.id);
+            
+            // ...dann prüfen und anzeigen
+            if (filtered.length > 0) {
+                area.innerHTML += `
+                    <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">
+                        <h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">${lang === 'DE' ? kat.de : kat.it}</h2>
+                    </div>`;
+                
+                filtered.forEach(item => {
+                    const realIdx = data.pizzas.findIndex(p => p === item);
+                    area.innerHTML += renderPizzaOrEvent(item, realIdx, true);
+                });
+            }
+        });
+    } 
+    // --- FALL 2: TV & EVENTS ---
+    else {
+        // ÜBERSCHRIFT NUR EINMAL (vor der Schleife)
+        const title = currentTab === 'tv' ? (lang === 'DE' ? 'TV-Sport' : 'TV-Sport') : (lang === 'DE' ? 'Events' : 'Eventi');
+        area.innerHTML += `
+            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0;">
+                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">${title}</h1>
+            </div>
+            <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>
+        `;
+
+        data[currentTab].forEach((item, idx) => {
+            if (currentTab === 'tv') {
+                area.innerHTML += `
+                    <div class="event-card">
+                        <div class="event-date">${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}</div> 
+                        <hr class="event-line">
+                        <div class="event-grid">
+                            <div class="event-time">${item.right || ''}</div>
+                            <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
+                            <div class="event-league">LIVE</div>
                         </div>
-                        <div class="desc">${lang === 'DE' ? item.descDE : item.descIT}</div>
                         ${getAdminButtonsHtml(idx)}
-                    </div>
-                </div>`;
-        }
-    });
+                    </div>`;
+            } else {
+                area.innerHTML += renderPizzaOrEvent(item, idx, false);
+            }
+        });
+    }
+} // Ende von render()
+
+// Hilfsfunktion, um doppelten Code zu vermeiden
+		function renderPizzaOrEvent(item, idx, isPizza) {
+    return `
+        <div class="entry">
+            <!-- Bild nur anzeigen, wenn eines vorhanden ist -->
+            ${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
+            
+            <div class="entry-content">
+                <div class="entry-header">
+                    <!-- Name/Titel in der gewählten Sprache -->
+                    <span style="font-weight: bold; font-size: 1.1rem;">
+                        ${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}
+                    </span>
+                    
+                    <!-- Rechts: Preis bei Pizzen, Datum/Uhrzeit bei Events -->
+                    <span class="price" style="color: var(--red); font-weight: bold; white-space: nowrap;">
+                        ${item.right || ''}${isPizza ? ' €' : ''}
+                    </span>
+                </div>
+
+                <!-- Beschreibung/Zutaten -->
+                <div class="desc" style="font-size: 0.9rem; color: #555; font-style: italic; margin: 10px 0; flex-grow: 1;">
+                    ${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}
+                </div>
+
+                <!-- Admin-Buttons nur im Edit-Mode einblenden -->
+                ${typeof getAdminButtonsHtml === 'function' ? getAdminButtonsHtml(idx) : ''}
+            </div>
+        </div>
+    `;
 }
 
 
-// HILFSFUNKTION (Benannt!)
+
+
+// HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
 function getAdminButtonsHtml(idx) {
     if (!editMode) return '';
     return `
@@ -898,7 +982,8 @@ function addTimeRow() {
 }
 
  
-
+//Öffnungszeiten
+//=========================================
 // 2. In MongoDB speichern
 async function saveHoursToDB(newArray) {
     const updatedData = {
@@ -928,7 +1013,8 @@ async function saveHoursToDB(newArray) {
 }
 
 
-
+// ITEM HINZUFÜGEN
+//===================================================
     async function addItem() {
     // 1. Werte aus den Feldern holen
     const newItem = {
@@ -939,6 +1025,17 @@ async function saveHoursToDB(newArray) {
         right: document.getElementById('inRight').value,
         img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
     };
+
+   // WICHTIG: Hier wird die Kategorie ausgelesen
+    if (currentTab === 'pizzas') {
+        const catDropdown = document.getElementById('inCat');
+        if (catDropdown) {
+            newItem.cat = catDropdown.value; // Nimmt 'pizza', 'bianche' oder 'kinder'
+        } else {
+            newItem.cat = 'pizza'; // Sicherheits-Fallback
+        }
+    }
+
 
     // Sicherheitscheck: Falls Name leer ist
     if (!newItem.nameDE && currentTab !== 'start') {
@@ -955,7 +1052,7 @@ async function saveHoursToDB(newArray) {
     } else {
         // NEU: Nur wenn kein editIndex gesetzt ist, wird gepusht
         if (currentTab === 'start') {
-            data.start = [newItem]; // Bei Start meist nur ein Eintrag
+            data.start = newItem; // [newItem]; // Bei Start meist nur ein Eintrag
         } else {
             data[currentTab].push(newItem);
             console.log("Neuer Eintrag am Ende hinzugefügt.");
@@ -981,6 +1078,9 @@ async function saveHoursToDB(newArray) {
     }
 }
 
+
+// Öffnungszeiten
+//============================
 async function editStartInfo() {
     // 1. Neue Zeiten vom User abfragen
     const neueZeiten = prompt("Geben Sie die neuen Öffnungszeiten ein (z.B. Di-Do 16:00-00:00, Fr-Sa...):");
@@ -1022,24 +1122,67 @@ async function editStartInfo() {
     
 
     
-// Hilfsfunktion zum Leeren der Felder
-function clearFields() {
-    document.getElementById('inNameDE').value = "";
-    document.getElementById('inNameIT').value = "";
-    document.getElementById('inDescDE').value = "";
-    document.getElementById('inDescIT').value = "";
-    document.getElementById('inRight').value = "";
-    if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
-    const title = document.getElementById('admin-title');
-    if(title) title.innerText = "Neuen Eintrag hinzufügen";
-}
-    function move(index, dir) {
+	// Hilfsfunktion zum Leeren der Felder
+	function clearFields() {
+		document.getElementById('inNameDE').value = "";
+		document.getElementById('inNameIT').value = "";
+		document.getElementById('inDescDE').value = "";
+		document.getElementById('inDescIT').value = "";
+		document.getElementById('inRight').value = "";
+		if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
+		const title = document.getElementById('admin-title');
+		if(title) title.innerText = "Neuen Eintrag hinzufügen";
+	}
+	
+    /*function move(index, dir) {
         const list = data[currentTab];
         if (index + dir >= 0 && index + dir < list.length) {
             [list[index], list[index + dir]] = [list[index + dir], list[index]];
             save();
         }
+    }*/
+	
+async function move(index, direction) {
+    const items = data[currentTab];
+    const currentItem = items[index];
+
+    // 1. Suche den nächsten Nachbarn, der die GLEICHE Kategorie hat
+    let targetIndex = -1;
+    if (direction === -1) { // Nach oben schieben
+        for (let i = index - 1; i >= 0; i--) {
+            if ((items[i].cat || 'pizza') === (currentItem.cat || 'pizza')) {
+                targetIndex = i;
+                break;
+            }
+        }
+    } else { // Nach unten schieben
+        for (let i = index + 1; i < items.length; i++) {
+            if ((items[i].cat || 'pizza') === (currentItem.cat || 'pizza')) {
+                targetIndex = i;
+                break;
+            }
+        }
     }
+
+    // 2. Wenn kein passender Nachbar in der Kategorie gefunden wurde -> Abbruch
+    if (targetIndex === -1) {
+        console.log("Kein Nachbar in dieser Kategorie gefunden.");
+        return;
+    }
+
+    // 3. Tausch im Array
+    const temp = items[index];
+    items[index] = items[targetIndex];
+    items[targetIndex] = temp;
+
+    // 4. Speichern & Neu zeichnen
+    await save();
+    render();
+}
+  
+	
+	
+	
 
     function remove(idx) {
         if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); save(); }
@@ -1057,7 +1200,6 @@ function clearFields() {
 </script>
 </body>
 </html>
-
 
 
 
