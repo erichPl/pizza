@@ -517,7 +517,7 @@ h1, h2, h3, p {
     let data = { start: {}, pizzas: [], events: [], tv: [] };
     let currentTab = 'start';
     let lang = 'DE';
-    const editMode = new URLSearchParams(window.location.search).get('pw') === 'leon2208';
+    const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
     if(editMode) document.body.classList.add('admin-mode');
 
   // ZEILE LÖSCHEN
@@ -1057,6 +1057,7 @@ function clearFields() {
 </script>
 </body>
 </html>
+
 
 
 
