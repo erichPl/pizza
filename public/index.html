@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzeria Pub St. Sisinius</title>
     <style>
-	
+
 	/* Grunddesign für den Header */
 .main-header {
     background-color: rgb(144, 41, 50);
@@ -375,6 +375,19 @@ h1, h2, h3, p {
 
 .hours-item:last-child { border-bottom: none; }
 
+.zeit-spalte {
+    white-space: pre-wrap; /* ERZWINGT, dass jedes Leerzeichen &nbsp; angezeigt wird */
+    display: inline-block;
+}	
+
+.hours-item span:last-child {
+    white-space: pre-wrap !important; /* Erlaubt echte Leerzeichen aus der Eingabe */
+    display: inline-block;
+    min-width: 100px;
+}
+
+
+
 /* --- FINALE HANDY-ANPASSUNG (max-width: 850px) --- */
 @media (max-width: 850px) {
     /* 1. Container & Scroll-Schutz */
@@ -481,20 +494,20 @@ h1, h2, h3, p {
 <footer>
     <div class="footer-section">
         <strong>Pizzeria Pub St. Sisinius</strong>
-        Vinschgaustraße 74, 39023 Laas (BZ)<br>
-        Südtirol, Italien
+        <span id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</span>
+        <span id="footer-region">Südtirol, Italien)</span>
     </div>
     
     <div class="footer-section">
-        <strong>Kontakt</strong>
+        <strong id="footer-contact">Kontakt</strong>
         <a href="tel:+393898334004">Tel: +39 389 833 4004</a>
-        <span style="opacity: 0.8; font-size: 0.8rem;">P.IVA / MwSt.-Nr.: IT00000000000</span>
+        <span style="opacity: 0.8; font-size: 0.8rem;">P.IVA / MwSt.-Nr.: 03317990210</span>
     </div>
 
     <div class="footer-section">
-        <strong>Rechtliches</strong>
-        <a href="impressum.html">Impressum / Note Legali</a>
-        <a href="datenschutz.html">Datenschutz / Privacy</a>
+        <strong id="footer-rechtliches">Rechtliches</strong>
+        <a href="impressumDe.html" id="footer-impressum-link">Impressum / Note Legali</a>
+        <a href="datenschutzDe.html" id="footer-datenschutz-link">Datenschutz / Privacy</a>
     </div>
 </footer>
 
@@ -506,7 +519,6 @@ h1, h2, h3, p {
     let lang = 'DE';
     const editMode = new URLSearchParams(window.location.search).get('pw') === 'leon2208';
     if(editMode) document.body.classList.add('admin-mode');
-
 
   // ZEILE LÖSCHEN
 function deleteTime(index) {
@@ -660,6 +672,55 @@ function render() {
         document.body.classList.remove('admin-mode');
     }
 
+	// --- FOOTER SPRACHUMSTELLUNG ---
+
+// 1. Elemente abgreifen
+const footerAddr = document.getElementById('footer-address');
+const footerRegion = document.getElementById('footer-region');
+const footerContact = document.getElementById('footer-contact');
+const footerRecht = document.getElementById('footer-rechtliches');
+const footerImpLink = document.getElementById('footer-impressum-link');
+const footerDataLink = document.getElementById('footer-datenschutz-link');
+
+// 2. Texte und Links je nach Sprache setzen
+if (lang === 'DE') {
+    if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+    if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
+    if (footerContact) footerContact.innerText = "Kontakt";
+    if (footerRecht) footerRecht.innerText = "Rechtliches";
+    
+    if (footerImpLink) {
+        footerImpLink.innerText = "Impressum";
+        footerImpLink.href = "impressumDe.html";
+    }
+    if (footerDataLink) {
+        footerDataLink.innerText = "Datenschutz";
+        footerDataLink.href = "datenschutzDe.html";
+    }
+} else {
+    // ITALIENISCH (IT)
+    if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+    if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
+    if (footerContact) footerContact.innerText = "Contatto";
+    if (footerRecht) footerRecht.innerText = "Note Legali";
+    
+    if (footerImpLink) {
+        footerImpLink.innerText = "Note Legali"; // In Italien heißt Impressum oft Note Legali
+        footerImpLink.href = "impressumIt.html";
+    }
+    if (footerDataLink) {
+        footerDataLink.innerText = "Privacy";
+        footerDataLink.href = "datenschutzIt.html";
+    }
+}
+
+
+
+
+
+
+
+
     // 1. STARTSEITE (Sonderlayout)
     if (currentTab === 'start') {
         const s = data.start || { 
@@ -713,7 +774,7 @@ function render() {
 								data.start.zeiten.map((z, idx) => `
 									<div class="hours-item">
 										<span>${z.tag}</span> 
-										<span>${z.zeit}</span>
+										<span>${z.zeit.replace(/%/g, '&nbsp;&nbsp;&nbsp;&nbsp;')}</span>
 										${editMode ? `
 											<div class="admin-btns-row">
 												<button onclick="moveTime(${idx}, -1)">↑</button>
