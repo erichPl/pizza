@@ -547,10 +547,34 @@ function editSingleTime(index) {
     document.getElementById('inDescDE').value = item.descDE || "";
     document.getElementById('inDescIT').value = item.descIT || "";
     document.getElementById('inRight').value = item.right || "";
-    if(document.getElementById('inImg')) document.getElementById('inImg').value = item.img || "";
+    
+	// 2. BILD-VORSCHAU AKTUALISIEREN (Der entscheidende Teil!)
+    const preview = document.getElementById('img-preview');
+    const hiddenInput = document.getElementById('inImgBase64');
+    const noImgText = document.getElementById('no-img-text');
+
+    if (item.img && item.img.length > 10) {
+        // Falls ein Bild-Code in der MongoDB ist
+        if (preview) {
+            preview.src = item.img;
+            preview.style.display = 'block';
+        }
+        if (hiddenInput) hiddenInput.value = item.img; // Code für späteres Speichern vorhalten
+        if (noImgText) noImgText.style.display = 'none';
+    } else {
+        // Falls kein Bild vorhanden ist
+        if (preview) {
+            preview.src = "";
+            preview.style.display = 'none';
+        }
+        if (hiddenInput) hiddenInput.value = "";
+        if (noImgText) noImgText.style.display = 'block';
+    }
 
     editIndex = idx; // Position speichern!
-    document.getElementById('admin-title').innerText = "Eintrag bearbeiten (Position: " + (idx + 1) + ")";
+    // 3. Titel und Scroll-Effekt
+    const title = document.getElementById('admin-title');
+    if (title) title.innerText = "Eintrag bearbeiten (Position: " + (idx + 1) + ")";
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }   
     
@@ -722,49 +746,60 @@ function render() {
 
 // 2.1. ADMIN-KONSOLE
     //-------------------------------
-	if (editMode && currentTab !== 'start') {
-        
-		
-		
-		
-		let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
-        area.innerHTML += `
-            <div class="admin-panel" style="display: block; margin-bottom: 20px;">
-                <strong>Admin-Konsole (${currentTab.toUpperCase()})</strong>
-                <div class="input-grid">
-                    <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
-                    <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
-                    <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
-                    <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
-                    <input type="text" id="inRight" placeholder="${label}">
-					   <!-- NEU: Bild-URL Feld -->
-                    <input type="text" id="inImg" placeholder="Bild-URL (z.B. event.jpg)">
-                </div>
-				  
-				<!-- NEU: Kategoriewahl nur für Pizzen anzeigen -->
-                ${(currentTab === 'pizzas' || currentTab === 'tv') ? `
-					<div style="margin-top: 10px;">
-						<label>${currentTab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}</label>
-						${currentTab === 'pizzas' ? `
-							<select id="inCat" style="width:100%; padding:8px;">
-								<option value="pizza">Standard Pizza</option>
-								<option value="bianche">Pizza Bianche</option>
-								<option value="kinder">Kinderpizza</option>
-								<option value="extras">Extras</option>
-							</select>
-						` : `
-							<input type="text" id="inCat" placeholder="z.B. Champions League oder Serie A" style="width:100%; padding:8px;">
-						`}
-					</div>
-				` : ''}
-				
-				
-				
-                <button onclick="addItem()" style="background: #2e7d32; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Eintrag speichern</button>
-                <button onclick="location.reload()" style="background: #757575; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
+if (editMode && currentTab !== 'start') {
+    let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+    
+    area.innerHTML += `
+        <div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+            <strong id="admin-title" style="color: var(--red);">Admin-Konsole (${currentTab.toUpperCase()})</strong>
+            
+            <div class="input-grid" style="margin-top: 10px;">
+                <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+                <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+                <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
+                <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
+                <input type="text" id="inRight" placeholder="${label}">
             </div>
-        `;
-    }
+
+            <!-- BILD-UPLOAD BEREICH -->
+            <div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: white;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px; font-size: 0.9rem;">Bild für ${currentTab.toUpperCase()}:</label>
+                
+                <input type="file" id="inImgFile" accept="image/*" onchange="encodeImageFileAsURL(this)" style="width:100%; font-size: 0.8rem;">
+
+                <div id="preview-box" style="margin-top: 10px; text-align: center; min-height: 50px;">
+                    <img id="img-preview" src="" style="max-height:120px; border-radius:5px; display:none; border:2px solid var(--red);">
+                    <p id="no-img-text" style="font-size: 0.8rem; color: #888; margin: 5px 0;">Kein Bild gewählt</p>
+                </div>
+
+                <input type="hidden" id="inImgBase64">
+                <div id="upload-status" style="font-size: 0.8rem; color: green; display: none; text-align: center;">✅ Bild bereit!</div>
+            </div>
+
+            <!-- KATEGORIE-WAHL -->
+            ${(currentTab === 'pizzas' || currentTab === 'tv') ? `
+                <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">${currentTab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}</label>
+                    ${currentTab === 'pizzas' ? `
+                        <select id="inCat" style="width:100%; padding:8px; margin-top:5px;">
+                            <option value="pizza">Standard Pizza</option>
+                            <option value="bianche">Pizza Bianche</option>
+                            <option value="kinder">Kinderpizza</option>
+                            <option value="extras">Extras</option>
+                        </select>
+                    ` : `
+                        <input type="text" id="inCat" placeholder="z.B. Champions League" style="width:100%; padding:8px; margin-top:5px;">
+                    `}
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="addItem()" style="flex: 1; background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Eintrag speichern</button>
+                <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
+            </div>
+        </div>
+    `;
+}
 
 
 
@@ -1039,7 +1074,8 @@ async function saveHoursToDB(newArray) {
         descDE: document.getElementById('inDescDE').value,
         descIT: document.getElementById('inDescIT').value,
         right: document.getElementById('inRight').value,
-        img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+        img: document.getElementById('inImgBase64').value || ""
+		//img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
     };
 
    // WICHTIG: Hier wird die Kategorie ausgelesen
@@ -1218,6 +1254,36 @@ async function move(index, direction) {
         }
     }
 
+	function encodeImageFileAsURL(element) {
+		const file = element.files[0]; 
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onloadend = function() {
+			const base64String = reader.result;
+
+			// WICHTIG: Wir suchen die Elemente erst JETZT im aktuellen Dokument
+			const hiddenInput = document.querySelector('#inImgBase64');
+			const preview = document.querySelector('#img-preview');
+			const noImgText = document.querySelector('#no-img-text');
+
+			if (hiddenInput) hiddenInput.value = base64String;
+
+			if (preview) {
+				preview.src = base64String;
+				preview.style.display = 'block'; // Erzwinge Anzeige
+				preview.style.opacity = '1';    // Sicherheitshalber
+				if (noImgText) noImgText.style.display = 'none';
+				console.log("Vorschau in Pizzeria St. Sisinius aktualisiert!");
+			} else {
+				console.error("Vorschau-Bild mit ID 'img-preview' nicht im HTML gefunden!");
+			}
+		};
+		reader.readAsDataURL(file);
+	}
+		
+	
+
     load();
 	
 	
@@ -1285,15 +1351,3 @@ async function move(index, direction) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
