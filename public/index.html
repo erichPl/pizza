@@ -1255,29 +1255,49 @@ async function move(index, direction) {
     }
 
 	function encodeImageFileAsURL(element) {
-		const file = element.files[0]; 
+		const file = element.files[0];
 		if (!file) return;
 
 		const reader = new FileReader();
-		reader.onloadend = function() {
-			const base64String = reader.result;
+		reader.onload = function(e) {
+			const img = new Image();
+			img.onload = function() {
+				// 1. Leinwand erstellen
+				const canvas = document.createElement('canvas');
+				const MAX_WIDTH = 800; // Maximale Breite für die Pizzeria-Webseite
+				
+				let width = img.width;
+				let height = img.height;
 
-			// WICHTIG: Wir suchen die Elemente erst JETZT im aktuellen Dokument
-			const hiddenInput = document.querySelector('#inImgBase64');
-			const preview = document.querySelector('#img-preview');
-			const noImgText = document.querySelector('#no-img-text');
+				// 2. Proportionen berechnen
+				if (width > MAX_WIDTH) {
+					height *= MAX_WIDTH / width;
+					width = MAX_WIDTH;
+				}
 
-			if (hiddenInput) hiddenInput.value = base64String;
+				canvas.width = width;
+				canvas.height = height;
 
-			if (preview) {
-				preview.src = base64String;
-				preview.style.display = 'block'; // Erzwinge Anzeige
-				preview.style.opacity = '1';    // Sicherheitshalber
-				if (noImgText) noImgText.style.display = 'none';
-				console.log("Vorschau in Pizzeria St. Sisinius aktualisiert!");
-			} else {
-				console.error("Vorschau-Bild mit ID 'img-preview' nicht im HTML gefunden!");
-			}
+				// 3. Bild auf Leinwand zeichnen (verkleinern)
+				const ctx = canvas.getContext('2d');
+				ctx.drawImage(img, 0, 0, width, height);
+
+				// 4. Als komprimiertes JPG exportieren (Qualität 0.7 = 70%)
+				const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+				// 5. In das versteckte Feld und die Vorschau schreiben
+				document.getElementById('inImgBase64').value = compressedBase64;
+				
+				const preview = document.getElementById('img-preview');
+				if (preview) {
+					preview.src = compressedBase64;
+					preview.style.display = 'block';
+				}
+				if (document.getElementById('no-img-text')) document.getElementById('no-img-text').style.display = 'none';
+				
+				console.log("Bild für St. Sisinius optimiert: " + Math.round(compressedBase64.length / 1024) + " KB");
+			};
+			img.src = e.target.result;
 		};
 		reader.readAsDataURL(file);
 	}
@@ -1351,4 +1371,3 @@ async function move(index, direction) {
 </script>
 </body>
 </html>
-
