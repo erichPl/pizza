@@ -397,10 +397,13 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
     font-size: 1rem;
+	gap: 10px; /* Kleiner Abstand zwischen Tag und Zeit */
 }
 
 /* Der Wochentag (links) */
 .tag-spalte {
+    flex: 0 0 100px; /* Der Tag hat eine feste Basisbreite */
+	text-align: left;
     font-weight: bold;
     color: var(--dark);
 }
@@ -408,7 +411,8 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 /* Die Zeit-Spalte (rechts) */
 .zeit-spalte {
     /* Nutzt eine feste Breite für alle Zahlen-Blöcke */
-    min-width: 140px; 
+    margin-left: auto; /* SCHIEBT DIE ZEIT NACH RECHTS */
+	min-width: 140px; 
     text-align: right;
     /* Monospace sorgt dafür, dass die '1' genau so breit ist wie die '0' */
     font-family: 'Courier New', Courier, monospace; 
@@ -416,9 +420,26 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
     white-space: nowrap; /* Verhindert Umbruch innerhalb der Uhrzeit */
 }
 
+
+
 .hours-item:last-child { border-bottom: none; }
 
+/* Admin-Buttons Box */
+.admin-btns-row {
+    display: flex;
+    gap: 4px;
+    margin-left: 15px; /* Abstand zur Zeit-Spalte */
+    flex-shrink: 0;   /* Buttons dürfen nicht schrumpfen */
+}
 
+.admin-btns-row button {
+    padding: 4px 8px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
 
 
 
@@ -932,27 +953,20 @@ area.innerHTML += `
 							${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
 								data.start.zeiten.map((z, idx) => `
 									<div class="hours-item">
-										<!-- Anzeige des Tages (bleibt sprachabhängig durch JS) -->
-										 <!-- Links: Der Tag (z.B. Montag) -->
-										<span>${lang === 'DE' ? (z.tagDE || z.tag) : (z.tagIT || z.tag)}</span> 
+										<!-- 1. Der Tag (Links) -->
+										<span class="tag-spalte">
+											${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
+										</span> 
 
-										<!-- Rechts: Die Zeit oder der Ruhetag-Check -->
-										<span>
-											${(() => {
-												let info = z.zeit || '';
-												// Wenn "Ruhetag" drin steht, übersetzen wir es für Lasa
-												if (info.toLowerCase().includes('ruhetag')) {
-													return lang === 'DE' ? info : info.replace(/ruhetag/i, 'Giorno di riposo');
-												}
-												// Ansonsten normale Zeit mit den % Abständen
-												return info.replace(/%/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
-											})()}
-										</span>							
+										<!-- 2. Die Zeit (Rechts) - Nutzt data-wert für CSS-Übersetzung & Ausrichtung -->
+										<span class="zeit-spalte" data-wert="${z.zeit ? z.zeit.trim() : ''}"></span>
+
+										<!-- 3. Admin-Buttons (Nur wenn editMode aktiv) -->
 										${editMode ? `
 											<div class="admin-btns-row">
 												<button onclick="moveTime(${idx}, -1)">↑</button>
 												<button onclick="moveTime(${idx}, 1)">↓</button>
-												<button onclick="editSingleTime(${idx})" title="Bearbeiten">✎</button>
+												<button onclick="editSingleTime(${idx})">✎</button>
 												<button onclick="deleteTime(${idx})">X</button>
 											</div>` : ''}
 									</div>
