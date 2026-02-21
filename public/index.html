@@ -1,3 +1,523 @@
+
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzeria Pub St. Sisinius</title>
+    <style>
+* {
+    box-sizing: border-box;
+}
+
+
+	/* Grunddesign für den Header */
+.main-header {
+    /*background-color: rgb(144, 41, 50);*/
+	background-color: var(--red);
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: none;
+}
+
+.main-header .logo {
+    width: 100px; /* Etwas kleiner für mehr Platz */
+    height: 100px;
+    border: 2px solid white;
+    object-fit: cover;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.header-text {
+    margin-left: 30px;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: white;
+    /* WICHTIG: Kein white-space: nowrap mehr! */
+    white-space: normal !important; 
+    overflow-wrap: break-word;
+}
+
+.header-text p {
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    letter-spacing: 1px;
+}
+
+/* HANDY-SPEZIALKORREKTUR */
+@media (max-width: 600px) {
+    .header-text h1 {
+        font-size: 1.2rem !important; /* Kleinerer Text auf dem Handy */
+    }
+    .main-header .logo {
+        width: 55px; /* Kleineres Logo spart Platz */
+        height: 55px;
+    }
+}
+	
+	
+	
+	
+	footer { 
+    position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
+    width: 100%; 
+    background: #1a1a1a; 
+    color: white; 
+    padding: 30px 0; 
+    border-top: 4px solid var(--red); 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px; 
+    text-align: center; 
+    font-size: 0.85rem; 
+    line-height: 1.2 !important; /* Hier wird der Abstand eng gemacht */
+}
+
+.footer-section {
+    display: block !important; /* Verhindert den flex-Abstand (gap) */
+    margin-bottom: 10px;
+}
+
+.footer-section strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--white);
+}
+
+.footer-section a, 
+.footer-section span {
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important; /* Garantiert den engen Abstand wie bei der Adresse */
+}
+
+footer a:hover {
+    color: var(--red);
+    text-decoration: underline;
+}
+	
+	
+    /* Nur die Admin-Elemente standardmäßig ausblenden */
+        .admin-only, .btn-ctrl, .admin-panel { 
+            display: none !important; 
+        }
+        
+        /* Nur einblenden, wenn die Klasse am body aktiv ist */
+        body.admin-mode .admin-only, 
+        body.admin-mode .btn-ctrl, 
+        body.admin-mode .admin-panel { 
+            display: block !important; 
+        }
+        
+        /* Spezialfall für die Button-Reihe (Flex-Layout erhalten) */
+        body.admin-mode .btn-row.admin-only {
+            display: flex !important;
+        }
+        
+       
+:root { 
+    --red: rgb(144, 41, 50); /* Dein neues dunkles Rot */
+    --dark: #1a1a1a; 
+    --light: #f4f4f4; 
+    --white: #ffffff; 
+}
+
+/* Stelle sicher, dass die Überschrift im Header keinen Schatten von alten Styles hat */
+header h1 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+      .container { 
+			max-width: 1100px; 
+			width: 95%; /* Sorgt für einen kleinen Rand links/rechts auf dem Handy */
+			margin: 20px auto; 
+			padding: 0; 
+		}
+
+/* Verhindert, dass lange Wörter (wie Willkommen) am Handy rauswandern */
+h1, h2, h3, p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);}
+        /*header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }*/        
+       /* .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red);  margin-left:10%;}*/
+        h1 { margin: 0; font-size: 1.6rem; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000;}
+        .tabs { display: flex; flex-wrap: wrap;  margin-left:20%;}
+        .tab-btn { background: none; border: none; color: white; cursor: pointer; padding: 12px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
+        .tab-btn.active { color: var(--red); border-bottom: 3px solid var(--red); }
+        .lang-switch { display: flex; gap: 5px; }
+        .lang-btn { background: #444; border: 1px solid #666; color: white; padding: 4px 10px; cursor: pointer; border-radius: 3px; }
+        .lang-btn.active { background: var(--red); border-color: var(--red); }
+    
+        #content-area { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 850px) { #content-area.grid-mode { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 850px) { #content-area.list-mode { grid-template-columns: 1fr; /* Nur eine Spalte = volle Breite */} }
+        .entry { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; border: 1px solid #ddd; }
+        .entry-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .entry-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
+        .price { color: var(--red); white-space: nowrap; margin-left: 10px; }
+        .desc { font-size: 0.9rem; color: #555; font-style: italic; flex-grow: 1; }
+        .item-img { width: 100%; height: 180px; object-fit: cover; }
+        .admin-only { display: none; }
+        body.admin-mode .admin-only { display: block; }
+        .admin-panel { background: #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed #999; }
+        .admin-panel div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .admin-panel input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
+       
+    /* Rahmen für das gesamte Event */
+.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0; /* Cremiger Hintergrund */
+}
+
+/* Datum als Überschrift */
+.event-date {
+    color: #8B4513;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+/* Die braune Linie */
+.event-line {
+    border: none;
+    height: 2px;
+    background-color: #8B4513;
+    margin-bottom: 15px;
+}
+
+/* 3-Spalten-Layout */
+.event-grid {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px; /* Zeit, Teams, League */
+    gap: 15px;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.event-time {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.event-teams {
+    font-weight: bold;
+    color: #333;
+}
+
+.event-league {
+    text-align: right;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+
+
+
+        /* HERO SECTION */
+.hero {
+    position: relative;
+    height: 450px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1.5rem; /* Etwas weniger Padding spart Platz */
+    border-radius: 10px;
+    backdrop-filter: blur(3px);
+    max-width: 90%; /* Erhöht auf 90%, damit mehr Text in eine Zeile passt */
+    box-sizing: border-box; /* Verhindert, dass Padding den Kasten sprengt */
+}
+
+.hero-overlay h2 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-transform: none; /* 'uppercase' macht Wörter oft zu breit für das Handy */
+    overflow-wrap: break-word; /* Erzwingt den Umbruch bei langen Wörtern */
+    word-wrap: break-word;
+    line-height: 1.2;
+}
+
+/* --- ABOUT SECTION (Bild & Text) --- */
+.about-section {
+    display: flex;
+    flex-direction: column; /* Standard für Handy: Untereinander */
+    align-items: center;
+    gap: 30px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 40px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.about-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.about-text {
+    flex: 1;
+    color: #333;
+    text-align: center; /* Handy: Zentriert */
+}
+
+/* WICHTIG: Entfernt den Abstand oberhalb des ersten Absatzes */
+.about-text p:first-child {
+    margin-top: 0 !important;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* PC-ANPASSUNG (Ab 850px) */
+@media (min-width: 850px) {
+    .about-section {
+        flex-direction: row !important; /* Bild links, Text rechts */
+        align-items: flex-start !important; /* Text beginnt ganz oben bündig mit Bild */
+        text-align: left !important;
+    }
+
+    .about-text {
+        text-align: left !important;
+        padding-top: 0 !important;
+    }
+}
+
+/* --- INFO CARDS (Kontakt & Öffnungszeiten) --- */
+.info-section-compact {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 25px;
+    margin-top: 40px;
+}
+
+/* Erkennt "Ruhetag", "ruhetag" und "RUHETAG" für die italienische Übersetzung */
+html[lang="it"] .zeit-spalte[data-wert="Ruhetag" i]::after {
+    content: "Giorno di riposo";
+}
+
+/* 1. Standard-Anzeige für Deutsch */
+html[lang="de"] .zeit-spalte::after {
+    content: attr(data-wert);
+}
+
+/* 2. Spezial-Regel für Italienisch: Wenn NICHT "Ruhetag" drinsteht (also eine Uhrzeit) */
+html[lang="it"] .zeit-spalte::after {
+    content: attr(data-wert);
+}
+
+/* 3. DIE ÜBERSETZUNG: Wenn exakt "Ruhetag" im Attribut steht und Sprache Italienisch ist */
+html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
+    content: "Giorno di riposo";
+}
+
+
+
+.contact-card-large, .hours-card-large {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    border-top: 5px solid var(--red);
+}
+
+.contact-icon, .hours-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.phone-number {
+    font-size: 1.5rem;
+    color: var(--red);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    margin: 15px 0;
+}
+
+.hours-list {
+    margin: 20px 0; /* Sorgt für vertikalen Abstand */
+    padding: 0;     /* Verhindert ungewollte Einrückungen */
+    width: 100%;    /* Nutzt die volle Breite der Karte */
+}
+
+/* Die Zeile als Ganzes */
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Zentriert Text vertikal */
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+	gap: 10px; /* Kleiner Abstand zwischen Tag und Zeit */
+}
+
+/* Der Wochentag (links) */
+.tag-spalte {
+    flex: 0 0 100px; /* Der Tag hat eine feste Basisbreite */
+	text-align: left;
+    font-weight: bold;
+    color: var(--dark);
+}
+
+/* Die Zeit-Spalte (rechts) */
+.zeit-spalte {
+    /* Nutzt eine feste Breite für alle Zahlen-Blöcke */
+    margin-left: auto; /* SCHIEBT DIE ZEIT NACH RECHTS */
+	min-width: 140px; 
+    text-align: right;
+    /* Monospace sorgt dafür, dass die '1' genau so breit ist wie die '0' */
+    font-family: 'Courier New', Courier, monospace; 
+    color: var(--red);
+    white-space: nowrap; /* Verhindert Umbruch innerhalb der Uhrzeit */
+}
+
+
+
+.hours-item:last-child { border-bottom: none; }
+
+/* Admin-Buttons Box */
+.admin-btns-row {
+    display: flex;
+    gap: 4px;
+    margin-left: 15px; /* Abstand zur Zeit-Spalte */
+    flex-shrink: 0;   /* Buttons dürfen nicht schrumpfen */
+}
+
+.admin-btns-row button {
+    padding: 4px 8px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+
+
+/* --- FINALE HANDY-ANPASSUNG (max-width: 850px) --- */
+@media (max-width: 850px) {
+    /* 1. Container & Scroll-Schutz */
+    .container { 
+        width: 95% !important; 
+        max-width: 100% !important;
+        margin: 10px auto !important;
+        overflow-x: hidden !important; 
+    }
+
+    /* 2. Startseite: Bild und Text untereinander */
+    .about-section { flex-direction: column !important; padding: 20px !important; text-align: center !important; }
+    .about-image { width: 100% !important; max-width: 320px !important; height: auto !important; }
+
+    /* 4. FIX FÜR "WILLKOMMEN" & "LAAS - VINSCHGAU" */
+    .hero-overlay {
+        width: 92% !important;
+        max-width: 92% !important;
+        padding: 15px 10px !important;
+        /*left: 50% !important;
+        transform: translateX(-50%) !important;*/
+        box-sizing: border-box !important;
+        position: relative !important; /* Wichtig für das Zentrieren */
+    }
+
+    .hero-overlay h2 { 
+        font-size: 1.5rem !important; 
+        line-height: 1.2 !important;
+        white-space: normal !important; 
+        word-break: break-word !important; 
+        overflow-wrap: break-word !important;
+        hyphens: auto !important; 
+        display: block !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        text-transform: none !important; /* 'uppercase' braucht zu viel Platz */
+    }
+    
+    .hero-overlay p { 
+        font-size: 1.0rem !important; 
+        white-space: normal !important;
+        margin-top: 10px !important;
+    }
+
+    /* 5. Kontakt & Öffnungszeiten */
+    .info-section-compact { grid-template-columns: 1fr !important; }
+
+    /* 6. TV-Events einspaltig */
+    .event-grid { grid-template-columns: 1fr !important; text-align: center !important; }
+}
+@media (max-width: 600px) {
+    .hours-item {
+        flex-wrap: wrap; /* Erlaubt den Umbruch, falls es zu eng wird */
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    .tag-spalte {
+        flex: 1 1 auto; /* Tag nimmt Platz ein, schiebt Rest nach rechts */
+        font-size: 0.9rem;
+    }
+
+    .zeit-spalte {
+        min-width: auto; /* Hebt die starre Breite auf */
+        margin-left: auto;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+
 @media (max-width: 600px) {
     /* Stapelt Zeit, Teams und Liga untereinander, damit nichts rechts rausragt */
     .event-grid {
@@ -20,3 +540,995 @@
         padding: 2px 0;
     }
 }
+
+
+</style>
+</head>
+<body>
+    
+<header class="main-header">
+    <img src="logo.webp" class="logo" alt="Logo">
+    <div class="header-text">
+        <h1>Pizzeria Pub St. Sisinius</h1>
+		<p id="ort">Laas - Vinschgau</p>	
+    </div>
+</header>
+    
+<div class="nav-container">
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-start" onclick="setTab('start')">Start</button>
+        <button class="tab-btn" id="tab-pizzas" onclick="setTab('pizzas')">Pizzakarte</button>
+        <button class="tab-btn" id="tab-events" onclick="setTab('events')">Events</button>
+        <button class="tab-btn" id="tab-tv" onclick="setTab('tv')">TV-Sport</button>
+    </div>
+    <div class="lang-switch">
+        <button class="lang-btn active" id="btn-de" onclick="setLang('DE')">DE</button>
+        <button class="lang-btn" id="btn-it" onclick="setLang('IT')">IT</button>
+    </div>
+</div>
+
+<div class="container">
+    <div id="content-area"></div>
+</div>
+    
+<footer>
+    <div class="footer-section">
+        <strong>Pizzeria Pub St. Sisinius</strong>
+        <span id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</span>
+        <span id="footer-region">Südtirol, Italien)</span>
+    </div>
+    
+    <div class="footer-section">
+        <strong id="footer-contact">Kontakt</strong>
+        <a href="tel:+393898334004">Tel: +39 389 833 4004</a>
+        <span style="opacity: 0.8; font-size: 0.8rem;">P.IVA / MwSt.-Nr.: 03317990210</span>
+    </div>
+
+    <div class="footer-section">
+        <strong id="footer-rechtliches">Rechtliches</strong>
+        <a href="impressumDe.html" id="footer-impressum-link">Impressum / Note Legali</a>
+        <a href="datenschutzDe.html" id="footer-datenschutz-link">Datenschutz / Privacy</a>
+    </div>
+</footer>
+
+<script>
+    
+    let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
+    let data = { start: {}, pizzas: [], events: [], tv: [] };
+    let currentTab = 'start';
+    let lang = 'DE';
+    const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
+    if(editMode) document.body.classList.add('admin-mode');
+
+//ÖFFNUNGSZEITEN 
+//========================================
+// ZEILE LÖSCHEN
+function deleteTime(index) {
+    if (confirm("Möchten Sie diese Öffnungszeit wirklich löschen?")) {
+        // Entfernt das Element an der Position 'index'
+        data.start.zeiten.splice(index, 1);
+        saveHoursToDB(data.start.zeiten);
+    }
+}
+
+// ZEILE VERSCHIEBEN (Richtung: -1 für hoch, 1 für runter)
+function moveTime(index, direction) {
+    const arr = data.start.zeiten;
+    const newIndex = index + direction;
+
+    // Prüfen, ob Verschieben möglich ist (nicht über die Grenzen hinaus)
+    if (newIndex >= 0 && newIndex < arr.length) {
+        // Tauscht die beiden Elemente im Array aus
+        const temp = arr[index];
+        arr[index] = arr[newIndex];
+        arr[newIndex] = temp;
+        
+        saveHoursToDB(arr);
+    }
+}
+
+// EINZELNE ZEILE BEARBEITEN (✎)
+async function editSingleTime(idx) {
+    const z = data.start.zeiten[idx];
+    const tDE = prompt("Tag DE:", z.tagDE || z.tag);
+    const tIT = prompt("Giorno IT:", z.tagIT || z.tag);
+    const uhr = prompt("Zeit:", z.zeit);
+
+    if (tDE && tIT && uhr) {
+        data.start.zeiten[idx] = { tagDE: tDE, tagIT: tIT, zeit: uhr };
+        await save();
+        render();
+    }
+}
+
+//-----------------------------------------------------  
+  
+  
+
+ function editItem(idx) {
+     const item = data[currentTab][idx];	
+
+   // ... deine anderen Felder (Name, Desc) ...
+    
+    // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
+    const catInput = document.getElementById('inCat'); 
+    if (catInput) {
+        catInput.value = item.cat || ""; 
+    }
+  
+  
+    document.getElementById('inNameDE').value = item.nameDE || "";
+    document.getElementById('inNameIT').value = item.nameIT || "";
+    document.getElementById('inDescDE').value = item.descDE || "";
+    document.getElementById('inDescIT').value = item.descIT || "";
+    document.getElementById('inRight').value = item.right || "";
+    
+	// 2. BILD-VORSCHAU AKTUALISIEREN (Der entscheidende Teil!)
+    const preview = document.getElementById('img-preview');
+    const hiddenInput = document.getElementById('inImgBase64');
+    const noImgText = document.getElementById('no-img-text');
+
+    if (item.img && item.img.length > 10) {
+        // Falls ein Bild-Code in der MongoDB ist
+        if (preview) {
+            preview.src = item.img;
+            preview.style.display = 'block';
+        }
+        if (hiddenInput) hiddenInput.value = item.img; // Code für späteres Speichern vorhalten
+        if (noImgText) noImgText.style.display = 'none';
+    } else {
+        // Falls kein Bild vorhanden ist
+        if (preview) {
+            preview.src = "";
+            preview.style.display = 'none';
+        }
+        if (hiddenInput) hiddenInput.value = "";
+        if (noImgText) noImgText.style.display = 'block';
+    }
+
+    editIndex = idx; // Position speichern!
+    // 3. Titel und Scroll-Effekt
+    const title = document.getElementById('admin-title');
+    if (title) title.innerText = "Eintrag bearbeiten (Position: " + (idx + 1) + ")";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}   
+    
+
+    
+    async function load() {
+    try {
+        const res = await fetch('/api/data?pw=leon2208');
+        const fetchedData = await res.json();
+        
+        // Sicherstellen, dass 'data' immer die richtige Struktur hat
+        data = fetchedData || {};
+        if (!data.pizzas) data.pizzas = [];
+        if (!data.events) data.events = [];
+        if (!data.start) data.start = { img: 'lokal.webp', textDE: 'Willkommen', textIT: 'Benvenuti' };
+
+        render(); // Jetzt wird die Seite garantiert gezeichnet
+    } catch (e) {
+        console.error("Fehler beim Laden der Daten:", e);
+        // Notfall-Plan: Leere Struktur, damit die Seite nicht hängen bleibt
+        data = { start: { img: 'lokal.webp', textDE: 'Willkommen' }, pizzas: [], events: [] };
+        render();
+    }
+}
+
+   /* async function save() {
+        // Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
+        if (currentTab === 'start') return; 
+        await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        render();
+    }*/
+	
+	
+	async function save() {
+    // Wir entfernen die Start-Sperre, damit auch Öffnungszeiten gespeichert werden!
+    try {
+        const res = await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if (!res.ok) {
+            alert("Fehler beim Speichern in der Cloud!");
+        }
+    } catch (e) {
+        console.error("Speicherfehler:", e);
+        alert("Verbindung zum Server fehlgeschlagen.");
+    }
+    // Wir rufen hier KEIN render() auf, das machen wir lieber in der 
+    // aufrufenden Funktion (z.B. move oder addItem) nach dem await.
+}
+
+    function setTab(t) { 
+        currentTab = t; 
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
+        render(); 
+    }
+
+    function setLang(l) { 
+        lang = l; 
+         // Tab-Buttons übersetzen
+        const btnStart = document.getElementById('tab-start');
+        const btnPizzas = document.getElementById('tab-pizzas');
+        const btnEvents = document.getElementById('tab-events');
+        const btnTV = document.getElementById('tab-tv');
+
+    if (lang === 'DE') {
+        if(btnStart) btnStart.innerText = "Start";
+        if(btnPizzas) btnPizzas.innerText = "Pizzakarte";
+        if(btnEvents) btnEvents.innerText = "Events";
+        if(btnTV) btnTV.innerText = "TV-Sport";
+    } else {
+        if(btnStart) btnStart.innerText = "Inizio";
+        if(btnPizzas) btnPizzas.innerText = "Menu Pizza";
+        if(btnEvents) btnEvents.innerText = "Eventi";
+        if(btnTV) btnTV.innerText = "Sport TV";
+    }
+     
+    const ort=document.getElementById('ort');
+    if (lang === 'DE') {
+        if (ort) {
+            ort.innerHTML = "Laas - Vinschagau";
+        }
+	}
+	else{
+	    if (ort) {
+		    ort.innerHTML = "Lasa - Venosta";
+		}
+	}
+	
+	
+    // Footer-Elemente übersetzen
+    const footerHours = document.getElementById('footer-hours');
+    const footerAddress = document.getElementById('footer-address');
+    
+    if (lang === 'DE') {
+        if (footerHours) {
+            footerHours.innerHTML = "Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00";
+        }
+        // Adresse (optional, falls "Vinschgaustraße" übersetzt werden soll)
+        if (footerAddress) footerAddress.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+    } else {
+        if (footerHours) {
+            footerHours.innerHTML = "Lunedì giorno di riposo<br>Mar-Gio: 16:00-00:00<br>Ven-Dom: 16:00-01:00";
+        }
+        if (footerAddress) footerAddress.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+    }
+
+
+        
+        document.getElementById('btn-de').classList.toggle('active', l==='DE');
+        document.getElementById('btn-it').classList.toggle('active', l==='IT');
+        render(); 
+    }
+
+function render() {
+    
+		// --- FOOTER SPRACHUMSTELLUNG ---
+
+		// 1. Elemente abgreifen
+		const footerAddr = document.getElementById('footer-address');
+		const footerRegion = document.getElementById('footer-region');
+		const footerContact = document.getElementById('footer-contact');
+		const footerRecht = document.getElementById('footer-rechtliches');
+		const footerImpLink = document.getElementById('footer-impressum-link');
+		const footerDataLink = document.getElementById('footer-datenschutz-link');
+
+		// 2. Texte und Links je nach Sprache setzen
+		if (lang === 'DE') {
+			if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+			if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
+			if (footerContact) footerContact.innerText = "Kontakt";
+			if (footerRecht) footerRecht.innerText = "Rechtliches";
+			
+			if (footerImpLink) {
+				footerImpLink.innerText = "Impressum";
+				footerImpLink.href = "impressumDe.html";
+			}
+			if (footerDataLink) {
+				footerDataLink.innerText = "Datenschutz";
+				footerDataLink.href = "datenschutzDe.html";
+			}
+		} else {
+			// ITALIENISCH (IT)
+			if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+			if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
+			if (footerContact) footerContact.innerText = "Contatto";
+			if (footerRecht) footerRecht.innerText = "Note Legali";
+			
+			if (footerImpLink) {
+				footerImpLink.innerText = "Note Legali"; // In Italien heißt Impressum oft Note Legali
+				footerImpLink.href = "impressumIt.html";
+			}
+			if (footerDataLink) {
+				footerDataLink.innerText = "Privacy";
+				footerDataLink.href = "datenschutzIt.html";
+			}
+		}
+	
+	
+	
+	
+	const area = document.getElementById('content-area');
+    if (!area) return;
+    area.innerHTML = '';
+
+    // Admin-Modus Klasse am Body umschalten
+    if (editMode) {
+        document.body.classList.add('admin-mode');
+    } else {
+        document.body.classList.remove('admin-mode');
+    }
+
+
+
+
+
+// 2.1. ADMIN-KONSOLE
+    //-------------------------------
+if (editMode && currentTab !== 'start') {
+    let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+    
+    area.innerHTML += `
+        <div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+            <strong id="admin-title" style="color: var(--red);">Admin-Konsole (${currentTab.toUpperCase()})</strong>
+            
+            <div class="input-grid" style="margin-top: 10px;">
+                <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+                <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+                <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
+                <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
+                <input type="text" id="inRight" placeholder="${label}">
+            </div>
+
+            <!-- BILD-UPLOAD BEREICH -->
+            <div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: white;">
+                <label style="display:block; font-weight:bold; margin-bottom:5px; font-size: 0.9rem;">Bild für ${currentTab.toUpperCase()}:</label>
+                
+                <input type="file" id="inImgFile" accept="image/*" onchange="encodeImageFileAsURL(this)" style="width:100%; font-size: 0.8rem;">
+
+                <div id="preview-box" style="margin-top: 10px; text-align: center; min-height: 50px;">
+                    <img id="img-preview" src="" style="max-height:120px; border-radius:5px; display:none; border:2px solid var(--red);">
+                    <p id="no-img-text" style="font-size: 0.8rem; color: #888; margin: 5px 0;">Kein Bild gewählt</p>
+                </div>
+
+                <input type="hidden" id="inImgBase64">
+                <div id="upload-status" style="font-size: 0.8rem; color: green; display: none; text-align: center;">✅ Bild bereit!</div>
+            </div>
+
+            <!-- KATEGORIE-WAHL -->
+            ${(currentTab === 'pizzas' || currentTab === 'tv') ? `
+                <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">${currentTab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}</label>
+                    ${currentTab === 'pizzas' ? `
+                        <select id="inCat" style="width:100%; padding:8px; margin-top:5px;">
+                            <option value="pizza">Standard Pizza</option>
+                            <option value="bianche">Pizza Bianche</option>
+                            <option value="kinder">Kinderpizza</option>
+                            <option value="extras">Extras</option>
+                        </select>
+                    ` : `
+                        <input type="text" id="inCat" placeholder="z.B. Champions League" style="width:100%; padding:8px; margin-top:5px;">
+                    `}
+                </div>
+            ` : ''}
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button onclick="addItem()" style="flex: 1; background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Eintrag speichern</button>
+                <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
+            </div>
+        </div>
+    `;
+}
+
+
+
+
+
+
+    // 1. STARTSEITE (Sonderlayout)
+	//=====================================
+    if (currentTab === 'start') {
+        const s = data.start || { 
+            img: 'lokal.webp', 
+            textDE: 'Willkommen bei Pizzeria Pub St. Sisinius', 
+            textIT: 'Benvenuti alla Pizzeria Pub St. Sisinius' 
+        };
+        
+        area.className = 'list-mode';
+      
+area.innerHTML += `
+    <div class="hero" style="
+        height: 500px; 
+        position: relative; 
+        width: 100vw; 
+        left: 50%; 
+        right: 50%; 
+        margin-left: -50vw; 
+        margin-right: -50vw; 
+        overflow: hidden; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: white;">
+        
+        <img src="lokal.webp" style="
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            z-index: 1;">
+            
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+
+        <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 10px; text-transform: none;">
+                ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
+            </h2>
+            <p style="font-size: 1.5rem; font-weight: 500;">
+                ${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}
+            </p>
+        </div>
+    </div>
+    
+    <div class="container">
+                <div class="about-section">
+					<img src="pizza.webp" alt="Pizza" class="about-image">
+					<div class="about-text">
+						${lang === 'DE' ? 
+							'<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
+							'<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live‑Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und bieten verschiedene Events und Specials für beste Stimmung und Abwechslung in der Pizzeria St. Sisinius.</p>' +
+							'<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
+							: 
+							'<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparata con ingredienti freschi e molta cura per i dettagli.</p>' +
+							'<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
+							'<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
+						}
+					</div>
+				</div>
+                <div class="info-section-compact">
+                    <div class="contact-card-large">
+                        <div class="contact-icon">📞</div>
+                        <h3 style="color:var(--red)">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+                        <a href="tel:+393898334004" class="phone-number">+39 389 833 4004</a>
+                        <p>${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}</p>
+                    </div>
+                    <div class="hours-card-large">
+                        <div class="hours-icon">🕐</div>
+                        <h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
+                        
+						<div class="hours-list">
+							${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
+								data.start.zeiten.map((z, idx) => `
+									<div class="hours-item">
+										<!-- 1. Der Tag (Links) -->
+										<span class="tag-spalte">
+											${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
+										</span> 
+
+										<!-- 2. Die Zeit (Rechts) - Nutzt data-wert für CSS-Übersetzung & Ausrichtung -->
+										<span class="zeit-spalte" data-wert="${z.zeit ? z.zeit.trim() : ''}"></span>
+
+										<!-- 3. Admin-Buttons (Nur wenn editMode aktiv) -->
+										${editMode ? `
+											<div class="admin-btns-row">
+												<button onclick="moveTime(${idx}, -1)">↑</button>
+												<button onclick="moveTime(${idx}, 1)">↓</button>
+												<button onclick="editSingleTime(${idx})">✎</button>
+												<button onclick="deleteTime(${idx})">X</button>
+											</div>` : ''}
+									</div>
+								`).join('') 
+								: `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
+							}
+						</div>	
+                    </div>
+                </div>
+            </div>
+            
+			 ${editMode ? `
+                <div style="text-align:center; margin:20px;">
+                    <button class="btn-ctrl" onclick="addTimeRow()" style="background-color: var(--red); color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        + Neue Öffnungszeit hinzufügen
+                    </button>
+                </div>` : ''}
+        `;
+        return;  //bricht render() ab
+    }
+	//---------------------------------------------------------------
+	
+    // 2. ANDERE SEITEN ALS STARTSEITE 
+	//=====================================
+    
+
+    if (!data[currentTab]) {
+        area.innerHTML = '<p>Lade Daten...</p>';
+        return;
+    }
+
+ // 2.2 LISTEN RENDERING
+    area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
+    // area.innerHTML = ''; // Falls du oben am Anfang der Funktion schon leerst, bleibt das auskommentiert
+
+    // --- FALL 1: PIZZAS ---
+    if (currentTab === 'pizzas') {
+        area.innerHTML += `
+            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">
+                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">
+                    ${lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza'}
+                </h1>
+            </div>
+        `;
+        
+        const kats = [
+            { id: 'pizza', de: 'Pizza', it: 'Pizza' },
+            { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' },
+            { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' },
+			{ id: 'extras', de: 'Extras', it: 'Extra' } // <--- Das hier hinzufügen!
+        ];
+
+        kats.forEach(kat => {
+            // Erst filtern...
+            const filtered = data.pizzas.filter(p => (p.cat || 'pizza') === kat.id);
+            
+            // ...dann prüfen und anzeigen
+            if (filtered.length > 0) {
+                area.innerHTML += `
+                    <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">
+                        <h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">${lang === 'DE' ? kat.de : kat.it}</h2>
+                    </div>`;
+                
+                filtered.forEach(item => {
+                    const realIdx = data.pizzas.findIndex(p => p === item);
+                    area.innerHTML += renderPizzaOrEvent(item, realIdx, true);
+                });
+            }
+        });
+    } 
+    // --- FALL 2: TV & EVENTS ---
+    else {
+        // ÜBERSCHRIFT NUR EINMAL (vor der Schleife)
+        const title = currentTab === 'tv' ? (lang === 'DE' ? 'TV-Sport' : 'TV-Sport') : (lang === 'DE' ? 'Events' : 'Eventi');
+        area.innerHTML += `
+            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0;">
+                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">${title}</h1>
+            </div>
+            <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>
+        `;
+
+        data[currentTab].forEach((item, idx) => {
+            if (currentTab === 'tv') {
+                area.innerHTML += `
+                    <div class="event-card">
+                        <div class="event-date">${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}</div> 
+                        <hr class="event-line">
+                        <div class="event-grid">
+                            <div class="event-time">${item.right || ''}</div>
+                            <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
+                            <div class="event-league">${item.cat || 'LIVE'}</div>
+                        </div>
+                        ${getAdminButtonsHtml(idx)}
+                    </div>`;
+            } else {
+                area.innerHTML += renderPizzaOrEvent(item, idx, false);
+            }
+        });
+    }
+} // Ende von render()
+
+// Hilfsfunktion, um doppelten Code zu vermeiden
+		function renderPizzaOrEvent(item, idx, isPizza) {
+    return `
+        <div class="entry">
+            <!-- Bild nur anzeigen, wenn eines vorhanden ist -->
+            ${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
+            
+            <div class="entry-content">
+                <div class="entry-header">
+                    <!-- Name/Titel in der gewählten Sprache -->
+                    <span style="font-weight: bold; font-size: 1.1rem;">
+                        ${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}
+                    </span>
+                    
+                    <!-- Rechts: Preis bei Pizzen, Datum/Uhrzeit bei Events -->
+                    <span class="price" style="color: var(--red); font-weight: bold; white-space: nowrap;">
+                        ${item.right || ''}${isPizza ? ' €' : ''}
+                    </span>
+                </div>
+
+                <!-- Beschreibung/Zutaten -->
+                <div class="desc" style="font-size: 0.9rem; color: #555; font-style: italic; margin: 10px 0; flex-grow: 1;">
+                    ${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}
+                </div>
+
+                <!-- Admin-Buttons nur im Edit-Mode einblenden -->
+                ${typeof getAdminButtonsHtml === 'function' ? getAdminButtonsHtml(idx) : ''}
+            </div>
+        </div>
+    `;
+}
+
+
+
+
+// HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
+function getAdminButtonsHtml(idx) {
+    if (!editMode) return '';
+    return `
+        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">
+            <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+            <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+            <button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
+            <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
+        </div>`;
+}
+
+// 1. Neue Zeile hinzufügen
+async function addTimeRow() {
+    const tDE = prompt("Tag auf DEUTSCH (z.B. Montag):", "Montag");
+    if (!tDE) return;
+    const tIT = prompt("Giorno in ITALIANO (p.es. Lunedì):", "Lunedì");
+    const uhr = prompt("Uhrzeit (Nutze % für Leerzeichen, z.B. 17:00-22:00):", "17:00-22:00");
+
+    const neueZeile = {
+        tagDE: tDE,
+        tagIT: tIT,
+        zeit: uhr
+    };
+
+    if (!data.start.zeiten) data.start.zeiten = [];
+    data.start.zeiten.push(neueZeile);
+    
+    await save(); // Deine save() Funktion zum Server
+    render();
+}
+
+ 
+//Öffnungszeiten
+//=========================================
+// 2. In MongoDB speichern
+async function saveHoursToDB(newArray) {
+    const updatedData = {
+        ...data,
+        type: "main_data",
+        start: { 
+            ...data.start, 
+            zeiten: newArray 
+        }
+    };
+
+    try {
+        const response = await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData)
+        });
+
+        if (response.ok) {
+            location.reload(); // Seite in Laas neu laden
+        } else {
+            alert("Fehler beim Speichern! Status: " + response.status);
+        }
+    } catch (e) {
+        console.error("Netzwerkfehler:", e);
+    }
+}
+
+
+// ITEM HINZUFÜGEN
+//===================================================
+    async function addItem() {
+    // 1. Werte aus den Feldern holen
+    const newItem = {
+        nameDE: document.getElementById('inNameDE').value,
+        nameIT: document.getElementById('inNameIT').value,
+        descDE: document.getElementById('inDescDE').value,
+        descIT: document.getElementById('inDescIT').value,
+        right: document.getElementById('inRight').value,
+        img: document.getElementById('inImgBase64').value || ""
+		//img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+    };
+
+   // WICHTIG: Hier wird die Kategorie ausgelesen
+    if (currentTab === 'pizzas' || currentTab === 'tv') {
+        const catDropdown = document.getElementById('inCat');
+        if (catDropdown) {
+            newItem.cat = catDropdown.value; // Nimmt 'pizza', 'bianche' oder 'kinder'
+        } else {
+			if (currentTab === 'pizzas'){
+              newItem.cat = 'pizza'; // Sicherheits-Fallback
+			}
+			else{
+			  newItem.cat = 'LIVE'; // Sicherheits-Fallback
+			}
+				
+        }
+    }
+
+
+    // Sicherheitscheck: Falls Name leer ist
+    if (!newItem.nameDE && currentTab !== 'start') {
+        alert("Bitte Namen eingeben!");
+        return;
+    }
+
+    // 2. ENTSCHEIDUNG: Bearbeiten oder Neu?
+    if (editIndex !== null) {
+        // BEARBEITEN: Bestehenden Index überschreiben
+        data[currentTab][editIndex] = newItem;
+        console.log("Eintrag an Position " + editIndex + " bearbeitet.");
+        editIndex = null; // WICHTIG: Index nach Erfolg zurücksetzen!
+    } else {
+        // NEU: Nur wenn kein editIndex gesetzt ist, wird gepusht
+        if (currentTab === 'start') {
+            data.start = newItem; // [newItem]; // Bei Start meist nur ein Eintrag
+        } else {
+            data[currentTab].push(newItem);
+            console.log("Neuer Eintrag am Ende hinzugefügt.");
+        }
+    }
+
+    // 3. SYNCHRONISATION MIT SERVER
+    try {
+        const res = await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            // Felder leeren für nächsten Eintrag
+            clearFields();
+            alert("Erfolgreich gespeichert!");
+            render();
+        }
+    } catch (e) {
+        alert("Fehler beim Speichern!");
+    }
+}
+
+
+// Öffnungszeiten
+//============================
+async function editStartInfo() {
+    // 1. Neue Zeiten vom User abfragen
+    const neueZeiten = prompt("Geben Sie die neuen Öffnungszeiten ein (z.B. Di-Do 16:00-00:00, Fr-Sa...):");
+    
+    if (neueZeiten) {
+        // 2. Das komplette Datenobjekt vorbereiten (muss zu deiner MongoDB Struktur passen)
+        const updatedData = {
+            ...data, // Behält alle bestehenden Daten (Pizzas, TV etc.) bei
+            type: "main_data",
+            start: {
+                ...data.start,
+                oeffnungszeiten: neueZeiten // Hier wird der neue Wert gesetzt
+            }
+        };
+
+        // 3. An deine bestehende API senden (Passwort in der URL wegen deiner Route)
+        try {
+            const response = await fetch('/api/data?pw=leon2208', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (response.ok) {
+                alert("Öffnungszeiten aktualisiert!");
+                location.reload();
+            } else {
+                alert("Fehler beim Speichern. Passwort korrekt?");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Verbindung zum Server fehlgeschlagen.");
+        }
+    }
+}
+
+
+
+    
+
+    
+	// Hilfsfunktion zum Leeren der Felder
+	function clearFields() {
+		document.getElementById('inNameDE').value = "";
+		document.getElementById('inNameIT').value = "";
+		document.getElementById('inDescDE').value = "";
+		document.getElementById('inDescIT').value = "";
+		document.getElementById('inRight').value = "";
+		if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
+		const title = document.getElementById('admin-title');
+		if(title) title.innerText = "Neuen Eintrag hinzufügen";
+	}
+	
+    /*function move(index, dir) {
+        const list = data[currentTab];
+        if (index + dir >= 0 && index + dir < list.length) {
+            [list[index], list[index + dir]] = [list[index + dir], list[index]];
+            save();
+        }
+    }*/
+	
+async function move(index, direction) {
+    const items = data[currentTab];
+    const currentItem = items[index];
+
+    // 1. Suche den nächsten Nachbarn, der die GLEICHE Kategorie hat
+    let targetIndex = -1;
+    if (direction === -1) { // Nach oben schieben
+        for (let i = index - 1; i >= 0; i--) {
+            if ((items[i].cat || 'pizza') === (currentItem.cat || 'pizza')) {
+                targetIndex = i;
+                break;
+            }
+        }
+    } else { // Nach unten schieben
+        for (let i = index + 1; i < items.length; i++) {
+            if ((items[i].cat || 'pizza') === (currentItem.cat || 'pizza')) {
+                targetIndex = i;
+                break;
+            }
+        }
+    }
+
+    // 2. Wenn kein passender Nachbar in der Kategorie gefunden wurde -> Abbruch
+    if (targetIndex === -1) {
+        console.log("Kein Nachbar in dieser Kategorie gefunden.");
+        return;
+    }
+
+    // 3. Tausch im Array
+    const temp = items[index];
+    items[index] = items[targetIndex];
+    items[targetIndex] = temp;
+
+    // 4. Speichern & Neu zeichnen
+    await save();
+    render();
+}
+  
+	
+	
+	
+
+    function remove(idx) {
+        if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); render();save(); }
+    }
+
+    function editStart() {
+        const txt = prompt("Text eingeben / Inserire testo:", lang === 'DE' ? data.start.textDE : data.start.textIT);
+        if(txt !== null) {
+            if(lang === 'DE') data.start.textDE = txt; else data.start.textIT = txt;
+            save();
+        }
+    }
+
+	function encodeImageFileAsURL(element) {
+		const file = element.files[0];
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onload = function(e) {
+			const img = new Image();
+			img.onload = function() {
+				// 1. Leinwand erstellen
+				const canvas = document.createElement('canvas');
+				const MAX_WIDTH = 800; // Maximale Breite für die Pizzeria-Webseite
+				
+				let width = img.width;
+				let height = img.height;
+
+				// 2. Proportionen berechnen
+				if (width > MAX_WIDTH) {
+					height *= MAX_WIDTH / width;
+					width = MAX_WIDTH;
+				}
+
+				canvas.width = width;
+				canvas.height = height;
+
+				// 3. Bild auf Leinwand zeichnen (verkleinern)
+				const ctx = canvas.getContext('2d');
+				ctx.drawImage(img, 0, 0, width, height);
+
+				// 4. Als komprimiertes JPG exportieren (Qualität 0.7 = 70%)
+				const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+				// 5. In das versteckte Feld und die Vorschau schreiben
+				document.getElementById('inImgBase64').value = compressedBase64;
+				
+				const preview = document.getElementById('img-preview');
+				if (preview) {
+					preview.src = compressedBase64;
+					preview.style.display = 'block';
+				}
+				if (document.getElementById('no-img-text')) document.getElementById('no-img-text').style.display = 'none';
+				
+				console.log("Bild für St. Sisinius optimiert: " + Math.round(compressedBase64.length / 1024) + " KB");
+			};
+			img.src = e.target.result;
+		};
+		reader.readAsDataURL(file);
+	}
+		
+	
+
+    load();
+	
+	
+	async function importPizzeriaDataComplete() {
+    const fullList = [
+        { n: "Margherita", p: "7.50", dDE: "Tomaten, Fior di Latte, Basilikum", dIT: "Pomodoro, fior di latte, basilico", c: "pizza" },
+        { n: "Marinara", p: "6.50", dDE: "Tomaten, Knoblauch, Olivenöl", dIT: "Pomodoro, aglio, olio d´oliva", c: "pizza" },
+        { n: "Prosciutto", p: "9.00", dDE: "Tomaten, Fior di Latte, Schinken", dIT: "Pomodoro, fior di latte, prosciutto cotto", c: "pizza" },
+        { n: "Prosciutto e funghi", p: "9.50", dDE: "Tomaten, Fior di Latte, Schinken, Champignon", dIT: "Pomodoro, fior di latte, prosciutto cotto, champignon", c: "pizza" },
+        { n: "Capricciosa", p: "10.00", dDE: "Tomaten, Fior di Latte, Schinken, Champignon, Artischocken", dIT: "Pomodoro, fior di latte, prosciutto, champignon, carciofi", c: "pizza" },
+        { n: "Quattro stagioni", p: "10.50", dDE: "Tomaten, Fior di Latte, Schinken, Champignon, Artischocken, Oliven", dIT: "Pomodoro, fior di latte, prosciutto, champignon, carciofi, olive", c: "pizza" },
+        { n: "Diavola", p: "10.00", dDE: "Tomaten, Fior di Latte, scharfe Salami, Lombardi", dIT: "Pomodoro, fior di latte, salame piccante, lombardi", c: "pizza" },
+        { n: "Siciliana", p: "10.00", dDE: "Tomaten, Fior di latte, Oliven, Kapern, Sardellen", dIT: "Pomodoro, fior di latte, olive, capperi, acciughe", c: "pizza" },
+        { n: "Quattro formaggi", p: "11.50", dDE: "Tomaten, Fior di latte, Bufala, Gorgonzola, Parmesan", dIT: "Pomodoro, fior di latte, bufala, gorgonzola, parmigiano", c: "pizza" },
+        { n: "Meeresfrüchte", p: "12.50", dDE: "Tomaten, Fior di latte, Meeresfrüchte, Knoblauch, Petersilie", dIT: "Pomodoro, fior di latte, frutti di mare, aglio, prezzemolo", c: "pizza" },
+        { n: "Tonno", p: "9.50", dDE: "Tomaten, Fior di latte, Thunfisch, Zwiebel", dIT: "Pomodoro, fior di latte, tonno, cipolla", c: "pizza" },
+        { n: "Garnelen", p: "13.00", dDE: "Tomaten, Fior di latte, Garnelen, Cocktailtomaten, Knoblauch", dIT: "Pomodoro, fior di latte, gamberi, pomodorini, aglio", c: "pizza" },
+        { n: "Lachs", p: "12.50", dDE: "Tomaten, Fior di latte, Lachs, Zucchini", dIT: "Pomodoro, fior di latte, salmone, zucchine", c: "pizza" },
+        { n: "Calzone", p: "10.50", dDE: "Tomaten, Fior di latte, Schinken, Champignon", dIT: "Pomodoro, fior di latte, prosciutto, champignon", c: "pizza" },
+        { n: "Bauern", p: "10.00", dDE: "Tomaten, Fior di latte, Speck, Zwiebel, Knoblauch", dIT: "Pomodoro, fior di latte, speck, cipolla, aglio", c: "pizza" },
+        { n: "Bufalina", p: "11.50", dDE: "Tomaten, Bufala, Rucola, Cocktailtomaten, Parmesan", dIT: "Pomodoro, bufala, rucola, pomodorini, parmigiano", c: "pizza" },
+        { n: "Parma", p: "12.50", dDE: "Tomaten, Fior di latte, Rucola, Cocktailtomaten, Rohschinken, Parmesan", dIT: "Pomodoro, fior di latte, rucola, pomodorini, crudo, parmigiano", c: "pizza" },
+        { n: "Gemüse", p: "11.00", dDE: "Tomaten, Fior di latte, Gemüse, Parmesan, Knoblauch", dIT: "Pomodoro, fior di latte, verdure, parmigiano, aglio", c: "pizza" },
+        { n: "Vegana", p: "9.50", dDE: "Tomaten, Gemüse, Knoblauch, Olivenöl", dIT: "Pomodoro, verdura, aglio, olio d’oliva", c: "pizza" },
+        { n: "Parmigiana", p: "10.50", dDE: "Tomaten, Fior di latte, Melanzane, Parmesan", dIT: "Pomodoro, fior di latte, melanzane, parmigiano", c: "pizza" },
+        { n: "Autunno", p: "11.50", dDE: "Tomaten, Fior di latte, Gorgonzola, Speck, Walnüsse", dIT: "Pomodoro, fior di latte, gorgonzola, speck, noci", c: "pizza" },
+        { n: "Parnetz", p: "11.50", dDE: "Tomaten, Fior di latte, Speck, Pfifferlinge, Spinat, Knoblauch", dIT: "Pomodoro, fior di latte, speck, finferli, spinaci, aglio", c: "pizza" },
+        { n: "Primavera", p: "12.00", dDE: "Tomaten, Bufala, Cocktailtomaten, Basilikumpesto, Ricotta", dIT: "Pomodoro, bufala, pomodorini, pesto alla Genovese, ricotta", c: "pizza" },
+        { n: "Rustica", p: "12.00", dDE: "Tomaten, Fior di latte, scharfe Salami, Gorgonzola, Zwiebel, Lombardi", dIT: "Pomodoro, fior di latte, salame piccante, gorgonzola, cipolla, lombardi", c: "pizza" },
+        { n: "Sisinius", p: "12.50", dDE: "Tomaten, Fior di latte, scharfe Salami, Zwiebel, Paprika, Pfifferlinge, Ei", dIT: "Pomodoro, fior di latte, salame piccante, cipolla, peperoni, finferli, uova", c: "pizza" },
+        { n: "Mediterranea", p: "12.00", dDE: "Tomaten, Fior di latte, Artischocken, Cocktailtomaten, Oliven, Ricotta, Parmesan", dIT: "Pomodoro, fior di latte, carciofi, pomodorini, olive, ricotta, parmigiano", c: "pizza" },
+        { n: "Vinschger", p: "13.00", dDE: "Tomaten, Fior di latte, Speck, Zwiebel, Gorgonzola, Pfifferlinge, Parmesan, Knoblauch", dIT: "Pomodoro, fior di latte, speck, cipolla, gorgonzola, finferli, parmigiano, aglio", c: "pizza" },
+        { n: "Italia", p: "13.50", dDE: "Tomaten, Fior di latte, Cocktailtomaten, Rohschinken, Burrata, Basilikum", dIT: "Pomodoro, fior di latte, pomodorini, crudo, burrata, basilico", c: "pizza" },
+
+        // --- PIZZA BIANCHE ---
+        { n: "Genovese", p: "13.00", dDE: "Basilikumpesto, Fior di latte, Cocktailomaten, Rohschinken, Parmesan", dIT: "Pesto alla genovese, fior di latte, pomodorini, crudo, parmigiano", c: "bianche" },
+        { n: "Carbonara", p: "12.00", dDE: "Fior di latte, Speck, Ei, Parmesan, Pfeffer", dIT: "Fior di latte, speck, uova, parmigiano, pepe", c: "bianche" },
+        { n: "Superba", p: "12.00", dDE: "Pesto, Fior di latte, Cocktailtomaten, Burrata, Basilikum", dIT: "Pesto, fior di latte, pomodorini, burrata, basilico", c: "bianche" },
+
+        // --- KINDERPIZZA ---
+        { n: "Micky Maus", p: "5.50", dDE: "Tomaten, Fior di latte", dIT: "Pomodoro, fior di latte", c: "kinder" },
+        { n: "Scooby Doo", p: "6.50", dDE: "Tomaten, Fior di latte, milde Salami, Mais", dIT: "Pomodoro, fior di latte, salame, mais", c: "kinder" },
+        { n: "Nemo", p: "7.00", dDE: "Tomate, Fior di latte, 2 Zutaten nach Wahl", dIT: "Pomodoro, fior di latte, 2 condimenti a scelta", c: "kinder" },
+
+        // --- EXTRAS ---
+        { n: "Kleine Pizza / pizze piccole", p: "1.50", dDE: "Abzug von:", dIT: "meno:", c: "extras" },
+        { n: "Extra Zutaten / aggiunte", p: "4.50", dDE: "max +", dIT: "max +", c: "extras" },
+        { n: "Glutenfreier Teig / impasto senza glutine", p: "3.00", dDE: "+", dIT: "+", c: "extras" },
+        { n: "Laktosefreie Mozarella / mozzarella senza lattosio", p: "2.00", dDE: "+", dIT: "+", c: "extras" }
+    ];
+
+    // Wir nehmen die bestehende Liste (Teil 1) und fügen den Rest hinzu
+    const formatted = fullList.map(p => ({
+        nameDE: p.n, nameIT: p.n, descDE: p.dDE, descIT: p.dIT, right: p.p, cat: p.c, img: ""
+    }));
+
+    data.pizzas = [...data.pizzas, ...formatted]; 
+
+    await save(); 
+    alert("Komplette Speisekarte inklusive Extras erfolgreich importiert!");
+    location.reload();
+}
+	
+	
+</script>
+</body>
+</html>
