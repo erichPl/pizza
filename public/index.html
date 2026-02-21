@@ -621,8 +621,17 @@ async function editSingleTime(idx) {
   
 
  function editItem(idx) {
-    const item = data[currentTab][idx];
+     const item = data[currentTab][idx];	
+
+   // ... deine anderen Felder (Name, Desc) ...
     
+    // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
+    const catInput = document.getElementById('inCat'); 
+    if (catInput) {
+        catInput.value = item.cat || ""; 
+    }
+  
+  
     document.getElementById('inNameDE').value = item.nameDE || "";
     document.getElementById('inNameIT').value = item.nameIT || "";
     document.getElementById('inDescDE').value = item.descDE || "";
