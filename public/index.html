@@ -892,10 +892,37 @@ function render() {
 
 
 // 2.1. ADMIN-KONSOLE
-    //-------------------------------
+//-------------------------------
 if (editMode && currentTab !== 'start') {
     let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
     
+	
+	 // NEU: Platzhalter für Beschreibung je nach Tab (TV = Datum, Events = Uhrzeit, Rest = Beschreibung)
+    let labelDesc = 'Beschreibung';
+    let labelDescIT = 'Descrizione';
+	
+    if (currentTab === 'tv') {
+        labelDesc = 'Datum (z.B. Freitag 13.02.26)';
+        labelDescIT = 'Data (p.es. Venerdì 13/02/26)';
+    } else if (currentTab === 'events') {
+        labelDesc = 'Uhrzeit (z.B. ab 20:00 Uhr)';
+        labelDescIT = 'Orario (p.es. dalle ore 20:00)';
+    }
+
+
+	// Vor dem area.innerHTML += Block:
+	let descITField = '';
+
+	// Nur bei Pizzen brauchen wir das zweite Beschreibungsfeld (Zutaten IT)
+	if (currentTab === 'pizzas') {
+		descITField = `<input type="text" id="inDescIT" placeholder="Descrizione (IT)">`;
+	} else {
+		// Bei TV-Sport und Events nutzen wir die Automatik -> Feld verstecken
+		descITField = `<input type="hidden" id="inDescIT" value="">`;
+	}
+
+
+
     area.innerHTML += `
         <div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
             <strong id="admin-title" style="color: var(--red);">Admin-Konsole (${currentTab.toUpperCase()})</strong>
@@ -903,8 +930,11 @@ if (editMode && currentTab !== 'start') {
             <div class="input-grid" style="margin-top: 10px;">
                 <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
                 <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
-                <input type="text" id="inDescDE" placeholder="Beschreibung (DE)">
-                <input type="text" id="inDescIT" placeholder="Descrizione (IT)">
+                
+                <!-- Hier werden die Platzhalter jetzt variabel genutzt -->
+                <input type="text" id="inDescDE" placeholder="${labelDesc}">
+                <!-- Hier wird nun das variable Feld eingesetzt -->
+                ${descITField}
                 <input type="text" id="inRight" placeholder="${label}">
             </div>
 
@@ -1132,25 +1162,37 @@ area.innerHTML += `
 
 
 
-        data[currentTab].forEach((item, idx) => {
-            if (currentTab === 'tv') {
-                area.innerHTML += `
-                    <div class="event-card">
-                        <div class="event-date">${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}</div> 
-                        <hr class="event-line">
-                        <div class="event-grid">
-                            <div class="event-time">${item.right || ''}</div>
-                            <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
-                            <div class="event-league">${item.cat || 'LIVE'}</div>
-                        </div>
-                        ${getAdminButtonsHtml(idx)}
-                    </div>`;
-            } else {
-                area.innerHTML += renderPizzaOrEvent(item, idx, false);
-            }
-        });
+  data[currentTab].forEach((item, idx) => {
+    if (currentTab === 'tv') {
+        // 1. Wir holen den Text direkt aus descDE (wo dein Datum steht)
+        const textDE = item.descDE || '';
+        
+        // 2. Wir rufen die Funktion auf, die bei den Events schon funktioniert
+        // Wir machen das AUSSERHALB des Strings, um Fehler zu vermeiden
+        const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
+
+        area.innerHTML += `
+            <div class="event-card">
+                <div class="event-date">
+                    <!-- HIER ENTSCHEIDET DER BROWSER: DE -> Original, IT -> Übersetzung -->
+                    ${lang === 'DE' ? textDE : textIT}
+                </div> 
+                
+                <hr class="event-line">
+                <div class="event-grid">
+                    <div class="event-time">${item.right || ''}</div>
+                    <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
+                    <div class="event-league">${item.cat || 'LIVE'}</div>
+                </div>
+                ${getAdminButtonsHtml(idx)}
+            </div>`;
+    } else {
+        // Events nutzen renderPizzaOrEvent, wo es ja schon klappt
+        area.innerHTML += renderPizzaOrEvent(item, idx, false);
     }
-} // Ende von render()
+});
+    } // <--- Ende des else-Blocks (für TV/Events)
+} // <--- Ende der render() Funktion
 
 // Hilfsfunktion, um doppelten Code zu vermeiden
 	// Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
@@ -1161,8 +1203,10 @@ function renderPizzaOrEvent(item, idx, isPizza) {
     
     // Nur übersetzen, wenn es KEINE Pizza ist (da Pizzen nur Zahlen/Preise haben)
     if (!isPizza && lang === 'IT' && displayRight) {
-        const de = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
-        const it = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+       // Zuerst die langen Wörter, dann die kurzen!
+const de = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const it = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+
         
         de.forEach((tag, i) => {
             const regex = new RegExp(tag, "gi");
@@ -1197,7 +1241,27 @@ function renderPizzaOrEvent(item, idx, isPizza) {
 }
 
 
+function translateDate(str) {
+    if (!str || lang === 'DE') return str;
 
+    // Lange Wörter und kurze Abkürzungen in einem Objekt mapping
+    const mapping = {
+        "Montag": "Lunedì", "Dienstag": "Martedì", "Mittwoch": "Mercoledì", 
+        "Donnerstag": "Giovedì", "Freitag": "Venerdì", "Samstag": "Sabato", "Sonntag": "Domenica",
+        "Mo": "Lun", "Di": "Mar", "Mi": "Mer", "Do": "Gio", "Fr": "Ven", "Sa": "Sab", "So": "Dom"
+    };
+
+    let res = str;
+    // Wir sortieren die Keys nach Länge (längste zuerst), um Teil-Fehler zu vermeiden
+    Object.keys(mapping).sort((a, b) => b.length - a.length).forEach(deTag => {
+        // \b stellt sicher, dass nur das GANZE Wort/Kürzel ersetzt wird
+        // Damit wird aus "Sa" in "Sabato" kein "Sabbato"!
+        const regex = new RegExp("\\b" + deTag + "\\b", "gi");
+        res = res.replace(regex, mapping[deTag]);
+    });
+    
+    return res;
+}
 
 // HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
 function getAdminButtonsHtml(idx) {
