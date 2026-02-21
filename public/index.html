@@ -8,7 +8,8 @@
 
 	/* Grunddesign für den Header */
 .main-header {
-    background-color: rgb(144, 41, 50);
+    /*background-color: rgb(144, 41, 50);*/
+	background-color: var(--red);
     color: white;
     padding: 15px;
     display: flex;
@@ -17,8 +18,8 @@
 }
 
 .main-header .logo {
-    width: 70px; /* Etwas kleiner für mehr Platz */
-    height: 70px;
+    width: 100px; /* Etwas kleiner für mehr Platz */
+    height: 100px;
     border: 2px solid white;
     object-fit: cover;
     border-radius: 50%;
@@ -26,7 +27,7 @@
 }
 
 .header-text {
-    margin-left: 15px;
+    margin-left: 30px;
 }
 
 .header-text h1 {
@@ -148,11 +149,11 @@ h1, h2, h3, p {
 
 
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);}
-        header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }        
-        .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red); }
+        /*header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }*/        
+       /* .logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red);  margin-left:10%;}*/
         h1 { margin: 0; font-size: 1.6rem; }
-        .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000; }
-        .tabs { display: flex; flex-wrap: wrap; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000;}
+        .tabs { display: flex; flex-wrap: wrap;  margin-left:20%;}
         .tab-btn { background: none; border: none; color: white; cursor: pointer; padding: 12px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
         .tab-btn.active { color: var(--red); border-bottom: 3px solid var(--red); }
         .lang-switch { display: flex; gap: 5px; }
@@ -337,6 +338,28 @@ h1, h2, h3, p {
     margin-top: 40px;
 }
 
+/* Erkennt "Ruhetag", "ruhetag" und "RUHETAG" für die italienische Übersetzung */
+html[lang="it"] .zeit-spalte[data-wert="Ruhetag" i]::after {
+    content: "Giorno di riposo";
+}
+
+/* 1. Standard-Anzeige für Deutsch */
+html[lang="de"] .zeit-spalte::after {
+    content: attr(data-wert);
+}
+
+/* 2. Spezial-Regel für Italienisch: Wenn NICHT "Ruhetag" drinsteht (also eine Uhrzeit) */
+html[lang="it"] .zeit-spalte::after {
+    content: attr(data-wert);
+}
+
+/* 3. DIE ÜBERSETZUNG: Wenn exakt "Ruhetag" im Attribut steht und Sprache Italienisch ist */
+html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
+    content: "Giorno di riposo";
+}
+
+
+
 .contact-card-large, .hours-card-large {
     background: white;
     padding: 30px;
@@ -361,30 +384,41 @@ h1, h2, h3, p {
 }
 
 .hours-list {
-    text-align: left;
-    margin: 20px 0;
+    margin: 20px 0; /* Sorgt für vertikalen Abstand */
+    padding: 0;     /* Verhindert ungewollte Einrückungen */
+    width: 100%;    /* Nutzt die volle Breite der Karte */
 }
 
+/* Die Zeile als Ganzes */
 .hours-item {
     display: flex;
     justify-content: space-between;
+    align-items: center; /* Zentriert Text vertikal */
     padding: 8px 0;
     border-bottom: 1px solid #eee;
     font-size: 1rem;
 }
 
+/* Der Wochentag (links) */
+.tag-spalte {
+    font-weight: bold;
+    color: var(--dark);
+}
+
+/* Die Zeit-Spalte (rechts) */
+.zeit-spalte {
+    /* Nutzt eine feste Breite für alle Zahlen-Blöcke */
+    min-width: 140px; 
+    text-align: right;
+    /* Monospace sorgt dafür, dass die '1' genau so breit ist wie die '0' */
+    font-family: 'Courier New', Courier, monospace; 
+    color: var(--red);
+    white-space: nowrap; /* Verhindert Umbruch innerhalb der Uhrzeit */
+}
+
 .hours-item:last-child { border-bottom: none; }
 
-.zeit-spalte {
-    white-space: pre-wrap; /* ERZWINGT, dass jedes Leerzeichen &nbsp; angezeigt wird */
-    display: inline-block;
-}	
 
-.hours-item span:last-child {
-    white-space: pre-wrap !important; /* Erlaubt echte Leerzeichen aus der Eingabe */
-    display: inline-block;
-    min-width: 100px;
-}
 
 
 
@@ -407,8 +441,8 @@ h1, h2, h3, p {
         width: 92% !important;
         max-width: 92% !important;
         padding: 15px 10px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+        /*left: 50% !important;
+        transform: translateX(-50%) !important;*/
         box-sizing: border-box !important;
         position: relative !important; /* Wichtig für das Zentrieren */
     }
@@ -445,8 +479,8 @@ h1, h2, h3, p {
 <header class="main-header">
     <img src="logo.webp" class="logo" alt="Logo">
     <div class="header-text">
-        <h1>Willkommen bei Pizzeria Pub St. Sisinius</h1>
-        <p>Laas - Vinschgau</p>
+        <h1>Pizzeria Pub St. Sisinius</h1>
+		<p id="ort">Laas - Vinschgau</p>	
     </div>
 </header>
     
@@ -524,14 +558,16 @@ function moveTime(index, direction) {
 }
 
 // EINZELNE ZEILE BEARBEITEN (✎)
-function editSingleTime(index) {
-    const item = data.start.zeiten[index];
-    const neuerTag = prompt("Tag ändern:", item.tag);
-    const neueZeit = prompt("Zeit ändern:", item.zeit);
-    
-    if (neuerTag !== null && neueZeit !== null) {
-        data.start.zeiten[index] = { tag: neuerTag, zeit: neueZeit };
-        saveHoursToDB(data.start.zeiten);
+async function editSingleTime(idx) {
+    const z = data.start.zeiten[idx];
+    const tDE = prompt("Tag DE:", z.tagDE || z.tag);
+    const tIT = prompt("Giorno IT:", z.tagIT || z.tag);
+    const uhr = prompt("Zeit:", z.zeit);
+
+    if (tDE && tIT && uhr) {
+        data.start.zeiten[idx] = { tagDE: tDE, tagIT: tIT, zeit: uhr };
+        await save();
+        render();
     }
 }
 
@@ -657,11 +693,24 @@ function editSingleTime(index) {
         if(btnEvents) btnEvents.innerText = "Eventi";
         if(btnTV) btnTV.innerText = "Sport TV";
     }
-        
+     
+    const ort=document.getElementById('ort');
+    if (lang === 'DE') {
+        if (ort) {
+            ort.innerHTML = "Laas - Vinschagau";
+        }
+	}
+	else{
+	    if (ort) {
+		    ort.innerHTML = "Lasa - Venosta";
+		}
+	}
+	
+	
     // Footer-Elemente übersetzen
     const footerHours = document.getElementById('footer-hours');
     const footerAddress = document.getElementById('footer-address');
-
+    
     if (lang === 'DE') {
         if (footerHours) {
             footerHours.innerHTML = "Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00";
@@ -817,19 +866,43 @@ if (editMode && currentTab !== 'start') {
         
         area.className = 'list-mode';
       
-		area.innerHTML += `
-            <div class="hero" style="height: 500px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
-                <img src="lokal.webp" style="position: absolute; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
-				<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
-                    <h2 style="font-size: 3rem; margin-bottom: 10px; text-transform: none;">
-                        ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
-                    </h2>
-                    <p style="font-size: 1.5rem; font-weight: 500;">
-                        ${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}
-                    </p>
-                </div>
-            </div>
-            <div class="container">
+area.innerHTML += `
+    <div class="hero" style="
+        height: 500px; 
+        position: relative; 
+        width: 100vw; 
+        left: 50%; 
+        right: 50%; 
+        margin-left: -50vw; 
+        margin-right: -50vw; 
+        overflow: hidden; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: white;">
+        
+        <img src="lokal.webp" style="
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            z-index: 1;">
+            
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+
+        <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 10px; text-transform: none;">
+                ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
+            </h2>
+            <p style="font-size: 1.5rem; font-weight: 500;">
+                ${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}
+            </p>
+        </div>
+    </div>
+    
+    <div class="container">
                 <div class="about-section">
 					<img src="pizza.webp" alt="Pizza" class="about-image">
 					<div class="about-text">
@@ -859,20 +932,34 @@ if (editMode && currentTab !== 'start') {
 							${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
 								data.start.zeiten.map((z, idx) => `
 									<div class="hours-item">
-										<span>${z.tag}</span> 
-										<span>${z.zeit.replace(/%/g, '&nbsp;&nbsp;&nbsp;&nbsp;')}</span>
+										<!-- Anzeige des Tages (bleibt sprachabhängig durch JS) -->
+										 <!-- Links: Der Tag (z.B. Montag) -->
+										<span>${lang === 'DE' ? (z.tagDE || z.tag) : (z.tagIT || z.tag)}</span> 
+
+										<!-- Rechts: Die Zeit oder der Ruhetag-Check -->
+										<span>
+											${(() => {
+												let info = z.zeit || '';
+												// Wenn "Ruhetag" drin steht, übersetzen wir es für Lasa
+												if (info.toLowerCase().includes('ruhetag')) {
+													return lang === 'DE' ? info : info.replace(/ruhetag/i, 'Giorno di riposo');
+												}
+												// Ansonsten normale Zeit mit den % Abständen
+												return info.replace(/%/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+											})()}
+										</span>							
 										${editMode ? `
 											<div class="admin-btns-row">
 												<button onclick="moveTime(${idx}, -1)">↑</button>
 												<button onclick="moveTime(${idx}, 1)">↓</button>
-                                                <button onclick="editSingleTime(${idx})" title="Bearbeiten">✎</button>
+												<button onclick="editSingleTime(${idx})" title="Bearbeiten">✎</button>
 												<button onclick="deleteTime(${idx})">X</button>
 											</div>` : ''}
 									</div>
 								`).join('') 
-								: '<p>Keine Öffnungszeiten hinterlegt. Bitte im Admin-Modus hinzufügen.</p>'
+								: `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
 							}
-						</div>				
+						</div>	
                     </div>
                 </div>
             </div>
@@ -1015,21 +1102,23 @@ function getAdminButtonsHtml(idx) {
 }
 
 // 1. Neue Zeile hinzufügen
-function addTimeRow() {
-    const tag = prompt("Wochentag (z.B. Di - So):");
-    const zeit = prompt("Uhrzeit (z.B. 17:00 - 23:00):");
+async function addTimeRow() {
+    const tDE = prompt("Tag auf DEUTSCH (z.B. Montag):", "Montag");
+    if (!tDE) return;
+    const tIT = prompt("Giorno in ITALIANO (p.es. Lunedì):", "Lunedì");
+    const uhr = prompt("Uhrzeit (Nutze % für Leerzeichen, z.B. 17:00-22:00):", "17:00-22:00");
+
+    const neueZeile = {
+        tagDE: tDE,
+        tagIT: tIT,
+        zeit: uhr
+    };
+
+    if (!data.start.zeiten) data.start.zeiten = [];
+    data.start.zeiten.push(neueZeile);
     
-    if (tag && zeit) {
-        // Sicherstellen, dass die Struktur existiert
-        if (!data.start) data.start = {};
-        if (!Array.isArray(data.start.zeiten)) data.start.zeiten = [];
-        
-        // Neue Zeile zum Array hinzufügen
-        data.start.zeiten.push({ tag: tag, zeit: zeit });
-        
-        // Ab zum Server (Südtirol MongoDB)
-        saveHoursToDB(data.start.zeiten);
-    }
+    await save(); // Deine save() Funktion zum Server
+    render();
 }
 
  
