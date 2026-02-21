@@ -1153,31 +1153,43 @@ area.innerHTML += `
 } // Ende von render()
 
 // Hilfsfunktion, um doppelten Code zu vermeiden
-		function renderPizzaOrEvent(item, idx, isPizza) {
+	// Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
+function renderPizzaOrEvent(item, idx, isPizza) {
+    
+    // --- LOGIK FÜR WOCHENTAG-ÜBERSETZUNG ---
+    let displayRight = item.right || '';
+    
+    // Nur übersetzen, wenn es KEINE Pizza ist (da Pizzen nur Zahlen/Preise haben)
+    if (!isPizza && lang === 'IT' && displayRight) {
+        const de = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+        const it = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+        
+        de.forEach((tag, i) => {
+            const regex = new RegExp(tag, "gi");
+            displayRight = displayRight.replace(regex, it[i]);
+        });
+    }
+
     return `
         <div class="entry">
-            <!-- Bild nur anzeigen, wenn eines vorhanden ist -->
             ${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
             
             <div class="entry-content">
                 <div class="entry-header">
-                    <!-- Name/Titel in der gewählten Sprache -->
                     <span style="font-weight: bold; font-size: 1.1rem;">
                         ${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}
                     </span>
                     
-                    <!-- Rechts: Preis bei Pizzen, Datum/Uhrzeit bei Events -->
+                    <!-- Hier wird der (eventuell übersetzte) Wert angezeigt -->
                     <span class="price" style="color: var(--red); font-weight: bold; white-space: nowrap;">
-                        ${item.right || ''}${isPizza ? ' €' : ''}
+                        ${displayRight}${isPizza ? ' €' : ''}
                     </span>
                 </div>
 
-                <!-- Beschreibung/Zutaten -->
                 <div class="desc" style="font-size: 0.9rem; color: #555; font-style: italic; margin: 10px 0; flex-grow: 1;">
                     ${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}
                 </div>
 
-                <!-- Admin-Buttons nur im Edit-Mode einblenden -->
                 ${typeof getAdminButtonsHtml === 'function' ? getAdminButtonsHtml(idx) : ''}
             </div>
         </div>
