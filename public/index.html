@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -812,6 +810,27 @@ async function editSingleTime(idx) {
 
 function render() {
     
+		// --- AUTOMATISCHE SORTIERUNG ---
+		if (currentTab === 'tv' || currentTab === 'events') {
+			data[currentTab].sort((a, b) => {
+				let dateStrA, timeStrA, dateStrB, timeStrB;
+
+				if (currentTab === 'tv') {
+					// TV: Datum in descDE, Zeit in right
+					dateStrA = a.descDE; timeStrA = a.right;
+					dateStrB = b.descDE; timeStrB = b.right;
+				} else {
+					// EVENTS: Datum in right (z.B. "Fr 13.02.26"), Zeit meist in descDE oder gar nicht
+					dateStrA = a.right; timeStrA = "00:00"; 
+					dateStrB = b.right; timeStrB = "00:00";
+				}
+
+				const dA = parseSisiniusDate(dateStrA, timeStrA);
+				const dB = parseSisiniusDate(dateStrB, timeStrB);
+				return dA - dB;
+			});
+		}
+	
 		// --- FOOTER SPRACHUMSTELLUNG ---
 
 		// 1. Elemente abgreifen
@@ -1106,6 +1125,13 @@ area.innerHTML += `
             <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>
         `;
 
+
+
+
+
+
+
+
         data[currentTab].forEach((item, idx) => {
             if (currentTab === 'tv') {
                 area.innerHTML += `
@@ -1165,10 +1191,13 @@ area.innerHTML += `
 function getAdminButtonsHtml(idx) {
     if (!editMode) return '';
     return `
-        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">
-            <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
-            <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
-            <button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
+        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">           
+			 <!-- Pfeile NUR im Pizza-Tab anzeigen -->
+            ${currentTab === 'pizzas' ? `
+			  <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+              <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+            ` : ''}			
+			<button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
             <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
         </div>`;
 }
@@ -1363,40 +1392,31 @@ async function editStartInfo() {
 	
 async function move(index, direction) {
     const items = data[currentTab];
-    const currentItem = items[index];
+    const targetIndex = index + direction;
 
-    // 1. Suche den nächsten Nachbarn, der die GLEICHE Kategorie hat
-    let targetIndex = -1;
-    if (direction === -1) { // Nach oben schieben
-        for (let i = index - 1; i >= 0; i--) {
-            if ((items[i].cat || 'pizza') === (currentItem.cat || 'pizza')) {
-                targetIndex = i;
-                break;
-            }
+    // 1. Abbruch, wenn man über den Anfang oder das Ende hinaus will
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    // 2. KATEGORIE-CHECK (NUR für Pizzen!)
+    if (currentTab === 'pizzas') {
+        const currentCat = items[index].cat || 'pizza';
+        const targetCat = items[targetIndex].cat || 'pizza';
+        
+        // Wenn die Kategorien unterschiedlich sind (z.B. Pizza -> Bianche), Tausch stoppen
+        if (currentCat !== targetCat) {
+            console.log("Verschieben nur innerhalb der Pizza-Kategorie erlaubt.");
+            return; 
         }
-    } else { // Nach unten schieben
-        for (let i = index + 1; i < items.length; i++) {
-            if ((items[i].cat || 'pizza') === (currentItem.cat || 'pizza')) {
-                targetIndex = i;
-                break;
-            }
-        }
-    }
+    } 
+    // HINWEIS: Für 'tv' und 'events' gibt es hier kein 'if', 
+    // daher wird dort IMMER getauscht, egal was in 'cat' steht.
 
-    // 2. Wenn kein passender Nachbar in der Kategorie gefunden wurde -> Abbruch
-    if (targetIndex === -1) {
-        console.log("Kein Nachbar in dieser Kategorie gefunden.");
-        return;
-    }
+    // 3. Tausch im Array (Destructuring-Methode)
+    [items[index], items[targetIndex]] = [items[targetIndex], items[index]];
 
-    // 3. Tausch im Array
-    const temp = items[index];
-    items[index] = items[targetIndex];
-    items[targetIndex] = temp;
-
-    // 4. Speichern & Neu zeichnen
+    // 4. In die MongoDB Atlas Cloud speichern & Ansicht erneuern
     await save();
-    render();
+    render(); 
 }
   
 	
@@ -1527,7 +1547,38 @@ async function move(index, direction) {
     alert("Komplette Speisekarte inklusive Extras erfolgreich importiert!");
     location.reload();
 }
-	
+
+
+
+function parseSisiniusDate(dateStr, timeStr) {
+    if (!dateStr) return new Date(2099, 0, 1); 
+
+    try {
+        // Sucht nach TT.MM. (2 oder 4 Stellen beim Jahr)
+        // Erkennt: 13.02.26, 13.02.2026, Freitag 13.02.26 etc.
+        const match = dateStr.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+        
+        if (match) {
+            let day = parseInt(match[1]);
+            let month = parseInt(match[2]) - 1; // Monate 0-11
+            let year = parseInt(match[3]);
+
+            // Wenn das Jahr nur 2 Stellen hat (z.B. 26), machen wir 2026 daraus
+            if (year < 100) year += 2000;
+
+            // Uhrzeit "18:00" oder "18.00" oder "18" finden
+            const tMatch = (timeStr || "").match(/(\d{1,2})[:.]?(\d{2})?/);
+            const hours = tMatch ? parseInt(tMatch[1]) : 0;
+            const minutes = tMatch ? parseInt(tMatch[2] || 0) : 0;
+
+            return new Date(year, month, day, hours, minutes);
+        }
+    } catch (e) {
+        console.error("Format-Fehler in Laas:", e);
+    }
+    // Falls gar kein Datum gefunden wird, ab nach hinten in der Liste
+    return new Date(2099, 0, 1);
+}	
 	
 </script>
 </body>
