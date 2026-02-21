@@ -493,6 +493,26 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
     /* 6. TV-Events einspaltig */
     .event-grid { grid-template-columns: 1fr !important; text-align: center !important; }
 }
+@media (max-width: 600px) {
+    .hours-item {
+        flex-wrap: wrap; /* Erlaubt den Umbruch, falls es zu eng wird */
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    .tag-spalte {
+        flex: 1 1 auto; /* Tag nimmt Platz ein, schiebt Rest nach rechts */
+        font-size: 0.9rem;
+    }
+
+    .zeit-spalte {
+        min-width: auto; /* Hebt die starre Breite auf */
+        margin-left: auto;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+
+
 </style>
 </head>
 <body>
