@@ -1009,6 +1009,7 @@ area.innerHTML += `
         justify-content: center; 
         color: white;">
         
+        <!-- 1. Haupt-Hintergrundbild -->
         <img src="lokal.webp" style="
             position: absolute; 
             top: 0;
@@ -1018,8 +1019,15 @@ area.innerHTML += `
             object-fit: cover; 
             z-index: 1;">
             
-        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+        <!-- 2. Dunkler Schleier -->
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5; pointer-events: none;"></div>
 
+         <!-- 3. Mini-Container für Luftbild + Punkt (Bündig unten rechts) -->
+        <!--<a href="https://www.google.com/maps/search/?api=1&destination=46.6171,10.6948" -->
+		<!--<a href="https://www.google.com/maps/place/46%C2%B037'01.6%22N+10%C2%B041'41.3%22E(Pizzeria+St.+Sisinius)/@46.6171,10.6948,18z?entry=ttu"-->
+		
+
+        <!-- 4. Text-Inhalt -->
         <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
             <h2 style="font-size: 2.5rem; margin-bottom: 10px; text-transform: none;">
                 ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
@@ -1029,60 +1037,123 @@ area.innerHTML += `
             </p>
         </div>
     </div>
+    	<!--<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
+					   target="_blank" -->
+<div class="container">
+    <div class="about-section">
+        <img src="pizza.webp" alt="Pizza" class="about-image">
+        <div class="about-text">
+            ${lang === 'DE' ? 
+                '<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
+                '<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und bieten verschiedene Events und Specials für beste Stimmung und Abwechslung in der Pizzeria St. Sisinius.</p>' +
+                '<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
+                : 
+                '<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparata con ingredienti freschi e molta cura per i dettagli.</p>' +
+                '<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
+                '<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
+            }
+        </div>
+    </div> <!-- Ende about-section -->
+
+    <!-- Dieser Container sorgt dafür, dass Kontakt und Öffnungszeiten nebeneinander stehen -->
+    <div class="info-section-compact" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+        
+		
+		
+		
+        <!-- KONTAKT KARTE -->
+      <div class="contact-card-large" style="position: relative; overflow: hidden; min-height: 180px;">
     
-    <div class="container">
-                <div class="about-section">
-					<img src="pizza.webp" alt="Pizza" class="about-image">
-					<div class="about-text">
-						${lang === 'DE' ? 
-							'<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
-							'<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live‑Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und bieten verschiedene Events und Specials für beste Stimmung und Abwechslung in der Pizzeria St. Sisinius.</p>' +
-							'<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
-							: 
-							'<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparata con ingredienti freschi e molta cura per i dettagli.</p>' +
-							'<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
-							'<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
-						}
-					</div>
+    <!-- Kopfzeile: Icon, Titel und das Bild rechts daneben -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 15px;">
+			
+			<div style="flex: 1;">
+				<div class="contact-icon">📞</div>
+				<h3 style="color:var(--red); margin: 5px 0;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+				
+				<a href="tel:+393898334004" class="phone-number" style="display: block; font-weight: bold; text-decoration: none; font-size: 1.2rem;">
+					+39 389 833 4004
+				</a>
+				<p style="font-size: 0.85rem; margin-top: 8px; line-height: 1.3; max-width: 180px;">
+					${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}
+				</p>
+			</div>
+
+			
+				<!-- Rechte Spalte: Alles exakt rechtsbündig untereinander -->
+				<div style="display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; width: 110px;">
+
+
+
+			
+					<!-- 1. GOOGLE MAPS WIDGET (Dein bisheriges Design) -->
+					<!-- Das Orthofoto: Jetzt oben rechts neben dem Text -->
+					<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
+						 target="_blank" 
+						   style="text-decoration: none; display: block; cursor: pointer; margin-bottom: 0px; width: 110px;">
+							
+							<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
+								<div style="position: relative; width: 110px; height: 90px;">
+									<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+									<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
+								</div>
+								<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
+									${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
+								</div>
+							</div>
+						</a>
+						<!-- 3. QUELLENNACHWEIS (Dezent & Rechtsbündig für Südtirol) -->
+						<p style="font-size: 8px; color: #999; margin: 0 0 15px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
+							© Prov. BZ - CC BY 4.0<br>
+							<span style="font-size: 7px;">Geoportal Südtirol</span>
+						</p>
+						<!-- 2. FACEBOOK BUTTON (Rechtsbündig ausgerichtet) -->
+						<a href="https://www.facebook.com" 
+						   target="_blank" 
+						   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-right: 0; margin-left: auto;">
+							<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
+							FACEBOOK
+						</a>
+						<!-- 3. WHATSAPP GRUPPEN BUTTON -->
+						<a href="https://chat.whatsapp.com" 
+						   target="_blank" 
+						   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #25D366; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-top: 8px; margin-left: auto;">
+							<span style="font-size: 14px; margin-right: 5px;">✆</span> 
+							WHATSAPP
+						</a>
+						
+
 				</div>
-                <div class="info-section-compact">
-                    <div class="contact-card-large">
-                        <div class="contact-icon">📞</div>
-                        <h3 style="color:var(--red)">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-                        <a href="tel:+393898334004" class="phone-number">+39 389 833 4004</a>
-                        <p>${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}</p>
-                    </div>
-                    <div class="hours-card-large">
-                        <div class="hours-icon">🕐</div>
-                        <h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
-                        
-						<div class="hours-list">
-							${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
-								data.start.zeiten.map((z, idx) => `
-									<div class="hours-item">
-										<!-- 1. Der Tag (Links) -->
-										<span class="tag-spalte">
-											${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
-										</span> 
+		</div>
+	</div>
 
-										<!-- 2. Die Zeit (Rechts) - Nutzt data-wert für CSS-Übersetzung & Ausrichtung -->
-										<span class="zeit-spalte" data-wert="${z.zeit ? z.zeit.trim() : ''}"></span>
 
-										<!-- 3. Admin-Buttons (Nur wenn editMode aktiv) -->
-										${editMode ? `
-											<div class="admin-btns-row">
-												<button onclick="moveTime(${idx}, -1)">↑</button>
-												<button onclick="moveTime(${idx}, 1)">↓</button>
-												<button onclick="editSingleTime(${idx})">✎</button>
-												<button onclick="deleteTime(${idx})">X</button>
-											</div>` : ''}
-									</div>
-								`).join('') 
-								: `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
-							}
-						</div>	
-                    </div>
-                </div>
+
+
+
+
+
+
+
+
+        <!-- ÖFFNUNGSZEITEN KARTE -->
+        <div class="hours-card-large" style="flex: 1; min-width: 300px;">
+            <div class="hours-icon">🕐</div>
+            <h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
+            <div class="hours-list">
+                ${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
+                    data.start.zeiten.map((z, idx) => `
+                        <div class="hours-item">
+                            <span class="tag-spalte">${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}</span> 
+                            <span class="zeit-spalte" data-wert="${z.zeit ? z.zeit.trim() : ''}"></span>
+                        </div>
+                    `).join('') 
+                    : `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
+                }
+            </div>  
+        </div>
+    </div> <!-- Ende info-section-compact -->
+</div> <!-- Ende container -->
             </div>
             
 			 ${editMode ? `
