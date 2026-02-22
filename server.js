@@ -7,6 +7,12 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
+// Ein extrem schneller Health-Check Endpunkt
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
+
+
 
 //für local I7
 // Nutzt die Cloud-URI falls vorhanden, ansonsten die lokale MongoDB
@@ -84,3 +90,4 @@ app.post('/api/data', async (req, res) => {
 // START
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+
