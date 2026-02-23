@@ -110,6 +110,35 @@ footer a:hover {
     color: var(--red);
     text-decoration: underline;
 }
+
+
+
+footer {
+    display: flex;
+    flex-wrap: wrap; /* WICHTIG: Erlaubt das Umbrechen in die nächste Zeile */
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.footer-bottom {
+    flex-basis: 100%; /* Erzwingt, dass dieser Block die volle Breite einnimmt */
+    margin-top: 20px;
+    text-align: center;
+}
+
+.footer-divider {
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.copyright-text {
+    color: white;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin: 0;
+}
 	
 	
     /* Nur die Admin-Elemente standardmäßig ausblenden */
@@ -592,6 +621,15 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
         <a href="impressumDe.html" id="footer-impressum-link">Impressum / Note Legali</a>
         <a href="datenschutzDe.html" id="footer-datenschutz-link">Datenschutz / Privacy</a>
     </div>
+	  <!-- Trennlinie und Copyright -->
+    <!-- Diese Box erzwingt eine neue Zeile -->
+    <div class="footer-bottom">
+        <hr class="footer-divider">
+        <p class="copyright-text">
+            &copy; 2026 Pizzeria Pub St. Sisinius. Alle Rechte vorbehalten.
+        </p>
+    </div>
+	
 </footer>
 
 <script>
@@ -1111,20 +1149,29 @@ function render() {
 								© Prov. BZ - CC BY 4.0<br>
 								<span style="font-size: 7px;">Geoportal Südtirol</span>
 							</p>
+							 <!-- 1. INSTAGRAM BUTTON -->
+							<a href="https://www.instagram.com/stsisinius?igsh=MnNyaDdhbnMwcmd4"
+							   target="_blank" 
+							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+								<span style="font-size: 12px; margin-right: 5px;">📸</span> 
+								INSTAGRAM
+							</a>
+							
+							
 							<!-- 2. FACEBOOK BUTTON (Rechtsbündig ausgerichtet) -->
-							<a href="https://www.facebook.com" 
+							<a href="https://www.facebook.com/61585930843655/"
 							   target="_blank" 
 							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-right: 0; margin-left: auto;">
 								<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
 								FACEBOOK
 							</a>
 							<!-- 3. WHATSAPP GRUPPEN BUTTON -->
-							<a href="https://chat.whatsapp.com" 
+							<!--<a href="https://chat.whatsapp.com" 
 							   target="_blank" 
 							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #25D366; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-top: 8px; margin-left: auto;">
 								<span style="font-size: 14px; margin-right: 5px;">✆</span> 
 								WHATSAPP
-							</a>
+							</a>-->
 						</div>
 					</div>
 				</div>
@@ -1173,14 +1220,21 @@ function render() {
 				<div style="margin-bottom: 15px;">
 					<p style="margin-bottom: 5px;"><strong>Event-Bild / Foto (JPG/PNG):</strong></p>
 					
-					<!-- WICHTIG: Neue Funktion 'encodeNoticeImage' aufrufen -->
-					<input type="file" accept="image/*" onchange="encodeNoticeImage(this)" style="width: 100%;">
+					<input type="file" id="file-input-notice" accept="image/*" onchange="encodeNoticeImage(this)" style="width: 100%;">
 					
-					<!-- Eindeutige ID: inImgBase64Notice -->
+					<!-- Hidden Input für Base64 -->
 					<input type="hidden" id="inImgBase64Notice" value="${(data.notice && data.notice.img) ? data.notice.img : ''}">
 					
-					<div style="margin-top: 10px; text-align: center; background: #eee; border-radius: 8px; padding: 10px;">
-						<!-- Eindeutige ID: img-preview-notice -->
+					<div style="margin-top: 10px; text-align: center; background: #eee; border-radius: 8px; padding: 10px; position: relative;">
+						
+						<!-- Lösch-Button (wird nur angezeigt, wenn ein Bild da ist) -->
+						<button onclick="removeNoticeImage()" id="btn-remove-notice" 
+								style="display: ${(data.notice && data.notice.img) ? 'block' : 'none'}; 
+								position: absolute; top: 5px; right: 5px; background: #dc3545; color: white; 
+								border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;">
+							Bild löschen 🗑️
+						</button>
+
 						<img id="img-preview-notice" src="${(data.notice && data.notice.img) ? data.notice.img : ''}" 
 							 style="max-width: 100%; max-height: 150px; display: ${(data.notice && data.notice.img) ? 'inline-block' : 'none'}; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
 						
@@ -1980,7 +2034,21 @@ function showPopup() {
 		}
 	}
 }
-
+function removeNoticeImage() {
+    // 1. Hidden Input leeren
+    document.getElementById('inImgBase64Notice').value = "";
+    
+    // 2. File Input leeren
+    document.getElementById('file-input-notice').value = "";
+    
+    // 3. Vorschau-Elemente anpassen
+    document.getElementById('img-preview-notice').style.display = "none";
+    document.getElementById('img-preview-notice').src = "";
+    document.getElementById('no-img-text-notice').style.display = "block";
+    
+    // 4. Lösch-Button verstecken
+    document.getElementById('btn-remove-notice').style.display = "none";
+}
 
 	
 </script>
