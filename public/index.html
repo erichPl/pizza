@@ -15,7 +15,7 @@
 }
 
 
-	/* Grunddesign für den Header */
+/* Grunddesign für den Header */
 .main-header {
     /*background-color: rgb(144, 41, 50);*/
 	background-color: var(--red);
@@ -70,19 +70,19 @@
 	
 	
 	
-	footer { 
-    position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
-    width: 100%; 
-    background: #1a1a1a; 
-    color: white; 
-    padding: 30px 0; 
-    border-top: 4px solid var(--red); 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 20px; 
-    text-align: center; 
-    font-size: 0.85rem; 
-    line-height: 1.2 !important; /* Hier wird der Abstand eng gemacht */
+footer { 
+	position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
+	width: 100%; 
+	background: #1a1a1a; 
+	color: white; 
+	padding: 30px 0; 
+	border-top: 4px solid var(--red); 
+	display: grid; 
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+	gap: 20px; 
+	text-align: center; 
+	font-size: 0.85rem; 
+	line-height: 1.2 !important; /* Hier wird der Abstand eng gemacht */
 }
 
 .footer-section {
@@ -633,13 +633,94 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 </footer>
 
 <script>
+ 
+
+
+
+function renderNoticePopup(data, lang, container) {
+    if (!data.notice || !data.notice.active || sessionStorage.getItem('noticeSeen')) {
+        return;
+    }
+
+    const title = lang === 'DE' ? (data.notice.titleDE || 'Wichtige Info') : (data.notice.titleIT || 'Info importante');
+    const scrollHint = lang === 'DE' ? 'Mehr lesen' : 'Leggi di più';
     
-    let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
-    let data = { start: {}, pizzas: [], events: [], tv: [] };
-    let currentTab = 'start';
-    let lang = 'DE';
-    const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
-    if(editMode) document.body.classList.add('admin-mode');
+    let rawText = (lang === 'DE' ? data.notice.textDE : data.notice.textIT) || "";
+    const formattedText = rawText
+        .replace(/\n/g, '<br>') 
+        .replace(/%25|%/g, '<div style="display:block; width:80%; height:2px; background-color:#ddd; margin:15px auto; border-radius:2px;"></div>');
+
+    container.innerHTML += `
+        <style>
+            @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-5px);} 60% {transform: translateY(-3px);} }
+            .scroll-hint { 
+                position: absolute; bottom: 100px; right: 25px; 
+                background: white; padding: 8px 12px; border-radius: 20px; 
+                font-size: 13px; color: var(--red); font-weight: bold; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+                cursor: pointer; display: flex; align-items: center; gap: 5px; 
+                animation: bounce 2s infinite; z-index: 11000; 
+                border: 2px solid var(--red); transition: opacity 0.3s, transform 0.2s;
+                user-select: none;
+            }
+            .scroll-hint:active { transform: scale(0.95); }
+        </style>
+
+        <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; animation: fadeIn 0.3s ease-out;">
+            
+            <div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column; position: relative;">
+                
+                <!-- SCROLL-HINWEIS (Anklickbar) -->
+                <div id="popup-scroll-hint" class="scroll-hint" onclick="document.getElementById('popup-scroll-content').scrollBy({top: 150, behavior: 'smooth'})">
+                    ${scrollHint} <span style="font-size: 16px;">↓</span>
+                </div>
+
+                <!-- HEADER -->
+                <div style="padding:20px 20px 10px 20px; flex-shrink:0; background: white; z-index: 10;">
+                    <h2 style="color:var(--red); margin:0;">${title}</h2>
+                </div>
+
+                <!-- SCROLL-BEREICH -->
+                <div id="popup-scroll-content" 
+                     onscroll="if(this.scrollTop > 50) document.getElementById('popup-scroll-hint').style.opacity='0';" 
+                     style="overflow-y:auto; flex-grow:1; padding:0 25px; scroll-behavior: smooth;">
+                    
+                    ${data.notice.img ? `
+                        <img src="${data.notice.img}" 
+                             style="max-width:100%; max-height:45vh; object-fit:contain; display:block; margin:0 auto 15px; border-radius:8px;">
+                    ` : '<div style="font-size:50px; margin-bottom:15px;">📢</div>'}
+                    
+                    <div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.5; text-align:center; padding-bottom:40px;">
+                        ${formattedText}
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <div style="padding:15px 20px 25px 20px; flex-shrink:0; border-top:1px solid #eee; background: white; z-index: 10;">
+                    <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%;">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
+
+
+
+
+
+
+
+ 
+let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
+let data = { start: {}, pizzas: [], events: [], tv: [] };
+let currentTab = 'start';
+let lang = 'DE';
+const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
+if(editMode) document.body.classList.add('admin-mode');
 
 //ÖFFNUNGSZEITEN 
 //========================================
@@ -686,10 +767,10 @@ async function editSingleTime(idx) {
   
   
 
- function editItem(idx) {
-     const item = data[currentTab][idx];	
+function editItem(idx) {
+    const item = data[currentTab][idx];	
 
-   // ... deine anderen Felder (Name, Desc) ...
+    // ... deine anderen Felder (Name, Desc) ...
     
     // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
     const catInput = document.getElementById('inCat'); 
@@ -736,39 +817,39 @@ async function editSingleTime(idx) {
     
 
     
-    async function load() {
-    try {
-        const res = await fetch('/api/data?pw=leon2208');
-        const fetchedData = await res.json();
-        
-        // Sicherstellen, dass 'data' immer die richtige Struktur hat
-        data = fetchedData || {};
-        if (!data.pizzas) data.pizzas = [];
-        if (!data.events) data.events = [];
-        if (!data.start) data.start = { img: 'lokal.webp', textDE: 'Willkommen', textIT: 'Benvenuti' };
+async function load() {
+	try {
+		const res = await fetch('/api/data?pw=leon2208');
+		const fetchedData = await res.json();
+		
+		// Sicherstellen, dass 'data' immer die richtige Struktur hat
+		data = fetchedData || {};
+		if (!data.pizzas) data.pizzas = [];
+		if (!data.events) data.events = [];
+		if (!data.start) data.start = { img: 'lokal.webp', textDE: 'Willkommen', textIT: 'Benvenuti' };
 
-        render(); // Jetzt wird die Seite garantiert gezeichnet
-    } catch (e) {
-        console.error("Fehler beim Laden der Daten:", e);
-        // Notfall-Plan: Leere Struktur, damit die Seite nicht hängen bleibt
-        data = { start: { img: 'lokal.webp', textDE: 'Willkommen' }, pizzas: [], events: [] };
-        render();
-    }
+		render(); // Jetzt wird die Seite garantiert gezeichnet
+	} catch (e) {
+		console.error("Fehler beim Laden der Daten:", e);
+		// Notfall-Plan: Leere Struktur, damit die Seite nicht hängen bleibt
+		data = { start: { img: 'lokal.webp', textDE: 'Willkommen' }, pizzas: [], events: [] };
+		render();
+	}
 }
 
-   /* async function save() {
-        // Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
-        if (currentTab === 'start') return; 
-        await fetch('/api/data?pw=leon2208', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        });
-        render();
-    }*/
+/* async function save() {
+	// Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
+	if (currentTab === 'start') return; 
+	await fetch('/api/data?pw=leon2208', {
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(data)
+	});
+	render();
+}*/
 	
 	
-	async function save() {
+async function save() {
     // Wir entfernen die Start-Sperre, damit auch Öffnungszeiten gespeichert werden!
     try {
         const res = await fetch('/api/data?pw=leon2208', {
@@ -788,25 +869,25 @@ async function editSingleTime(idx) {
     // aufrufenden Funktion (z.B. move oder addItem) nach dem await.
 }
 
-    function setTab(t) { 
-        currentTab = t; 
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
-        render(); 
-    }
+function setTab(t) { 
+	currentTab = t; 
+	document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
+	render(); 
+}
 
-    function setLang(l) { 
-        lang = l; 
-		
-		// 2. WICHTIG: Das 'Gesehen'-Flag für das Popup löschen!
-        // Dadurch wird das Popup beim nächsten render() wieder angezeigt.
-        sessionStorage.removeItem('noticeSeen');
-		
-		
-         // Tab-Buttons übersetzen
-        const btnStart = document.getElementById('tab-start');
-        const btnPizzas = document.getElementById('tab-pizzas');
-        const btnEvents = document.getElementById('tab-events');
-        const btnTV = document.getElementById('tab-tv');
+function setLang(l) { 
+	lang = l; 
+	
+	// 2. WICHTIG: Das 'Gesehen'-Flag für das Popup löschen!
+	// Dadurch wird das Popup beim nächsten render() wieder angezeigt.
+	sessionStorage.removeItem('noticeSeen');
+	
+	
+	 // Tab-Buttons übersetzen
+	const btnStart = document.getElementById('tab-start');
+	const btnPizzas = document.getElementById('tab-pizzas');
+	const btnEvents = document.getElementById('tab-events');
+	const btnTV = document.getElementById('tab-tv');
 
     if (lang === 'DE') {
         if(btnStart) btnStart.innerText = "Start";
@@ -849,13 +930,11 @@ async function editSingleTime(idx) {
         }
         if (footerAddress) footerAddress.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
     }
-
-
-        
-        document.getElementById('btn-de').classList.toggle('active', l==='DE');
-        document.getElementById('btn-it').classList.toggle('active', l==='IT');
-        render(); 
-    }
+       
+	document.getElementById('btn-de').classList.toggle('active', l==='DE');
+	document.getElementById('btn-it').classList.toggle('active', l==='IT');
+	render(); 
+}
 
 function render() {    
 	// --- AUTOMATISCHE SORTIERUNG ---
@@ -933,10 +1012,6 @@ function render() {
         document.body.classList.remove('admin-mode');
     }
 
-
-
-
-
 	// 2.1. ADMIN-KONSOLE
 	//-------------------------------
 	if (editMode && currentTab !== 'start') {
@@ -966,8 +1041,6 @@ function render() {
 			// Bei TV-Sport und Events nutzen wir die Automatik -> Feld verstecken
 			descITField = `<input type="hidden" id="inDescIT" value="">`;
 		}
-
-
 
 		area.innerHTML += `
 			<div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
@@ -1231,7 +1304,18 @@ function render() {
 					Popup auf Startseite AKTIVIEREN
 				</label>
 
-			   <!-- Bild-Upload für das POPUP -->
+                 <!-- HIER DIE NEUEN TITEL-FELDER EINFÜGEN -->
+				<p><strong>Überschrift (DE):</strong></p>
+				<input type="text" id="edit-notice-title-de" 
+					   value="${(data.notice && data.notice.titleDE) ? data.notice.titleDE : 'Wichtige Info'}" 
+					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
+
+				<p><strong>Titolo (IT):</strong></p>
+				<input type="text" id="edit-notice-title-it" 
+					   value="${(data.notice && data.notice.titleIT) ? data.notice.titleIT : 'Info importante'}" 
+					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
+
+			    <!-- Bild-Upload für das POPUP -->
 				<div style="margin-bottom: 15px;">
 					<p style="margin-bottom: 5px;"><strong>Event-Bild / Foto (JPG/PNG):</strong></p>
 					
@@ -1260,16 +1344,7 @@ function render() {
 				</div>
 
 							
-				<!-- HIER DIE NEUEN TITEL-FELDER EINFÜGEN -->
-				<p><strong>Überschrift (DE):</strong></p>
-				<input type="text" id="edit-notice-title-de" 
-					   value="${(data.notice && data.notice.titleDE) ? data.notice.titleDE : 'Wichtige Info'}" 
-					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
-
-				<p><strong>Titolo (IT):</strong></p>
-				<input type="text" id="edit-notice-title-it" 
-					   value="${(data.notice && data.notice.titleIT) ? data.notice.titleIT : 'Info importante'}" 
-					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
+				
 
 				<!-- Nachrichtentext (vorhanden) -->
 				<p><strong>Nachricht (Deutsch):</strong></p>
@@ -1286,39 +1361,11 @@ function render() {
 	
 		`: ''}
 		`;		
-		if (data.notice && data.notice.active) {
-			if (!sessionStorage.getItem('noticeSeen')) {
-					area.innerHTML += `
-					<div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px;animation: fadeIn .3s ease-out;">
-						<div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
-							
-							<!-- BILD-BEREICH: max-height auf 40% des Bildschirms begrenzt, damit Button sichtbar bleibt -->
-							${data.notice.img ? `
-								<div style="width: 100%; max-height: 40vh; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #eee; flex-shrink: 0;">
-									<img src="${data.notice.img}" 
-										 style="max-width: 100%; max-height: 40vh; object-fit: contain; display: block;" 
-										 alt="Event">
-								</div>
-							` : '<div style="font-size: 50px; margin: 20px 0; text-align: center; flex-shrink: 0;">📢</div>'}
-
-							<!-- TEXT-BEREICH: Scrollt, falls der Text zu lang für das Handy ist -->
-							<div style="padding:25px; overflow-y: auto; flex-grow: 1;">
-								<h2 style="color:var(--red); margin-top:0;">
-									${lang === 'DE' 
-										? (data.notice.titleDE || 'Wichtige Info') 
-										: (data.notice.titleIT || 'Info importante')}
-								</h2>
-								<p style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.4;">
-									${lang === 'DE' ? data.notice.textDE : data.notice.textIT}
-								</p>
-								<button onclick="closeNoticePopup()" style="margin-top:20px; background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width: 100%;">OK</button>
-							</div>
-						</div>
-					</div>`;
-				}
-			}
+		// Ruft die Funktion auf und übergibt die benötigten Daten
+        renderNoticePopup(data, lang, area);
         
 		return;  //bricht render() ab
+		
     }
 	
 	//---------------------------------------------------------------
@@ -1370,6 +1417,7 @@ function render() {
                 });
             }
         });
+		renderNoticePopup(data, lang, area);
     } 
     // --- FALL 2: TV & EVENTS ---
     else {
@@ -1414,37 +1462,8 @@ function render() {
 			}
 		});
 				
-		if (data.notice && data.notice.active) {
-			if (!sessionStorage.getItem('noticeSeen')) {
-				area.innerHTML += `
-				<div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px;animation: fadeIn 0.3s ease-out;">
-					<div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
-						
-						<!-- BILD-BEREICH: max-height auf 40% des Bildschirms begrenzt, damit Button sichtbar bleibt -->
-						${data.notice.img ? `
-							<div style="width: 100%; max-height: 40vh; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #eee; flex-shrink: 0;">
-								<img src="${data.notice.img}" 
-									 style="max-width: 100%; max-height: 40vh; object-fit: contain; display: block;" 
-									 alt="Event">
-							</div>
-						` : '<div style="font-size: 50px; margin: 20px 0; text-align: center; flex-shrink: 0;">📢</div>'}
-
-						<!-- TEXT-BEREICH: Scrollt, falls der Text zu lang für das Handy ist -->
-						<div style="padding:25px; overflow-y: auto; flex-grow: 1;">
-							<h2 style="color:var(--red); margin-top:0;">
-								${lang === 'DE' 
-									? (data.notice.titleDE || 'Wichtige Info') 
-									: (data.notice.titleIT || 'Info importante')}
-							</h2>
-							<p style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.4;">
-								${lang === 'DE' ? data.notice.textDE : data.notice.textIT}
-							</p>
-							<button onclick="closeNoticePopup()" style="margin-top:20px; background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width: 100%;">OK</button>
-						</div>
-					</div>
-				</div>`;
-			}
-		}
+		// Ruft die Funktion auf und übergibt die benötigten Daten
+		renderNoticePopup(data, lang, area);
 		
 	} // <--- Ende des else-Blocks (für TV/Events)
 	
@@ -2063,7 +2082,7 @@ async function saveNoticeSettings() {
 }
 
 // 3. Die neue Schließ-Funktion (außerhalb der render-Funktion platzieren)
-function closeNoticePopup() {
+/*function closeNoticePopup() {
     // Merken, dass gesehen wurde
     sessionStorage.setItem('noticeSeen', 'true');
     // Aktuelle Sprache speichern
@@ -2071,7 +2090,16 @@ function closeNoticePopup() {
     
     const popup = document.getElementById('notice-popup');
     if (popup) popup.remove();
-}
+}*/
+
+window.closeNoticePopup = function() {
+    const popup = document.getElementById('notice-popup');
+    if (popup) {
+        popup.remove();
+        sessionStorage.setItem('noticeSeen', 'true');
+    }
+};
+
 
 function showPopup() {
     if (data.notice && data.notice.active) {
