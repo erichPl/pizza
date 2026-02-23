@@ -1185,14 +1185,29 @@ function render() {
 					<div class="hours-list">
 						${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
 							data.start.zeiten.map((z, idx) => `
-								<div class="hours-item">
-									<span class="tag-spalte">${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}</span> 
-									<span class="zeit-spalte" data-wert="${z.zeit ? z.zeit.trim() : ''}"></span>
+								<div class="hours-item" style="display: flex; flex-direction: column; margin-bottom: 15px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: ${editMode ? '10px' : '0'};">
+									<!-- Anzeige der Zeit -->
+									<div style="display: flex; justify-content: space-between; width: 100%;">
+										<span class="tag-spalte" style="font-weight: bold;">
+											${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
+										</span> 
+										<span class="zeit-spalte">${z.zeit ? z.zeit.trim() : ''}</span>
+									</div>
+
+									<!-- Admin Controls: Nur im EditMode sichtbar -->
+									${editMode ? `
+									<div class="admin-row-controls" style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
+										<button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️ Edit</button>
+										<button onclick="moveTimeRow(${idx}, -1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
+										<button onclick="moveTimeRow(${idx}, 1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === data.start.zeiten.length - 1 ? 'disabled' : ''}>↓</button>
+										<button onclick="deleteTimeRow(${idx})" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">🗑️</button>
+									</div>
+									` : ''}
 								</div>
 							`).join('') 
 							: `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
 						}
-					</div>  
+					</div>
 				</div>
 			</div> <!-- Ende info-section-compact -->
 		</div> <!-- Ende container -->
@@ -1508,7 +1523,7 @@ function getAdminButtonsHtml(idx) {
 }
 
 // 1. Neue Zeile hinzufügen
-async function addTimeRow() {
+/*async function addTimeRow() {
     const tDE = prompt("Tag auf DEUTSCH (z.B. Montag):", "Montag");
     if (!tDE) return;
     const tIT = prompt("Giorno in ITALIANO (p.es. Lunedì):", "Lunedì");
@@ -1525,7 +1540,63 @@ async function addTimeRow() {
     
     await save(); // Deine save() Funktion zum Server
     render();
+}*/
+
+// Hilfsfunktion zum Speichern der gesamten Daten
+async function saveAllData() {
+    try {
+        const response = await fetch('/api/data?pw=leon2208', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (response.ok) { location.reload(); } 
+        else { alert("Fehler beim Speichern!"); }
+    } catch (err) { console.error(err); }
 }
+
+// Zeile löschen
+function deleteTimeRow(index) {
+    if(confirm(lang === 'DE' ? "Zeile wirklich löschen?" : "Eliminare riga?")) {
+        data.start.zeiten.splice(index, 1);
+        saveAllData();
+    }
+}
+
+// Zeile verschieben (hoch/runter)
+function moveTimeRow(index, direction) {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= data.start.zeiten.length) return;
+    
+    const element = data.start.zeiten.splice(index, 1)[0];
+    data.start.zeiten.splice(targetIndex, 0, element);
+    saveAllData();
+}
+
+// Zeile editieren
+function editTimeRow(index) {
+    const z = data.start.zeiten[index];
+    const newTagDE = prompt("Tag (DE):", z.tagDE || z.tag);
+    const newTagIT = prompt("Giorno (IT):", z.tagIT || z.tag);
+    const newZeit = prompt("Zeit / Orario:", z.zeit);
+    
+    if (newTagDE !== null && newTagIT !== null && newZeit !== null) {
+        data.start.zeiten[index] = {
+            tagDE: newTagDE,
+            tagIT: newTagIT,
+            zeit: newZeit
+        };
+        saveAllData();
+    }
+}
+
+// Neue Zeile hinzufügen (Erweiterung deiner bestehenden Funktion)
+function addTimeRow() {
+    if (!data.start.zeiten) data.start.zeiten = [];
+    data.start.zeiten.push({ tagDE: "Neu", tagIT: "Nuovo", zeit: "00:00 - 00:00" });
+    saveAllData();
+}
+
 
  
 //Öffnungszeiten
