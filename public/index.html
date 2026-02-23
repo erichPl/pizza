@@ -634,12 +634,240 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 
 <script>
     
-    let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
-    let data = { start: {}, pizzas: [], events: [], tv: [] };
-    let currentTab = 'start';
-    let lang = 'DE';
-    const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
-    if(editMode) document.body.classList.add('admin-mode');
+let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
+let data = { start: {}, pizzas: [], events: [], tv: [] };
+let currentTab = 'start';
+let lang = 'DE';
+const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
+if(editMode) document.body.classList.add('admin-mode');
+
+function getNoticePopupHTML(data, lang) {
+    if (!data || !data.notice || !data.notice.active) return '';
+    const storageKey = 'noticeSeen_' + lang;
+    if (sessionStorage.getItem(storageKey)) return '';
+
+    return `
+    <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:99999; padding:20px; animation: fadeIn .3s ease-out;">
+        <div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column; position:relative;">
+            
+            <!-- 1. TITEL-BEREICH (Jetzt ganz oben) -->
+            <div style="padding: 20px 20px 10px 20px; flex-shrink: 0;">
+                <h2 style="color:var(--red); margin:0;">
+                    ${lang === 'DE' ? (data.notice.titleDE || 'Wichtige Info') : (data.notice.titleIT || 'Info importante')}
+                </h2>
+            </div>
+
+            <!-- 2. BILD-BEREICH (Jetzt unter dem Titel) -->
+            ${data.notice.img ? `
+                <div style="width: 100%; max-height: 30vh; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #eee; flex-shrink: 0;">
+                    <img src="${data.notice.img}" style="max-width: 100%; max-height: 30vh; object-fit: contain; display: block;" alt="Event">
+                </div>
+            ` : ''}
+
+            <!-- 3. SCROLL-TEXT -->
+            <div style="position: relative; flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+                <div id="popup-scroll-container" onscroll="handlePopupScroll(this)" style="padding: 15px 25px 20px 25px; overflow-y: auto; text-align: center;">
+                    <div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.3; white-space: pre-line;">
+                        ${(lang === 'DE' ? data.notice.textDE : data.notice.textIT)
+                            .replace(/%/g, '<hr style="border:0; border-top:2px solid var(--red); margin:15px auto 5px auto; width:80%; opacity:0.4;">')
+                        }
+                    </div>
+                </div>
+
+                <!-- Scroll-Hinweis "Mehr lesen" -->
+                <div id="scroll-hint-box" onclick="scrollPopupDown()" style="position: absolute; bottom: 8px; right: 15px; cursor: pointer; display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--red); z-index: 20;">
+                    <span style="color: var(--red); font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">
+                        ${lang === 'DE' ? 'Mehr lesen' : 'Leggi di più'}
+                    </span>
+                    <span style="color: var(--red); font-size: 16px; font-weight: bold;">↓</span>
+                </div>
+            </div>
+
+            <!-- 4. FIXER BUTTON -->
+            <div style="padding: 15px 25px 25px 25px; background: white; flex-shrink: 0; border-top: 1px solid #eee;">
+                <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+
+
+function getNoticePopupHTML2(data, lang) {
+    // 1. Sicherheits-Check
+    if (!data || !data.notice || !data.notice.active) return '';
+
+    // 2. WICHTIG: Nur den sprachspezifischen Key prüfen
+    const storageKey = 'noticeSeen_' + lang;
+    
+    if (sessionStorage.getItem(storageKey)) {
+        console.log("Popup für " + lang + " bereits gesehen.");
+        return '';
+    }
+
+    console.log("Zeige Popup für Sprache: " + lang);
+
+    return `
+    <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:99999; padding:20px; animation: fadeIn .3s ease-out;">
+        <div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column; position:relative;">
+            
+            ${data.notice.img ? `<div style="flex-shrink: 0; max-height: 25vh; overflow: hidden; border-bottom: 2px solid #eee;"><img src="${data.notice.img}" style="width: 100%; object-fit: contain; max-height: 25vh;"></div>` : ''}
+
+            <div style="padding: 15px; flex-shrink: 0;">
+                <h2 style="color:var(--red); margin:0;">${lang === 'DE' ? (data.notice.titleDE || 'Info') : (data.notice.titleIT || 'Info')}</h2>
+            </div>
+
+            <div style="position: relative; flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+                <div id="popup-scroll-container" onscroll="handlePopupScroll(this)" style="padding: 0 25px 20px 25px; overflow-y: auto; text-align: center;">
+                    <div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.4; white-space: pre-line;">
+                        ${(lang === 'DE' ? data.notice.textDE : data.notice.textIT).replace(/%/g, '<hr style="border:0; border-top:2px solid var(--red); margin:15px auto 5px auto; width:60%; opacity:0.3;">')}
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 15px 25px 20px 25px; flex-shrink: 0; background: white; border-top: 1px solid #eee;">
+                <!-- Wir übergeben lang direkt an die Schließen-Funktion -->
+                <button onclick="closeNoticePopup('${lang}')" style="background:var(--red); color:white; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+
+function getNoticePopupHTML__(data, lang) {
+    // TEST-MODUS: Ignoriere sessionStorage und active-Status kurzzeitig
+    console.log("Popup-Generator aufgerufen für:", lang);
+
+    // Falls Daten komplett fehlen, sicherheitshalber abbrechen
+    if (!data || !data.notice) {
+        console.error("Datenobjekt 'notice' fehlt in der Datenbank!");
+        return '';
+    }
+
+    // Wenn du es NUR zum Testen IMMER sehen willst, kommentiere die nächste Zeile aus:
+    // if (sessionStorage.getItem('noticeSeen_' + lang)) return '';
+
+    return `
+    <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:99999; padding:20px;">
+        <div style="background:white; border-radius:15px; max-width:450px; width:100%; border:4px solid var(--red); overflow:hidden; display:flex; flex-direction:column;">
+            <div style="padding:20px;">
+                <h2 style="color:var(--red);">${lang === 'DE' ? (data.notice.titleDE || 'Info') : (data.notice.titleIT || 'Info')}</h2>
+                <p style="white-space: pre-line;">${lang === 'DE' ? data.notice.textDE : data.notice.textIT}</p>
+            </div>
+            <div style="padding:15px; border-top:1px solid #eee;">
+                <button onclick="closeNoticePopup()" style="background:var(--red); color:white; width:100%; padding:10px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">OK</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+
+
+
+
+function getNoticePopupHTML_(data, lang) {
+    console.log("Prüfe Popup für Sprache:", lang);
+
+    if (!data || !data.notice) {
+        console.log("❌ Abbruch: data.notice fehlt in DB");
+        return '';
+    }
+    if (!data.notice.active) {
+        console.log("❌ Abbruch: Popup ist auf AUS gestellt");
+        return '';
+    }
+
+    const storageKey = 'noticeSeen_' + lang;
+    if (sessionStorage.getItem(storageKey)) {
+        console.log("❌ Abbruch: Für " + lang + " bereits gesehen");
+        return '';
+    }
+
+    console.log("✅ Erfolg: Popup wird erstellt!");
+    return `... dein HTML Code ...`;
+	
+	
+	// 1. Prüfen ob Daten da sind und Popup aktiv ist
+    if (!data || !data.notice || !data.notice.active) return '';
+    
+    // 2. NUR pro Sprache prüfen (das ermöglicht den Sprachwechsel-Popup)
+    if (sessionStorage.getItem('noticeSeen_' + lang)) return '';
+    
+	return `
+    <style>
+        /* Pizza-Rote Scrollbar für bessere Sichtbarkeit */
+        #popup-scroll-container::-webkit-scrollbar { width: 6px; }
+        #popup-scroll-container::-webkit-scrollbar-thumb { background-color: var(--red); border-radius: 10px; }
+        #popup-scroll-container { scrollbar-width: thin; scrollbar-color: var(--red) #f1f1f1; }
+        
+        @keyframes pulse-scroll {
+            0% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(5px); }
+            100% { opacity: 0.4; transform: translateY(0); }
+        }
+    </style>
+
+    <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:99999; padding:20px; animation: fadeIn 0.3s ease-out;">
+        <div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column; position:relative;">
+            
+            <!-- 1. BILD -->
+            ${data.notice.img ? `<div style="flex-shrink: 0; max-height: 25vh; overflow: hidden; border-bottom: 2px solid #eee;"><img src="${data.notice.img}" style="width: 100%; object-fit: contain; max-height: 25vh;"></div>` : ''}
+
+            <!-- 2. TITEL -->
+            <div style="padding: 15px; flex-shrink: 0;"><h2 style="color:var(--red); margin:0;">${lang === 'DE' ? (data.notice.titleDE || 'Wichtige Info') : (data.notice.titleIT || 'Info importante')}</h2></div>
+
+            <!-- 3. TEXT-BEREICH MIT SCROLL-INDIKATOR UNTEN RECHTS -->
+			<div style="position: relative; flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+				<div id="popup-scroll-container" onscroll="handlePopupScroll(this)" style="padding: 0 25px 20px 25px; overflow-y: auto; text-align: center;">
+					<div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.3; white-space: pre-line;">
+						${(lang === 'DE' ? data.notice.textDE : data.notice.textIT)
+							/* Wir reduzieren den margin-bottom der Linie von 15px auf 5px */
+							.replace(/%/g, '<hr style="border:0; border-top:2px solid var(--red); margin:15px auto 5px auto; width:80%; opacity:0.4;">')
+						}
+					</div>
+				</div>
+
+				<!-- DER INTUITIVE HINWEIS (Jetzt klickbar!) -->
+				<div id="scroll-hint-box" 
+					 onclick="scrollPopupDown()" 
+					 style="position: absolute; bottom: 8px; right: 15px; cursor: pointer; pointer-events: auto; display: flex; align-items: center; gap: 5px; transition: opacity 0.4s; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--red); box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 20;">
+					<span style="color: var(--red); font-size: 0.65rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
+						${lang === 'DE' ? 'Mehr lesen' : 'Leggi di più'}
+					</span>
+					<span style="color: var(--red); font-size: 16px; animation: pulse-scroll 1.5s infinite; font-weight: bold;">↓</span>
+				</div>
+			</div>
+
+            <!-- 4. BUTTON -->
+            <div style="padding: 15px 25px 20px 25px; flex-shrink: 0; background: white; border-top: 1px solid #eee;">
+                <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>`;
+}
+
+
+function handlePopupScroll(target) {
+    const gradient = document.getElementById('scroll-gradient');
+    // Wenn der User fast ganz unten ist (innerhalb von 20px), verschwindet der Hinweis
+    if (target.scrollHeight - target.scrollTop <= target.clientHeight + 20) {
+        gradient.style.opacity = "0";
+    } else {
+        gradient.style.opacity = "1";
+    }
+}
+
+function scrollPopupDown() {
+    const container = document.getElementById('popup-scroll-container');
+    if (container) {
+        container.scrollBy({
+            top: 120, // Pixel-Anzahl pro Klick
+            behavior: 'smooth' // Sanftes Gleiten
+        });
+    }
+}
+
+
 
 //ÖFFNUNGSZEITEN 
 //========================================
@@ -788,25 +1016,28 @@ async function editSingleTime(idx) {
     // aufrufenden Funktion (z.B. move oder addItem) nach dem await.
 }
 
-    function setTab(t) { 
-        currentTab = t; 
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
-        render(); 
-    }
+function setTab(t) { 
+	currentTab = t; 
+	document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
+	render(); 
+}
 
-    function setLang(l) { 
-        lang = l; 
-		
-		// 2. WICHTIG: Das 'Gesehen'-Flag für das Popup löschen!
-        // Dadurch wird das Popup beim nächsten render() wieder angezeigt.
-        sessionStorage.removeItem('noticeSeen');
-		
-		
-         // Tab-Buttons übersetzen
-        const btnStart = document.getElementById('tab-start');
-        const btnPizzas = document.getElementById('tab-pizzas');
-        const btnEvents = document.getElementById('tab-events');
-        const btnTV = document.getElementById('tab-tv');
+function setLang(l) { 
+    lang = l; 
+    
+    // 1. WICHTIG: Das Flag für die NEUE Sprache löschen!
+    // Wenn man auf 'IT' klickt, löschen wir 'noticeSeen_IT'.
+    // Dadurch wird das Popup beim folgenden render() für diese Sprache wieder angezeigt.
+    sessionStorage.removeItem('noticeSeen_' + l);
+    
+    // Optional: Falls du einen alten allgemeinen Key hast, auch diesen löschen
+    sessionStorage.removeItem('noticeSeen');
+
+    // --- Tab-Buttons übersetzen ---
+    const btnStart = document.getElementById('tab-start');
+    const btnPizzas = document.getElementById('tab-pizzas');
+    const btnEvents = document.getElementById('tab-events');
+    const btnTV = document.getElementById('tab-tv');
 
     if (lang === 'DE') {
         if(btnStart) btnStart.innerText = "Start";
@@ -820,550 +1051,156 @@ async function editSingleTime(idx) {
         if(btnTV) btnTV.innerText = "Sport TV";
     }
      
-    const ort=document.getElementById('ort');
-    if (lang === 'DE') {
-        if (ort) {
-            ort.innerHTML = "Laas - Vinschagau";
-        }
-	}
-	else{
-	    if (ort) {
-		    ort.innerHTML = "Lasa - Venosta";
-		}
-	}
-	
-	
-    // Footer-Elemente übersetzen
+    // --- Ort übersetzen ---
+    const ort = document.getElementById('ort');
+    if (ort) {
+        ort.innerHTML = (lang === 'DE') ? "Laas - Vinschgau" : "Lasa - Venosta";
+    }
+
+    // --- Footer übersetzen ---
     const footerHours = document.getElementById('footer-hours');
     const footerAddress = document.getElementById('footer-address');
-    
+
     if (lang === 'DE') {
-        if (footerHours) {
-            footerHours.innerHTML = "Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00";
-        }
-        // Adresse (optional, falls "Vinschgaustraße" übersetzt werden soll)
+        if (footerHours) footerHours.innerHTML = "Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00";
         if (footerAddress) footerAddress.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
     } else {
-        if (footerHours) {
-            footerHours.innerHTML = "Lunedì giorno di riposo<br>Mar-Gio: 16:00-00:00<br>Ven-Dom: 16:00-01:00";
-        }
+        if (footerHours) footerHours.innerHTML = "Lunedì giorno di riposo<br>Mar-Gio: 16:00-00:00<br>Ven-Dom: 16:00-01:00";
         if (footerAddress) footerAddress.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
     }
+getNoticeP
+    // --- Aktiven Button markieren und neu zeichnen ---
+    document.getElementById('btn-de').classList.toggle('active', l === 'DE');
+    document.getElementById('btn-it').classList.toggle('active', l === 'IT');
+    
+    render(); 
+}
 
-
-        
-        document.getElementById('btn-de').classList.toggle('active', l==='DE');
-        document.getElementById('btn-it').classList.toggle('active', l==='IT');
-        render(); 
+async function render() {    
+    // --- 1. AUTOMATISCHE SORTIERUNG ---
+    if (currentTab === 'tv' || currentTab === 'events') {
+        data[currentTab].sort((a, b) => {
+            let dateStrA, timeStrA, dateStrB, timeStrB;
+            if (currentTab === 'tv') {
+                dateStrA = a.descDE; timeStrA = a.right;
+                dateStrB = b.descDE; timeStrB = b.right;
+            } else {
+                dateStrA = a.right; timeStrA = "00:00"; 
+                dateStrB = b.right; timeStrB = "00:00";
+            }
+            const dA = parseSisiniusDate(dateStrA, timeStrA);
+            const dB = parseSisiniusDate(dateStrB, timeStrB);
+            return dA - dB;
+        });
     }
+    
+    // --- 2. FOOTER SPRACHUMSTELLUNG ---
+    const footerAddr = document.getElementById('footer-address');
+    const footerRegion = document.getElementById('footer-region');
+    const footerContact = document.getElementById('footer-contact');
+    const footerRecht = document.getElementById('footer-rechtliches');
+    const footerImpLink = document.getElementById('footer-impressum-link');
+    const footerDataLink = document.getElementById('footer-datenschutz-link');
 
-function render() {    
-	// --- AUTOMATISCHE SORTIERUNG ---
-	if (currentTab === 'tv' || currentTab === 'events') {
-		data[currentTab].sort((a, b) => {
-			let dateStrA, timeStrA, dateStrB, timeStrB;
-
-			if (currentTab === 'tv') {
-				// TV: Datum in descDE, Zeit in right
-				dateStrA = a.descDE; timeStrA = a.right;
-				dateStrB = b.descDE; timeStrB = b.right;
-			} else {
-				// EVENTS: Datum in right (z.B. "Fr 13.02.26"), Zeit meist in descDE oder gar nicht
-				dateStrA = a.right; timeStrA = "00:00"; 
-				dateStrB = b.right; timeStrB = "00:00";
-			}
-
-			const dA = parseSisiniusDate(dateStrA, timeStrA);
-			const dB = parseSisiniusDate(dateStrB, timeStrB);
-			return dA - dB;
-		});
-	}
-	
-	// --- FOOTER SPRACHUMSTELLUNG ---
-
-	// 1. Elemente abgreifen
-	const footerAddr = document.getElementById('footer-address');
-	const footerRegion = document.getElementById('footer-region');
-	const footerContact = document.getElementById('footer-contact');
-	const footerRecht = document.getElementById('footer-rechtliches');
-	const footerImpLink = document.getElementById('footer-impressum-link');
-	const footerDataLink = document.getElementById('footer-datenschutz-link');
-
-	// 2. Texte und Links je nach Sprache setzen
-	if (lang === 'DE') {
-		if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
-		if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
-		if (footerContact) footerContact.innerText = "Kontakt";
-		if (footerRecht) footerRecht.innerText = "Rechtliches";
-		
-		if (footerImpLink) {
-			footerImpLink.innerText = "Impressum";
-			footerImpLink.href = "impressumDe.html";
-		}
-		if (footerDataLink) {
-			footerDataLink.innerText = "Datenschutz";
-			footerDataLink.href = "datenschutzDe.html";
-		}
-	} else {
-		// ITALIENISCH (IT)
-		if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
-		if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
-		if (footerContact) footerContact.innerText = "Contatto";
-		if (footerRecht) footerRecht.innerText = "Note Legali";
-		
-		if (footerImpLink) {
-			footerImpLink.innerText = "Note Legali"; // In Italien heißt Impressum oft Note Legali
-			footerImpLink.href = "impressumIt.html";
-		}
-		if (footerDataLink) {
-			footerDataLink.innerText = "Privacy";
-			footerDataLink.href = "datenschutzIt.html";
-		}
-	}
-	
-
-	const area = document.getElementById('content-area');
+    if (lang === 'DE') {
+        if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+        if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
+        if (footerContact) footerContact.innerText = "Kontakt";
+        if (footerRecht) footerRecht.innerText = "Rechtliches";
+        if (footerImpLink) { footerImpLink.innerText = "Impressum"; footerImpLink.href = "impressumDe.html"; }
+        if (footerDataLink) { footerDataLink.innerText = "Datenschutz"; footerDataLink.href = "datenschutzDe.html"; }
+    } else {
+        if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+        if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
+        if (footerContact) footerContact.innerText = "Contatto";
+        if (footerRecht) footerRecht.innerText = "Note Legali";
+        if (footerImpLink) { footerImpLink.innerText = "Note Legali"; footerImpLink.href = "impressumIt.html"; }
+        if (footerDataLink) { footerDataLink.innerText = "Privacy"; footerDataLink.href = "datenschutzIt.html"; }
+    }
+    
+    const area = document.getElementById('content-area');
     if (!area) return;
     area.innerHTML = '';
 
-    // Admin-Modus Klasse am Body umschalten
     if (editMode) {
         document.body.classList.add('admin-mode');
     } else {
         document.body.classList.remove('admin-mode');
     }
 
+    // --- 3. ADMIN-KONSOLE (PIZZAS, TV, EVENTS) ---
+    if (editMode && currentTab !== 'start') {
+        let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+        let labelDesc = 'Beschreibung', labelDescIT = 'Descrizione';
+        if (currentTab === 'tv') { labelDesc = 'Datum (z.B. Freitag 13.02.26)'; labelDescIT = 'Data (p.es. Venerdì 13/02/26)'; }
+        else if (currentTab === 'events') { labelDesc = 'Uhrzeit (z.B. ab 20:00 Uhr)'; labelDescIT = 'Orario (p.es. dalle ore 20:00)'; }
 
+        let descITField = (currentTab === 'pizzas') ? `<input type="text" id="inDescIT" placeholder="Descrizione (IT)">` : `<input type="hidden" id="inDescIT" value="">`;
 
-
-
-	// 2.1. ADMIN-KONSOLE
-	//-------------------------------
-	if (editMode && currentTab !== 'start') {
-		let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
-		
-		
-		 // NEU: Platzhalter für Beschreibung je nach Tab (TV = Datum, Events = Uhrzeit, Rest = Beschreibung)
-		let labelDesc = 'Beschreibung';
-		let labelDescIT = 'Descrizione';
-		
-		if (currentTab === 'tv') {
-			labelDesc = 'Datum (z.B. Freitag 13.02.26)';
-			labelDescIT = 'Data (p.es. Venerdì 13/02/26)';
-		} else if (currentTab === 'events') {
-			labelDesc = 'Uhrzeit (z.B. ab 20:00 Uhr)';
-			labelDescIT = 'Orario (p.es. dalle ore 20:00)';
-		}
-
-
-		// Vor dem area.innerHTML += Block:
-		let descITField = '';
-
-		// Nur bei Pizzen brauchen wir das zweite Beschreibungsfeld (Zutaten IT)
-		if (currentTab === 'pizzas') {
-			descITField = `<input type="text" id="inDescIT" placeholder="Descrizione (IT)">`;
-		} else {
-			// Bei TV-Sport und Events nutzen wir die Automatik -> Feld verstecken
-			descITField = `<input type="hidden" id="inDescIT" value="">`;
-		}
-
-
-
-		area.innerHTML += `
-			<div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-				<strong id="admin-title" style="color: var(--red);">Admin-Konsole (${currentTab.toUpperCase()})</strong>
-				
-				<div class="input-grid" style="margin-top: 10px;">
-					<input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
-					<input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
-					
-					<!-- Hier werden die Platzhalter jetzt variabel genutzt -->
-					<input type="text" id="inDescDE" placeholder="${labelDesc}">
-					<!-- Hier wird nun das variable Feld eingesetzt -->
-					${descITField}
-					<input type="text" id="inRight" placeholder="${label}">
-				</div>
-
-				<!-- BILD-UPLOAD BEREICH -->
-				<div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: white;">
-					<label style="display:block; font-weight:bold; margin-bottom:5px; font-size: 0.9rem;">Bild für ${currentTab.toUpperCase()}:</label>
-					
-					<input type="file" id="inImgFile" accept="image/*" onchange="encodeImageFileAsURL(this)" style="width:100%; font-size: 0.8rem;">
-
-					<div id="preview-box" style="margin-top: 10px; text-align: center; min-height: 50px;">
-						<img id="img-preview" src="" style="max-height:120px; border-radius:5px; display:none; border:2px solid var(--red);">
-						<p id="no-img-text" style="font-size: 0.8rem; color: #888; margin: 5px 0;">Kein Bild gewählt</p>
-					</div>
-
-					<input type="hidden" id="inImgBase64">
-					<div id="upload-status" style="font-size: 0.8rem; color: green; display: none; text-align: center;">✅ Bild bereit!</div>
-				</div>
-
-				<!-- KATEGORIE-WAHL -->
-				${(currentTab === 'pizzas' || currentTab === 'tv') ? `
-					<div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
-						<label style="font-weight: bold; font-size: 0.9rem;">${currentTab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}</label>
-						${currentTab === 'pizzas' ? `
-							<select id="inCat" style="width:100%; padding:8px; margin-top:5px;">
-								<option value="pizza">Standard Pizza</option>
-								<option value="bianche">Pizza Bianche</option>
-								<option value="kinder">Kinderpizza</option>
-								<option value="extras">Extras</option>
-							</select>
-						` : `
-							<input type="text" id="inCat" placeholder="z.B. Champions League" style="width:100%; padding:8px; margin-top:5px;">
-						`}
-					</div>
-				` : ''}
-				
-				<div style="margin-top: 20px; display: flex; gap: 10px;">
-					<button onclick="addItem()" style="flex: 1; background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Eintrag speichern</button>
-					<button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
-				</div>
-			</div>
-		`;
-	
-	}
-
-    // 1. STARTSEITE (Sonderlayout)
-	//=====================================
-    if (currentTab === 'start') {
-        const s = data.start || { 
-            img: 'lokal.webp', 
-            textDE: 'Willkommen bei Pizzeria Pub St. Sisinius', 
-            textIT: 'Benvenuti alla Pizzeria Pub St. Sisinius' 
-        };
-        
-		area.className = 'list-mode';
-		
-		area.innerHTML += `
-			<div class="hero" style="
-				height: 500px; 
-				position: relative; 
-				width: 100vw; 
-				left: 50%; 
-				right: 50%; 
-				margin-left: -50vw; 
-				margin-right: -50vw; 
-				overflow: hidden; 
-				display: flex; 
-				align-items: center; 
-				justify-content: center; 
-				color: white;">
-				
-				<!-- 1. Haupt-Hintergrundbild -->
-				<img src="lokal.webp" style="
-					position: absolute; 
-					top: 0;
-					left: 0;
-					width: 100%; 
-					height: 100%; 
-					object-fit: cover; 
-					z-index: 1;">
-					
-				<!-- 2. Dunkler Schleier -->
-				<div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5; pointer-events: none;"></div>
-
-				 <!-- 3. Mini-Container für Luftbild + Punkt (Bündig unten rechts) -->
-				<!--<a href="https://www.google.com/maps/search/?api=1&destination=46.6171,10.6948" -->
-				<!--<a href="https://www.google.com/maps/place/46%C2%B037'01.6%22N+10%C2%B041'41.3%22E(Pizzeria+St.+Sisinius)/@46.6171,10.6948,18z?entry=ttu"-->
-				
-
-				<!-- 4. Text-Inhalt -->
-				<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
-					<h2 style="font-size: 2.5rem; margin-bottom: 10px; text-transform: none;">
-						${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
-					</h2>
-					<p style="font-size: 1.5rem; font-weight: 500;">
-						${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}
-					</p>
-				</div>
-			</div>
-			<!--<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
-							   target="_blank" -->
-		<div class="container">
-			<div class="about-section">
-				<img src="pizza.webp" alt="Pizza" class="about-image">
-				<div class="about-text">
-					${lang === 'DE' ? 
-						'<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
-						'<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und bieten verschiedene Events und Specials für beste Stimmung und Abwechslung in der Pizzeria St. Sisinius.</p>' +
-						'<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
-						: 
-						'<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparata con ingredienti freschi e molta cura per i dettagli.</p>' +
-						'<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
-						'<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
-					}
-				</div>
-			</div> <!-- Ende about-section -->
-
-			<!-- Dieser Container sorgt dafür, dass Kontakt und Öffnungszeiten nebeneinander stehen -->
-			<div class="info-section-compact" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-				
-					
-					
-					
-					<!-- KONTAKT KARTE -->
-				<div class="contact-card-large" style="position: relative; overflow: hidden; min-height: 180px;">
-				
-					<!-- Kopfzeile: Icon, Titel und das Bild rechts daneben -->
-					<div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 15px;">
-							
-						<div style="flex: 1;">
-							<div class="contact-icon">📞</div>
-							<h3 style="color:var(--red); margin: 5px 0;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-							
-							<a href="tel:+393898334004" class="phone-number" style="display: block; font-weight: bold; text-decoration: none; font-size: 1.2rem;">
-								+39 389 833 4004
-							</a>
-							<p style="font-size: 0.85rem; margin-top: 8px; line-height: 1.3; max-width: 180px; font-weight: bold;">
-								${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}
-							</p>
-						</div>
-
-					
-						<!-- Rechte Spalte: Alles exakt rechtsbündig untereinander -->
-						<div style="display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; width: 110px;">
-
-
-
-					
-							<!-- 1. GOOGLE MAPS WIDGET (Dein bisheriges Design) -->
-							<!-- Das Orthofoto: Jetzt oben rechts neben dem Text -->
-							<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
-								target="_blank" 
-							   style="text-decoration: none; display: block; cursor: pointer; margin-bottom: 0px; width: 110px;">
-								
-								<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
-									<div style="position: relative; width: 110px; height: 90px;">
-										<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-										<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
-									</div>
-									<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
-										${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
-									</div>
-								</div>
-							</a>
-							<!-- 3. QUELLENNACHWEIS (Dezent & Rechtsbündig für Südtirol) -->
-							<p style="font-size: 8px; color: #999; margin: 0 0 15px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
-								© Prov. BZ - CC BY 4.0<br>
-								<span style="font-size: 7px;">Geoportal Südtirol</span>
-							</p>
-							 <!-- 1. INSTAGRAM BUTTON -->
-							<a href="https://www.instagram.com/stsisinius
-"
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-								<span style="font-size: 12px; margin-right: 5px;">📸</span> 
-								INSTAGRAM
-							</a>
-							
-							
-							<!-- 2. FACEBOOK BUTTON (Rechtsbündig ausgerichtet) -->
-							<a href="https://www.facebook.com/61585930843655/"
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-right: 0; margin-left: auto;">
-								<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
-								FACEBOOK
-							</a>
-							<!-- 3. WHATSAPP GRUPPEN BUTTON -->
-							<!--<a href="https://chat.whatsapp.com" 
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #25D366; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-top: 8px; margin-left: auto;">
-								<span style="font-size: 14px; margin-right: 5px;">✆</span> 
-								WHATSAPP
-							</a>-->
-						</div>
-					</div>
-				</div>
-
-
-				<!-- ÖFFNUNGSZEITEN KARTE -->
-				<div class="hours-card-large" style="flex: 1; min-width: 300px;">
-					<div class="hours-icon">🕐</div>
-					<h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
-					<div class="hours-list">
-						${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
-							data.start.zeiten.map((z, idx) => `
-								<div class="hours-item" style="display: flex; flex-direction: column; margin-bottom: 15px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: ${editMode ? '10px' : '0'};">
-									<!-- Anzeige der Zeit -->
-									<div style="display: flex; justify-content: space-between; width: 100%;">
-										<span class="tag-spalte" style="font-weight: bold;">
-											${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
-										</span> 
-										<span class="zeit-spalte">${z.zeit ? z.zeit.trim() : ''}</span>
-									</div>
-
-									<!-- Admin Controls: Nur im EditMode sichtbar -->
-									${editMode ? `
-									<div class="admin-row-controls" style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
-										<button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️ Edit</button>
-										<button onclick="moveTimeRow(${idx}, -1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
-										<button onclick="moveTimeRow(${idx}, 1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === data.start.zeiten.length - 1 ? 'disabled' : ''}>↓</button>
-										<button onclick="deleteTimeRow(${idx})" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">🗑️</button>
-									</div>
-									` : ''}
-								</div>
-							`).join('') 
-							: `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
-						}
-					</div>
-				</div>
-			</div> <!-- Ende info-section-compact -->
-		</div> <!-- Ende container -->
-		<!--</div>-->
-		
-		${editMode ? `
-			<div style="text-align:center; margin:20px;">
-				<button class="btn-ctrl" onclick="addTimeRow()" style="background-color: var(--red); color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-					+ Neue Öffnungszeit hinzufügen
-				</button>
-			</div> 
-			
-			
-		
-			<div class="admin-box" style="margin: 30px auto; padding: 20px; border: 3px solid var(--red); border-radius: 12px; background: #fff; max-width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-				<h3 style="color:var(--red); margin-top: 0;">📢 Admin: Info-Popup & Events</h3>
-				
-				<!-- Status -->
-				<label style="display:block; margin-bottom:15px; font-weight:bold; cursor:pointer; background: #f9f9f9; padding: 10px; border-radius: 6px;">
-					<input type="checkbox" id="edit-notice-active" ${data.notice && data.notice.active ? 'checked' : ''}> 
-					Popup auf Startseite AKTIVIEREN
-				</label>
-
-			   <!-- Bild-Upload für das POPUP -->
-				<div style="margin-bottom: 15px;">
-					<p style="margin-bottom: 5px;"><strong>Event-Bild / Foto (JPG/PNG):</strong></p>
-					
-					<input type="file" id="file-input-notice" accept="image/*" onchange="encodeNoticeImage(this)" style="width: 100%;">
-					
-					<!-- Hidden Input für Base64 -->
-					<input type="hidden" id="inImgBase64Notice" value="${(data.notice && data.notice.img) ? data.notice.img : ''}">
-					
-					<div style="margin-top: 10px; text-align: center; background: #eee; border-radius: 8px; padding: 10px; position: relative;">
-						
-						<!-- Lösch-Button (wird nur angezeigt, wenn ein Bild da ist) -->
-						<button onclick="removeNoticeImage()" id="btn-remove-notice" 
-								style="display: ${(data.notice && data.notice.img) ? 'block' : 'none'}; 
-								position: absolute; top: 5px; right: 5px; background: #dc3545; color: white; 
-								border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;">
-							Bild löschen 🗑️
-						</button>
-
-						<img id="img-preview-notice" src="${(data.notice && data.notice.img) ? data.notice.img : ''}" 
-							 style="max-width: 100%; max-height: 150px; display: ${(data.notice && data.notice.img) ? 'inline-block' : 'none'}; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-						
-						<p id="no-img-text-notice" style="display: ${(data.notice && data.notice.img) ? 'none' : 'block'}; color: #999; font-size: 0.9rem;">
-							Kein Bild ausgewählt
-						</p>
-					</div>
-				</div>
-
-							
-				<!-- HIER DIE NEUEN TITEL-FELDER EINFÜGEN -->
-				<p><strong>Überschrift (DE):</strong></p>
-				<input type="text" id="edit-notice-title-de" 
-					   value="${(data.notice && data.notice.titleDE) ? data.notice.titleDE : 'Wichtige Info'}" 
-					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
-
-				<p><strong>Titolo (IT):</strong></p>
-				<input type="text" id="edit-notice-title-it" 
-					   value="${(data.notice && data.notice.titleIT) ? data.notice.titleIT : 'Info importante'}" 
-					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
-
-				<!-- Nachrichtentext (vorhanden) -->
-				<p><strong>Nachricht (Deutsch):</strong></p>
-				<textarea id="edit-notice-de" style="width:100%; height:70px; margin-bottom:10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">${(data.notice && data.notice.textDE) ? data.notice.textDE : ''}</textarea>
-				
-				<p><strong>Messaggio (Italiano):</strong></p>
-				<textarea id="edit-notice-it" style="width:100%; height:70px; margin-bottom:20px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">${(data.notice && data.notice.textIT) ? data.notice.textIT : ''}</textarea>
-				
-				<!-- Speichern Button -->
-				<button onclick="saveNoticeSettings()" style="width:100%; background:#28a745; color:white; padding:15px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:1.1rem; transition: background 0.3s;">
-					Änderungen in Datenbank speichern
-				</button>
-			</div>
-	
-		`: ''}
-		`;		
-		if (data.notice && data.notice.active) {
-			if (!sessionStorage.getItem('noticeSeen')) {
-					area.innerHTML += `
-					<div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px;animation: fadeIn .3s ease-out;">
-						<div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
-							
-							<!-- BILD-BEREICH: max-height auf 40% des Bildschirms begrenzt, damit Button sichtbar bleibt -->
-							${data.notice.img ? `
-								<div style="width: 100%; max-height: 40vh; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #eee; flex-shrink: 0;">
-									<img src="${data.notice.img}" 
-										 style="max-width: 100%; max-height: 40vh; object-fit: contain; display: block;" 
-										 alt="Event">
-								</div>
-							` : '<div style="font-size: 50px; margin: 20px 0; text-align: center; flex-shrink: 0;">📢</div>'}
-
-							<!-- TEXT-BEREICH: Scrollt, falls der Text zu lang für das Handy ist -->
-							<div style="padding:25px; overflow-y: auto; flex-grow: 1;">
-								<h2 style="color:var(--red); margin-top:0;">
-									${lang === 'DE' 
-										? (data.notice.titleDE || 'Wichtige Info') 
-										: (data.notice.titleIT || 'Info importante')}
-								</h2>
-								<p style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.4;">
-									${lang === 'DE' ? data.notice.textDE : data.notice.textIT}
-								</p>
-								<button onclick="closeNoticePopup()" style="margin-top:20px; background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width: 100%;">OK</button>
-							</div>
-						</div>
-					</div>`;
-				}
-			}
-        
-		return;  //bricht render() ab
-    }
-	
-	//---------------------------------------------------------------
-	
-    // 2. ANDERE SEITEN ALS STARTSEITE 
-	//=====================================
-    
-
-    if (!data[currentTab]) {
-        area.innerHTML = '<p>Lade Daten...</p>';
-        return;
-    }
-
-    // 2.2 LISTEN RENDERING
-    area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
-    // area.innerHTML = ''; // Falls du oben am Anfang der Funktion schon leerst, bleibt das auskommentiert
-
-    // --- FALL 1: PIZZAS ---
-    if (currentTab === 'pizzas') {
         area.innerHTML += `
-            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">
-                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">
-                    ${lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza'}
-                </h1>
+            <div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+                <strong id="admin-title" style="color: var(--red);">Admin-Konsole (${currentTab.toUpperCase()})</strong>
+                <div class="input-grid" style="margin-top: 10px;">
+                    <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+                    <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+                    <input type="text" id="inDescDE" placeholder="${labelDesc}">
+                    ${descITField}
+                    <input type="text" id="inRight" placeholder="${label}">
+                </div>
+                <div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; background: white;">
+                    <input type="file" id="inImgFile" accept="image/*" onchange="encodeImageFileAsURL(this)">
+                    <input type="hidden" id="inImgBase64">
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button onclick="addItem()" style="flex: 1; background: #2e7d32; color: white; padding: 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Eintrag speichern</button>
+                    <button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 12px; border-radius: 4px; cursor: pointer;">Abbrechen</button>
+                </div>
+            </div>`;
+    }
+
+    // --- 4. TABS RENDERN ---
+    if (currentTab === 'start') {
+        area.className = 'list-mode';
+        area.innerHTML += `
+            <div class="hero" style="height: 500px; position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
+                <img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+                <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+                <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 10px;">${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}</h2>
+                    <p style="font-size: 1.5rem;">${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}</p>
+                </div>
+            </div>
+            <div class="container">
+                <div class="about-section">
+                    <img src="pizza.webp" alt="Pizza" class="about-image">
+                    <div class="about-text">
+                        ${lang === 'DE' ? '<p>Genießen Sie unsere frische Pizza aus dem Holzofen...</p>' : '<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa!...</p>'}
+                    </div>
+                </div>
+                <div class="info-section-compact" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <!-- Kontakt & Öffnungszeiten Karten hier... -->
+                </div>
             </div>
         `;
-        
-        const kats = [
-            { id: 'pizza', de: 'Pizza', it: 'Pizza' },
-            { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' },
-            { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' },
-			{ id: 'extras', de: 'Extras', it: 'Extra' } // <--- Das hier hinzufügen!
-        ];
 
+        if (editMode) {
+            area.innerHTML += `
+                <div class="admin-box" style="margin: 30px auto; padding: 20px; border: 3px solid var(--red); border-radius: 12px; background: #fff; max-width: 600px;">
+                    <h3 style="color:var(--red);">📢 Admin: Info-Popup & Events</h3>
+                    <textarea id="edit-notice-de" style="width:100%; height:70px; margin-bottom:10px;">${(data.notice && data.notice.textDE) ? data.notice.textDE : ''}</textarea>
+                    <textarea id="edit-notice-it" style="width:100%; height:70px; margin-bottom:20px;">${(data.notice && data.notice.textIT) ? data.notice.textIT : ''}</textarea>
+                    <button onclick="saveNoticeSettings()" style="width:100%; background:#28a745; color:white; padding:15px; border-radius:8px; font-weight:bold;">Änderungen speichern</button>
+                </div>`;
+        }
+    } 
+    else if (currentTab === 'pizzas') {
+        area.className = 'grid-mode';
+        area.innerHTML += `<div style="grid-column: 1 / -1; width: 100%;"><h1 style="font-size: 1.5rem;">${lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza'}</h1></div>`;
+        const kats = [ { id: 'pizza', de: 'Pizza', it: 'Pizza' }, { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' }, { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' }, { id: 'extras', de: 'Extras', it: 'Extra' } ];
         kats.forEach(kat => {
-            // Erst filtern...
             const filtered = data.pizzas.filter(p => (p.cat || 'pizza') === kat.id);
-            
-            // ...dann prüfen und anzeigen
             if (filtered.length > 0) {
-                area.innerHTML += `
-                    <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">
-                        <h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">${lang === 'DE' ? kat.de : kat.it}</h2>
-                    </div>`;
-                
+                area.innerHTML += `<div style="grid-column: 1 / -1; width: 100%; border-bottom: 3px solid var(--red);"><h2 style="color: var(--red);">${lang === 'DE' ? kat.de : kat.it}</h2></div>`;
                 filtered.forEach(item => {
                     const realIdx = data.pizzas.findIndex(p => p === item);
                     area.innerHTML += renderPizzaOrEvent(item, realIdx, true);
@@ -1371,84 +1208,26 @@ function render() {
             }
         });
     } 
-    // --- FALL 2: TV & EVENTS ---
     else {
-        // ÜBERSCHRIFT NUR EINMAL (vor der Schleife)
+        // TV & EVENTS
+        area.className = 'list-mode';
         const title = currentTab === 'tv' ? (lang === 'DE' ? 'TV-Sport' : 'TV-Sport') : (lang === 'DE' ? 'Events' : 'Eventi');
-        area.innerHTML += `
-            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0;">
-                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">${title}</h1>
-            </div>
-            <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>
-        `;
+        area.innerHTML += `<div style="grid-column: 1 / -1; width: 100%;"><h1 style="font-size: 1.5rem;">${title}</h1><div style="border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div></div>`;
+        data[currentTab].forEach((item, idx) => {
+            if (currentTab === 'tv') {
+                const textDE = item.descDE || '';
+                const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
+                area.innerHTML += `<div class="event-card"><div class="event-date">${lang === 'DE' ? textDE : textIT}</div><hr class="event-line"><div class="event-grid"><div class="event-time">${item.right || ''}</div><div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div><div class="event-league">${item.cat || 'LIVE'}</div></div>${getAdminButtonsHtml(idx)}</div>`;
+            } else {
+                area.innerHTML += renderPizzaOrEvent(item, idx, false);
+            }
+        });
+    }
 
+    // --- 5. DAS FINALE: POPUP AUFRUF (Wird IMMER ausgeführt!) ---
+    area.innerHTML += getNoticePopupHTML(data, lang);
 
-
-		data[currentTab].forEach((item, idx) => {
-			if (currentTab === 'tv') {
-				// 1. Wir holen den Text direkt aus descDE (wo dein Datum steht)
-				const textDE = item.descDE || '';
-				
-				// 2. Wir rufen die Funktion auf, die bei den Events schon funktioniert
-				// Wir machen das AUSSERHALB des Strings, um Fehler zu vermeiden
-				const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
-
-				area.innerHTML += `
-					<div class="event-card">
-						<div class="event-date">
-							<!-- HIER ENTSCHEIDET DER BROWSER: DE -> Original, IT -> Übersetzung -->
-							${lang === 'DE' ? textDE : textIT}
-						</div> 
-						
-						<hr class="event-line">
-						<div class="event-grid">
-							<div class="event-time">${item.right || ''}</div>
-							<div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
-							<div class="event-league">${item.cat || 'LIVE'}</div>
-						</div>
-						${getAdminButtonsHtml(idx)}
-					</div>`;
-			} else {
-				// Events nutzen renderPizzaOrEvent, wo es ja schon klappt
-				area.innerHTML += renderPizzaOrEvent(item, idx, false);
-			}
-		});
-				
-		if (data.notice && data.notice.active) {
-			if (!sessionStorage.getItem('noticeSeen')) {
-				area.innerHTML += `
-				<div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px;animation: fadeIn 0.3s ease-out;">
-					<div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
-						
-						<!-- BILD-BEREICH: max-height auf 40% des Bildschirms begrenzt, damit Button sichtbar bleibt -->
-						${data.notice.img ? `
-							<div style="width: 100%; max-height: 40vh; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #eee; flex-shrink: 0;">
-								<img src="${data.notice.img}" 
-									 style="max-width: 100%; max-height: 40vh; object-fit: contain; display: block;" 
-									 alt="Event">
-							</div>
-						` : '<div style="font-size: 50px; margin: 20px 0; text-align: center; flex-shrink: 0;">📢</div>'}
-
-						<!-- TEXT-BEREICH: Scrollt, falls der Text zu lang für das Handy ist -->
-						<div style="padding:25px; overflow-y: auto; flex-grow: 1;">
-							<h2 style="color:var(--red); margin-top:0;">
-								${lang === 'DE' 
-									? (data.notice.titleDE || 'Wichtige Info') 
-									: (data.notice.titleIT || 'Info importante')}
-							</h2>
-							<p style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.4;">
-								${lang === 'DE' ? data.notice.textDE : data.notice.textIT}
-							</p>
-							<button onclick="closeNoticePopup()" style="margin-top:20px; background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width: 100%;">OK</button>
-						</div>
-					</div>
-				</div>`;
-			}
-		}
-		
-	} // <--- Ende des else-Blocks (für TV/Events)
-	
-} // <--- Ende der render() Funktion
+} // Ende der function render()
 
 
 // Hilfsfunktion, um doppelten Code zu vermeiden
@@ -2063,15 +1842,42 @@ async function saveNoticeSettings() {
 }
 
 // 3. Die neue Schließ-Funktion (außerhalb der render-Funktion platzieren)
-function closeNoticePopup() {
-    // Merken, dass gesehen wurde
-    sessionStorage.setItem('noticeSeen', 'true');
-    // Aktuelle Sprache speichern
-    sessionStorage.setItem('noticeLang', lang); 
-    
+function closeNoticePopup_() {
     const popup = document.getElementById('notice-popup');
-    if (popup) popup.remove();
+    if (popup) {
+        // Speichert das "Gesehen"-Flag für die aktuell aktive Sprache
+        // Falls 'lang' nicht global ist, nutze: window.currentLang oder ähnliches
+        sessionStorage.setItem('noticeSeen_' + lang, 'true');
+        
+        popup.style.opacity = '0';
+        setTimeout(() => {
+            popup.remove();
+        }, 300);
+    }
 }
+
+function closeNoticePopup2(currentLang) {
+    const popup = document.getElementById('notice-popup');
+    if (popup) {
+        // Speichere genau für diese Sprache
+        sessionStorage.setItem('noticeSeen_' + currentLang, 'true');
+        
+        popup.style.opacity = '0';
+        setTimeout(() => popup.remove(), 300);
+    }
+}
+
+function closeNoticePopup() {
+    const popup = document.getElementById('notice-popup');
+    if (popup) {
+        // Speichere das Flag PRO SPRACHE (z.B. noticeSeen_DE)
+        sessionStorage.setItem('noticeSeen_' + lang, 'true');
+        
+        popup.style.opacity = '0';
+        setTimeout(() => popup.remove(), 300);
+    }
+}
+
 
 function showPopup() {
     if (data.notice && data.notice.active) {
