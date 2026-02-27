@@ -1026,8 +1026,8 @@ function render() {
 		let labelDescIT = 'Descrizione';
 		
 		if (currentTab === 'tv') {
-			labelDesc = 'Datum (z.B. Freitag 13.02.26)';
-			labelDescIT = 'Data (p.es. Venerdì 13/02/26)';
+			labelDesc = 'Datum (z.B. Samstag 14.02.26)';
+			labelDescIT = 'Data (p.es. Sabato 14/02/26)';
 		} else if (currentTab === 'events') {
 			labelDesc = 'Uhrzeit (z.B. ab 20:00 Uhr)';
 			labelDescIT = 'Orario (p.es. dalle ore 20:00)';
@@ -1437,14 +1437,16 @@ function render() {
 
 
 		data[currentTab].forEach((item, idx) => {
+			//console.log("Preis von Item " + idx + ":", item.price); // <--- Das hier einfügen
 			if (currentTab === 'tv') {
 				// 1. Wir holen den Text direkt aus descDE (wo dein Datum steht)
 				const textDE = item.descDE || '';
 				
+				
 				// 2. Wir rufen die Funktion auf, die bei den Events schon funktioniert
 				// Wir machen das AUSSERHALB des Strings, um Fehler zu vermeiden
 				const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
-
+  
 				area.innerHTML += `
 					<div class="event-card">
 						<div class="event-date">
@@ -1454,7 +1456,8 @@ function render() {
 						
 						<hr class="event-line">
 						<div class="event-grid">
-							<div class="event-time">${item.right || ''}</div>
+							<!--<div class="event-time">${item.right || ''}</div>-->
+							<div class="event-time">test</div>
 							<div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
 							<div class="event-league">${item.cat || 'LIVE'}</div>
 						</div>
@@ -1464,7 +1467,7 @@ function render() {
 				// Events nutzen renderPizzaOrEvent, wo es ja schon klappt
 				area.innerHTML += renderPizzaOrEvent(item, idx, false);
 			}
-		});
+	});
 				
 		// Ruft die Funktion auf und übergibt die benötigten Daten
 		renderNoticePopup(data, lang, area);
@@ -1478,11 +1481,18 @@ function render() {
 // Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
 function renderPizzaOrEvent(item, idx, isPizza) {    
     let displayRight = item.right || '';
-    
+    if (!isPizza){
+	  if (lang ==='DE'){}else{displayRight=translateDate(displayRight);}
+	}
+	
     // (Deine Logik...)
-
-    // KEIN Semikolon direkt nach return!
-    return `
+   
+	const imgHTML = item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : '';
+   
+    // KEIN Semikolon direkt nach return!    
+	return `
+	
+	
 	<div class="entry">
 		${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
 		
