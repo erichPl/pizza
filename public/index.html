@@ -5,8 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzeria Pub St. Sisinius</title>
     <style>
+/*
+.item-img {
+    /* FIX 2: Begrenze das Bild radikal! */
+    max-height: 200px; /* Oder der Wert, den du willst */
+    width: auto;
+    display: block;
+    margin: 10px auto; /* Zentriert das Bild */
+    object-fit: contain;
+}*/
 
 
+/*.item-img {
+    display: block;
+    max-height: 150px; /* Begrenzt die Höhe des Logos/Bildes */
+    width: auto;
+    margin: 0 auto 15px auto; /* Zentriert das Bild mit Abstand nach unten */
+    object-fit: contain;
+}*/
+
+.item-img {
+    display: block;
+    width: auto;
+    max-height: 150px; /* Begrenzt die Höhe radikal */
+    margin: 10px auto;  /* Zentriert das Bild und gibt Abstand */
+    object-fit: contain; /* Verhindert Verzerrungen */
+}
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
@@ -206,12 +230,24 @@ h1, h2, h3, p {
         .entry-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
         .price { color: var(--red); white-space: nowrap; margin-left: 10px; }
         .desc { font-size: 0.9rem; color: #555; font-style: italic; flex-grow: 1; }
-        .item-img { width: 100%; height: 180px; object-fit: cover; }
-        .admin-only { display: none; }
+        /*.item-img { width: 100%; height: 50%; object-fit: cover; }*/
+        .item-img {
+			width: 100%;    /* Nutzt die volle Breite der Karte */
+			height: 250px;  /* Deine Wunschhöhe (verringert den leeren Raum) */
+			
+			/* FIX: Das Bild wird jetzt verzerrt, um genau in den Rahmen zu passen */
+			object-fit: fill; 
+			
+			display: block;
+			margin-bottom: 10px;
+		}
+		
+		.admin-only { display: none; }
         body.admin-mode .admin-only { display: block; }
         .admin-panel { background: #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed #999; }
         .admin-panel div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .admin-panel input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
         .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
         .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
        
@@ -222,6 +258,38 @@ h1, h2, h3, p {
     margin-bottom: 25px;
     padding: 15px;
     background-color: #fffaf0; /* Cremiger Hintergrund */
+}
+
+/*.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0;
+    
+    /* NEU: Zwingt den Rahmen, eng am Inhalt zu liegen */
+    display: flex;
+    flex-direction: column;
+    height: auto; 
+    overflow: hidden; 
+}*/
+
+
+
+
+
+.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0;
+    
+    /* NEU: Zwingt den Rahmen, eng am Inhalt zu liegen */
+    display: flex;
+    flex-direction: column;
+    height: auto; 
+    overflow: hidden; 
 }
 
 /* Datum als Überschrift */
@@ -771,9 +839,14 @@ function editItem(idx) {
     const item = data[currentTab][idx];	
 
     // ... deine anderen Felder (Name, Desc) ...
-    
+    let catInput
     // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
-    const catInput = document.getElementById('inCat'); 
+    if (currentTab==="tv"){
+	  catInput = document.getElementById('inCat2'); 
+	}
+	else{
+	  catInput = document.getElementById('inCat'); 
+	}
     if (catInput) {
         catInput.value = item.cat || ""; 
     }
@@ -1087,7 +1160,7 @@ function render() {
 								<option value="extras">Extras</option>
 							</select>
 						` : `
-							<input type="text" id="inCat" placeholder="z.B. Champions League" style="width:100%; padding:8px; margin-top:5px;">
+							<input type="text" id="inCatTv" placeholder="z.B. Champions League" style="width:100%; padding:8px; margin-top:5px;">
 						`}
 					</div>
 				` : ''}
@@ -1438,6 +1511,7 @@ function render() {
 
 		data[currentTab].forEach((item, idx) => {
 			//console.log("Preis von Item " + idx + ":", item.price); // <--- Das hier einfügen
+//tv anzeigen
 			if (currentTab === 'tv') {
 				// 1. Wir holen den Text direkt aus descDE (wo dein Datum steht)
 				const textDE = item.descDE || '';
@@ -1446,18 +1520,20 @@ function render() {
 				// 2. Wir rufen die Funktion auf, die bei den Events schon funktioniert
 				// Wir machen das AUSSERHALB des Strings, um Fehler zu vermeiden
 				const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
-  
+
 				area.innerHTML += `
 					<div class="event-card">
+						<!--<div>${item.img}</div>-->
+					  
 						<div class="event-date">
 							<!-- HIER ENTSCHEIDET DER BROWSER: DE -> Original, IT -> Übersetzung -->
 							${lang === 'DE' ? textDE : textIT}
-						</div> 
-						
+						</div> 					
 						<hr class="event-line">
+						 ${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
 						<div class="event-grid">
 							<!--<div class="event-time">${item.right || ''}</div>-->
-							<div class="event-time">test</div>
+							<div class="event-time">${item.right}</div>
 							<div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
 							<div class="event-league">${item.cat || 'LIVE'}</div>
 						</div>
@@ -1680,17 +1756,21 @@ async function saveHoursToDB(newArray) {
    // WICHTIG: Hier wird die Kategorie ausgelesen
     if (currentTab === 'pizzas' || currentTab === 'tv') {
         const catDropdown = document.getElementById('inCat');
-        if (catDropdown) {
-            newItem.cat = catDropdown.value; // Nimmt 'pizza', 'bianche' oder 'kinder'
-        } else {
-			if (currentTab === 'pizzas'){
-              newItem.cat = 'pizza'; // Sicherheits-Fallback
+        if (currentTab === 'pizzas'){
+		    const catDropdown = document.getElementById('inCat');
+			if (catDropdown) {
+				newItem.cat = catDropdown.value; // Nimmt 'pizza', 'bianche' oder 'kinder'
+			} else {
+				 newItem.cat = 'pizza'; // Sicherheits-Fallback				
 			}
-			else{
-			  newItem.cat = 'LIVE'; // Sicherheits-Fallback
-			}
-				
-        }
+		}
+		if (currentTab === 'tv'){
+		     const catTv = document.getElementById('inCatTv');
+		     newItem.cat=catTv.value;
+			 if (newItem.cat ===""){
+               newItem.cat = 'LIVE'; // Sicherheits-Fallback
+			 }
+		}
     }
 
 
