@@ -716,7 +716,7 @@ function renderNoticePopup(data, lang, container) {
     let rawText = (lang === 'DE' ? data.notice.textDE : data.notice.textIT) || "";
     const formattedText = rawText
         .replace(/\n/g, '<br>') 
-        .replace(/%25|%/g, '<div style="display:block; width:80%; height:2px; background-color:#ddd; margin:15px auto; border-radius:2px;"></div>');
+        .replace(/%25|%/g, '<div style="display:block; width:80%; height:2px; background-color:var(--red); margin:15px auto; border-radius:2px;"></div>');
 
     container.innerHTML += `
         <style>
