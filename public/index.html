@@ -776,18 +776,12 @@ function renderNoticePopup(data, lang, container) {
 
 
 
-
-
-
-
-
-
- 
 let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
 let data = { start: {}, pizzas: [], events: [], tv: [] };
 let currentTab = 'start';
 let lang = 'DE';
 const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
+
 if(editMode) document.body.classList.add('admin-mode');
 
 //ÖFFNUNGSZEITEN 
@@ -838,6 +832,12 @@ async function editSingleTime(idx) {
 function editItem(idx) {
     const item = data[currentTab][idx];	
 
+	const heightInput = document.getElementById('inImgHeight'); // Prüfe, ob die ID in deinem HTML so heißt
+	if (heightInput) {
+		// Falls in der DB nichts steht, nimm 200 als Standard-Anzeige im Edit-Modus
+		heightInput.value = item.imgHeight || 200; 
+	}
+
     // ... deine anderen Felder (Name, Desc) ...
     let catInput
     // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
@@ -880,6 +880,14 @@ function editItem(idx) {
         if (hiddenInput) hiddenInput.value = "";
         if (noImgText) noImgText.style.display = 'block';
     }
+
+	// Falls du die Vorschau im Admin-Bereich auch direkt in der Höhe anpassen willst:
+	if (preview && item.imgHeight) {
+		preview.style.height = item.imgHeight + "px";
+		preview.style.objectFit = "cover"; // Sorgt für eine saubere Vorschau
+	}
+
+
 
     editIndex = idx; // Position speichern!
     // 3. Titel und Scroll-Effekt
@@ -1088,8 +1096,10 @@ function render() {
         document.body.classList.remove('admin-mode');
     }
 
+//ADMIN
 	// 2.1. ADMIN-KONSOLE
 	//-------------------------------
+//ADMIN '!start'
 	if (editMode && currentTab !== 'start') {
 		let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
 		
@@ -1138,6 +1148,15 @@ function render() {
 					<label style="display:block; font-weight:bold; margin-bottom:5px; font-size: 0.9rem;">Bild für ${currentTab.toUpperCase()}:</label>
 					
 					<input type="file" id="inImgFile" accept="image/*" onchange="encodeImageFileAsURL(this)" style="width:100%; font-size: 0.8rem;">
+					
+					
+					<!-- NEU: EINGABE FÜR DIE BILDHÖHE -->
+					<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+						<label style="font-size: 0.8rem; font-weight: bold;">Höhe:</label>
+						<input type="text" id="inImgHeight" placeholder="200" style="width: 70px; padding: 5px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 3px;">
+						<span style="font-size: 0.7rem; color: #666;">[px]</span>
+					</div>
+
 
 					<div id="preview-box" style="margin-top: 10px; text-align: center; min-height: 50px;">
 						<img id="img-preview" src="" style="max-height:120px; border-radius:5px; display:none; border:2px solid var(--red);">
@@ -1173,7 +1192,7 @@ function render() {
 		`;
 	
 	}
-
+//User 'start'
     // 1. STARTSEITE (Sonderlayout)
 	//=====================================
     if (currentTab === 'start') {
@@ -1459,7 +1478,7 @@ function render() {
     // 2.2 LISTEN RENDERING
     area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
     // area.innerHTML = ''; // Falls du oben am Anfang der Funktion schon leerst, bleibt das auskommentiert
-
+//User 'pizzas'
     // --- FALL 1: PIZZAS ---
     if (currentTab === 'pizzas') {
         area.innerHTML += `
@@ -1496,6 +1515,7 @@ function render() {
         });
 		renderNoticePopup(data, lang, area);
     } 
+//User 'TV & EVENTS' 
     // --- FALL 2: TV & EVENTS ---
     else {
         // ÜBERSCHRIFT NUR EINMAL (vor der Schleife)
@@ -1530,7 +1550,8 @@ function render() {
 							${lang === 'DE' ? textDE : textIT}
 						</div> 					
 						<hr class="event-line">
-						 ${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
+                        ${item.img ? `<img src="${item.img}" class="item-img" style="height: ${item.imgHeight ? item.imgHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}						
+						<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;"  alt="Bild">` : ''}-->
 						<div class="event-grid">
 							<!--<div class="event-time">${item.right || ''}</div>-->
 							<div class="event-time">${item.right}</div>
@@ -1543,12 +1564,12 @@ function render() {
 				// Events nutzen renderPizzaOrEvent, wo es ja schon klappt
 				area.innerHTML += renderPizzaOrEvent(item, idx, false);
 			}
-	});
+	});  //wo ist öffnende Klammer?
 				
 		// Ruft die Funktion auf und übergibt die benötigten Daten
 		renderNoticePopup(data, lang, area);
 		
-	} // <--- Ende des else-Blocks (für TV/Events)
+	} // <--- Ende des else-Blocks (für {start} else {TV/Events})
 	
 } // <--- Ende der render() Funktion
 
@@ -1570,7 +1591,8 @@ function renderPizzaOrEvent(item, idx, isPizza) {
 	
 	
 	<div class="entry">
-		${item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : ''}
+		${item.img ? `<img src="${item.img}" class="item-img" style="height: ${item.imgHeight ? item.imgHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}											
+		<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;" alt="Bild">` : ''}-->
 		
 		<div class="entry-content">
 			<div class="entry-header">
@@ -1749,8 +1771,9 @@ async function saveHoursToDB(newArray) {
         descDE: document.getElementById('inDescDE').value,
         descIT: document.getElementById('inDescIT').value,
         right: document.getElementById('inRight').value,
-        img: document.getElementById('inImgBase64').value || ""
+        img: document.getElementById('inImgBase64').value || "",
 		//img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+		imgHeight:document.getElementById('inImgHeight').value || "200" 
     };
 
    // WICHTIG: Hier wird die Kategorie ausgelesen
