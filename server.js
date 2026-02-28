@@ -19,6 +19,9 @@ app.get('/healthz', (req, res) => {
 
 
 
+
+
+
 //für local I7
 // Nutzt die Cloud-URI falls vorhanden, ansonsten die lokale MongoDB
 //const mongoURI = process.env.MONGO_URI || "mongodb://127.0.1.7/pizzeria"; 
@@ -78,6 +81,10 @@ app.get('/api/data', async (req, res) => {
     }
 });
 
+//=================================================================
+//Aufruf:   localhost:10000/api/fix-all-heights?pw=leon2208
+//An MongoDb ein Feld hinzufügen bei pizza, tv und event 
+//=============================================================
 app.post('/api/data', async (req, res) => {
     // PRÜFUNG: Ist das Passwort in der URL korrekt?
     if (req.query.pw !== 'leon2208') {
@@ -97,3 +104,96 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
 
 
+//Der "Update-Alles" Endpunkt für deine server.js: imgHeightHandy in mongoDb hinzufügen
+app.get('/api/fix-all-heights', async (req, res) => {
+    if (req.query.pw !== 'leon2208') return res.status(403).send("Falsches PW");
+
+    try {
+        const data = await DataModel.findOne({ type: "main_data" });
+        if (!data) return res.send("Keine Daten zum Aktualisieren gefunden.");
+
+        // Funktion zum sicheren Hinzufügen/Überschreiben (bzw. nicht überschreiben) von imgHeightHeight
+        const addHeight = (arr) => {
+            if (!Array.isArray(arr)) return arr;
+            return arr.map(item => ({
+                ...item,        // Behält alle alten Felder (img, text, etc.)
+				//NICHT ÜBERSCHREIBEN
+                imgHeightHandy: hasHeight ? item.imgHeightHandy : 100 // Falls vorhanden: behalte alten Wert, sonst: setze 100
+				//ÜBERSCHREIBEN
+                //imgHeightHandy: 100  // Setzt imgHeightHandy auf 100 (überschreibt falls vorhanden)
+            }));
+        };
+
+        // Auf alle drei Kategorien anwenden
+        data.tv = addHeight(data.tv);
+        data.pizzas = addHeight(data.pizzas);
+        data.events = addHeight(data.events);
+
+        await data.save();
+        res.send("Update erfolgreich: tv, pizzas und events haben nun imgHeightHandy: 100");
+    } catch (e) {
+        res.status(500).send("Fehler: " + e.message);
+    }
+});
+
+//****************************************
+//sisinius.it/backup.html?pw=leon2208
+//****************************************
+//=====================================================================================
+//BACKUP MnogoDb
+//=====================================================================================
+// DOWNLOAD: Alles als JSON exportieren
+app.get('/api/backup-download', async (req, res) => {
+    if (req.query.pw !== 'leon2208') return res.status(403).send("Falsches PW");
+    
+    try {
+        const allData = await DataModel.find({});
+        const jsonContent = JSON.stringify(allData, null, 2);
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename=mongodb_backup.json');
+        res.send(jsonContent);
+    } catch (e) {
+        res.status(500).send("Export-Fehler: " + e.message);
+    }
+});
+
+//=====================================================================================
+//UPLOAD MnogoDb (RESTORE)
+//=====================================================================================
+// UPLOAD: JSON wieder in MongoDB importieren
+// UPLOAD & RESTORE: Datenbank leeren und JSON neu einspielen
+app.post('/api/restore-upload', async (req, res) => {
+    if (req.query.pw !== 'leon2208') return res.status(403).send("Falsches PW");
+
+    try {
+        const backupData = req.body;
+        
+        if (!Array.isArray(backupData)) {
+            return res.status(400).send("Ungültiges Format: Erwarte ein Array von Objekten.");
+        }
+
+        // 1. SCHRITT: Alle alten Daten in der Kollektion löschen
+        const deleteResult = await DataModel.deleteMany({});
+        console.log(`${deleteResult.deletedCount} alte Dokumente gelöscht.`);
+
+        // 2. SCHRITT: Die Backup-Daten einfügen
+        // Wir entfernen die _id bei jedem Item, falls MongoDB neue IDs vergeben soll
+        // oder lassen sie, wenn die IDs exakt gleich bleiben sollen.
+        const cleanedData = backupData.map(item => {
+            const { _id, ...rest } = item; 
+            return rest; // Wir löschen die alte _id, um Konflikte zu vermeiden
+        });
+
+        await DataModel.insertMany(cleanedData);
+        
+        res.json({ 
+            status: "Restore erfolgreich", 
+            deleted: deleteResult.deletedCount, 
+            inserted: cleanedData.length 
+        });
+    } catch (e) {
+        console.error("Restore Fehler:", e);
+        res.status(500).send("Import-Fehler: " + e.message);
+    }
+});
