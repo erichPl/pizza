@@ -1,0 +1,635 @@
+/*
+.item-img {
+    /* FIX 2: Begrenze das Bild radikal! */
+    max-height: 200px; /* Oder der Wert, den du willst */
+    width: auto;
+    display: block;
+    margin: 10px auto; /* Zentriert das Bild */
+    object-fit: contain;
+}*/
+
+
+/*.item-img {
+    display: block;
+    max-height: 150px; /* Begrenzt die Höhe des Logos/Bildes */
+    width: auto;
+    margin: 0 auto 15px auto; /* Zentriert das Bild mit Abstand nach unten */
+    object-fit: contain;
+}*/
+
+.item-img {
+    display: block;
+    width: auto;
+    max-height: 150px; /* Begrenzt die Höhe radikal */
+    margin: 10px auto;  /* Zentriert das Bild und gibt Abstand */
+    object-fit: contain; /* Verhindert Verzerrungen */
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+* {
+    box-sizing: border-box;
+}
+
+
+/* Grunddesign für den Header */
+.main-header {
+    /*background-color: rgb(144, 41, 50);*/
+	background-color: var(--red);
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: none;
+}
+
+.main-header .logo {
+    width: 100px; /* Etwas kleiner für mehr Platz */
+    height: 100px;
+    border: 2px solid white;
+    object-fit: cover;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.header-text {
+    margin-left: 30px;
+}
+
+.header-text h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    color: white;
+    /* WICHTIG: Kein white-space: nowrap mehr! */
+    white-space: normal !important; 
+    overflow-wrap: break-word;
+}
+
+.header-text p {
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    letter-spacing: 1px;
+}
+
+/* HANDY-SPEZIALKORREKTUR */
+@media (max-width: 600px) {
+    .header-text h1 {
+        font-size: 1.2rem !important; /* Kleinerer Text auf dem Handy */
+    }
+    .main-header .logo {
+        width: 55px; /* Kleineres Logo spart Platz */
+        height: 55px;
+    }
+}
+	
+	
+	
+	
+footer { 
+	position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
+	width: 100%; 
+	background: #1a1a1a; 
+	color: white; 
+	padding: 30px 0; 
+	border-top: 4px solid var(--red); 
+	display: grid; 
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+	gap: 20px; 
+	text-align: center; 
+	font-size: 0.85rem; 
+	line-height: 1.2 !important; /* Hier wird der Abstand eng gemacht */
+}
+
+.footer-section {
+    display: block !important; /* Verhindert den flex-Abstand (gap) */
+    margin-bottom: 10px;
+}
+
+.footer-section strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--white);
+}
+
+.footer-section a, 
+.footer-section span {
+    display: block;
+    color: white;
+    text-decoration: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important; /* Garantiert den engen Abstand wie bei der Adresse */
+}
+
+footer a:hover {
+    color: var(--red);
+    text-decoration: underline;
+}
+
+
+
+footer {
+    display: flex;
+    flex-wrap: wrap; /* WICHTIG: Erlaubt das Umbrechen in die nächste Zeile */
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.footer-bottom {
+    flex-basis: 100%; /* Erzwingt, dass dieser Block die volle Breite einnimmt */
+    margin-top: 20px;
+    text-align: center;
+}
+
+.footer-divider {
+    border: 0;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.copyright-text {
+    color: white;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin: 0;
+}
+	
+	
+    /* Nur die Admin-Elemente standardmäßig ausblenden */
+        .admin-only, .btn-ctrl, .admin-panel { 
+            display: none !important; 
+        }
+        
+        /* Nur einblenden, wenn die Klasse am body aktiv ist */
+        body.admin-mode .admin-only, 
+        body.admin-mode .btn-ctrl, 
+        body.admin-mode .admin-panel { 
+            display: block !important; 
+        }
+        
+        /* Spezialfall für die Button-Reihe (Flex-Layout erhalten) */
+        body.admin-mode .btn-row.admin-only {
+            display: flex !important;
+        }
+        
+       
+:root { 
+    --red: rgb(144, 41, 50); /* Dein neues dunkles Rot */
+    --dark: #1a1a1a; 
+    --light: #f4f4f4; 
+    --white: #ffffff; 
+}
+
+/* Stelle sicher, dass die Überschrift im Header keinen Schatten von alten Styles hat */
+header h1 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+      .container { 
+			max-width: 1100px; 
+			width: 95%; /* Sorgt für einen kleinen Rand links/rechts auf dem Handy */
+			margin: 20px auto; 
+			padding: 0; 
+		}
+
+/* Verhindert, dass lange Wörter (wie Willkommen) am Handy rauswandern */
+h1, h2, h3, p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);}
+        /*header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }*/        
+        /*.logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red);  margin-left:10%;}*/
+        h1 { margin: 0; font-size: 1.6rem; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000;}
+        .tabs { display: flex; flex-wrap: wrap;  margin-left:20%;}
+        .tab-btn { background: none; border: none; color: white; cursor: pointer; padding: 12px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
+        .tab-btn.active { color: var(--red); border-bottom: 3px solid var(--red); }
+        .lang-switch { display: flex; gap: 5px; }
+        .lang-btn { background: #444; border: 1px solid #666; color: white; padding: 4px 10px; cursor: pointer; border-radius: 3px; }
+        .lang-btn.active { background: var(--red); border-color: var(--red); }
+    
+        #content-area { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 850px) { #content-area.grid-mode { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 850px) { #content-area.list-mode { grid-template-columns: 1fr; /* Nur eine Spalte = volle Breite */} }
+        .entry { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; border: 1px solid #ddd; }
+        .entry-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .entry-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
+        .price { color: var(--red); white-space: nowrap; margin-left: 10px; }
+        .desc { font-size: 0.9rem; color: #555; font-style: italic; flex-grow: 1; }
+        /*.item-img { width: 100%; height: 50%; object-fit: cover; }*/
+        .item-img {
+			width: 100%;    /* Nutzt die volle Breite der Karte */
+			height: 250px;  /* Deine Wunschhöhe (verringert den leeren Raum) */
+			
+			/* FIX: Das Bild wird jetzt verzerrt, um genau in den Rahmen zu passen */
+			object-fit: fill; 
+			
+			display: block;
+			margin-bottom: 10px;
+		}
+		
+		.admin-only { display: none; }
+        body.admin-mode .admin-only { display: block; }
+        .admin-panel { background: #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed #999; }
+        .admin-panel div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .admin-panel input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
+       
+    /* Rahmen für das gesamte Event */
+.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0; /* Cremiger Hintergrund */
+}
+
+/*.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0;
+    
+    /* NEU: Zwingt den Rahmen, eng am Inhalt zu liegen */
+    display: flex;
+    flex-direction: column;
+    height: auto; 
+    overflow: hidden; 
+}*/
+
+
+
+
+
+.event-card {
+    border: 2px solid #8B4513;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fffaf0;
+    
+    /* NEU: Zwingt den Rahmen, eng am Inhalt zu liegen */
+    display: flex;
+    flex-direction: column;
+    height: auto; 
+    overflow: hidden; 
+}
+
+/* Datum als Überschrift */
+.event-date {
+    color: #8B4513;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+/* Die braune Linie */
+.event-line {
+    border: none;
+    height: 2px;
+    background-color: #8B4513;
+    margin-bottom: 15px;
+}
+
+/* 3-Spalten-Layout */
+.event-grid {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px; /* Zeit, Teams, League */
+    gap: 15px;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.event-time {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.event-teams {
+    font-weight: bold;
+    color: #333;
+}
+
+.event-league {
+    text-align: right;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+
+
+
+        /* HERO SECTION */
+.hero {
+    position: relative;
+    height: 450px;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+}
+
+.hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1.5rem; /* Etwas weniger Padding spart Platz */
+    border-radius: 10px;
+    backdrop-filter: blur(3px);
+    max-width: 90%; /* Erhöht auf 90%, damit mehr Text in eine Zeile passt */
+    box-sizing: border-box; /* Verhindert, dass Padding den Kasten sprengt */
+}
+
+.hero-overlay h2 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-transform: none; /* 'uppercase' macht Wörter oft zu breit für das Handy */
+    overflow-wrap: break-word; /* Erzwingt den Umbruch bei langen Wörtern */
+    word-wrap: break-word;
+    line-height: 1.2;
+}
+
+/* --- ABOUT SECTION (Bild & Text) --- */
+.about-section {
+    display: flex;
+    flex-direction: column; /* Standard für Handy: Untereinander */
+    align-items: center;
+    gap: 30px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin: 40px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.about-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.about-text {
+    flex: 1;
+    color: #333;
+    text-align: center; /* Handy: Zentriert */
+}
+
+/* WICHTIG: Entfernt den Abstand oberhalb des ersten Absatzes */
+.about-text p:first-child {
+    margin-top: 0 !important;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* PC-ANPASSUNG (Ab 850px) */
+@media (min-width: 850px) {
+    .about-section {
+        flex-direction: row !important; /* Bild links, Text rechts */
+        align-items: flex-start !important; /* Text beginnt ganz oben bündig mit Bild */
+        text-align: left !important;
+    }
+
+    .about-text {
+        text-align: left !important;
+        padding-top: 0 !important;
+    }
+}
+
+/* --- INFO CARDS (Kontakt & Öffnungszeiten) --- */
+.info-section-compact {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 25px;
+    margin-top: 40px;
+}
+
+/* Erkennt "Ruhetag", "ruhetag" und "RUHETAG" für die italienische Übersetzung */
+html[lang="it"] .zeit-spalte[data-wert="Ruhetag" i]::after {
+    content: "Giorno di riposo";
+}
+
+/* 1. Standard-Anzeige für Deutsch */
+html[lang="de"] .zeit-spalte::after {
+    content: attr(data-wert);
+}
+
+/* 2. Spezial-Regel für Italienisch: Wenn NICHT "Ruhetag" drinsteht (also eine Uhrzeit) */
+html[lang="it"] .zeit-spalte::after {
+    content: attr(data-wert);
+}
+
+/* 3. DIE ÜBERSETZUNG: Wenn exakt "Ruhetag" im Attribut steht und Sprache Italienisch ist */
+html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
+    content: "Giorno di riposo";
+}
+
+
+
+.contact-card-large, .hours-card-large {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    border-top: 5px solid var(--red);
+}
+
+.contact-icon, .hours-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.phone-number {
+    font-size: 1.5rem;
+    color: var(--red);
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    margin: 15px 0;
+}
+
+.hours-list {
+    margin: 20px 0; /* Sorgt für vertikalen Abstand */
+    padding: 0;     /* Verhindert ungewollte Einrückungen */
+    width: 100%;    /* Nutzt die volle Breite der Karte */
+}
+
+/* Die Zeile als Ganzes */
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Zentriert Text vertikal */
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+	gap: 10px; /* Kleiner Abstand zwischen Tag und Zeit */
+}
+
+/* Der Wochentag (links) */
+.tag-spalte {
+    flex: 0 0 100px; /* Der Tag hat eine feste Basisbreite */
+	text-align: left;
+    font-weight: bold;
+    color: var(--dark);
+}
+
+/* Die Zeit-Spalte (rechts) */
+.zeit-spalte {
+    /* Nutzt eine feste Breite für alle Zahlen-Blöcke */
+    margin-left: auto; /* SCHIEBT DIE ZEIT NACH RECHTS */
+	min-width: 140px; 
+    text-align: right;
+    /* Monospace sorgt dafür, dass die '1' genau so breit ist wie die '0' */
+    font-family: 'Courier New', Courier, monospace; 
+    color: var(--red);
+    white-space: nowrap; /* Verhindert Umbruch innerhalb der Uhrzeit */
+}
+
+
+
+.hours-item:last-child { border-bottom: none; }
+
+/* Admin-Buttons Box */
+.admin-btns-row {
+    display: flex;
+    gap: 4px;
+    margin-left: 15px; /* Abstand zur Zeit-Spalte */
+    flex-shrink: 0;   /* Buttons dürfen nicht schrumpfen */
+}
+
+.admin-btns-row button {
+    padding: 4px 8px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+
+
+/* --- FINALE HANDY-ANPASSUNG (max-width: 850px) --- */
+@media (max-width: 850px) {
+    /* 1. Container & Scroll-Schutz */
+    .container { 
+        width: 95% !important; 
+        max-width: 100% !important;
+        margin: 10px auto !important;
+        overflow-x: hidden !important; 
+    }
+
+    /* 2. Startseite: Bild und Text untereinander */
+    .about-section { flex-direction: column !important; padding: 20px !important; text-align: center !important; }
+    .about-image { width: 100% !important; max-width: 320px !important; height: auto !important; }
+
+    /* 4. FIX FÜR "WILLKOMMEN" & "LAAS - VINSCHGAU" */
+    .hero-overlay {
+        width: 92% !important;
+        max-width: 92% !important;
+        padding: 15px 10px !important;
+        /*left: 50% !important;
+        transform: translateX(-50%) !important;*/
+        box-sizing: border-box !important;
+        position: relative !important; /* Wichtig für das Zentrieren */
+    }
+
+    .hero-overlay h2 { 
+        font-size: 1.5rem !important; 
+        line-height: 1.2 !important;
+        white-space: normal !important; 
+        word-break: break-word !important; 
+        overflow-wrap: break-word !important;
+        hyphens: auto !important; 
+        display: block !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        text-transform: none !important; /* 'uppercase' braucht zu viel Platz */
+    }
+    
+    .hero-overlay p { 
+        font-size: 1.0rem !important; 
+        white-space: normal !important;
+        margin-top: 10px !important;
+    }
+
+    /* 5. Kontakt & Öffnungszeiten */
+    .info-section-compact { grid-template-columns: 1fr !important; }
+
+    /* 6. TV-Events einspaltig */
+    .event-grid { grid-template-columns: 1fr !important; text-align: center !important; }
+}
+@media (max-width: 600px) {
+    .hours-item {
+        flex-wrap: wrap; /* Erlaubt den Umbruch, falls es zu eng wird */
+        justify-content: space-between;
+        gap: 5px;
+    }
+
+    .tag-spalte {
+        flex: 1 1 auto; /* Tag nimmt Platz ein, schiebt Rest nach rechts */
+        font-size: 0.9rem;
+    }
+
+    .zeit-spalte {
+        min-width: auto; /* Hebt die starre Breite auf */
+        margin-left: auto;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+
+@media (max-width: 600px) {
+    /* Stapelt Zeit, Teams und Liga untereinander, damit nichts rechts rausragt */
+    .event-grid {
+        grid-template-columns: 1fr !important; 
+        gap: 5px;
+        text-align: center;
+    }
+    
+    .event-time {
+        color: var(--red);
+        font-size: 1.1rem;
+    }
+
+    .event-league {
+        text-align: center !important;
+        font-style: normal;
+        font-weight: bold;
+        background: #eee; /* Kleine optische Trennung */
+        border-radius: 4px;
+        padding: 2px 0;
+    }
+}
