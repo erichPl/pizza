@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Sisinius Database Backup</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; background: #f4f4f9; }
+        .box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; max-width: 500px; margin-bottom: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button { cursor: pointer; padding: 10px 15px; background: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .danger { background: #dc3545; }
+        .danger:hover { background: #a71d2a; }
+        input[type="file"] { margin-bottom: 15px; display: block; }
+        .status-msg { margin-top: 10px; font-weight: bold; color: #28a745; }
+    </style>
+</head>
+<body>
+
+    <h2>Admin Database Control</h2>
+
+    <div class="box">
+        <h3>1. Backup (Download)</h3>
+        <p>Erstellt eine Kopie aller Daten als JSON-Datei.</p>
+        <button onclick="downloadBackup()">Jetzt sichern</button>
+    </div>
+
+    <div class="box">
+        <h3>2. Restore (Upload)</h3>
+        <p style="color: #d9534f;"><strong>Vorsicht:</strong> Die aktuelle Datenbank wird vorher geleert!</p>
+        <input type="file" id="backupFile" accept=".json">
+        <button class="danger" onclick="restoreBackup()">Backup einspielen</button>
+        <div id="status" class="status-msg"></div>
+    </div>
+
+    <script>
+        // Extrahiert das Passwort aus der URL (z.B. ?pw=leon2208)
+        const urlParams = new URLSearchParams(window.location.search);
+        const PW = urlParams.get('pw');
+
+        function checkPw() {
+            if (!PW) {
+                alert("Kein Passwort in der URL gefunden! Bitte nutze: backup.html?pw=DEIN_PW");
+                return false;
+            }
+            return true;
+        }
+
+        // DOWNLOAD
+        function downloadBackup() {
+            if (!checkPw()) return;
+            window.location.href = `/api/backup-download?pw=${PW}`;
+        }
+
+        // UPLOAD (RESTORE)
+        async function restoreBackup() {
+            if (!checkPw()) return;
+
+            const fileInput = document.getElementById('backupFile');
+            if (fileInput.files.length === 0) return alert("Bitte wähle zuerst eine .json Datei aus!");
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async (e) => {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    
+                    if (!confirm("Bist du sicher? Alle aktuellen Daten auf dem Server werden GELÖSCHT und durch dieses Backup ersetzt!")) return;
+
+                    document.getElementById('status').innerText = "Verarbeite...";
+
+                    const response = await fetch(`/api/restore-upload?pw=${PW}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(jsonData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        document.getElementById('status').innerText = "Erfolg! Gelöscht: " + result.deleted + ", Neu eingefügt: " + result.inserted;
+                        alert("Datenbank erfolgreich wiederhergestellt!");
+                    } else {
+                        throw new Error(result.error || "Serverfehler");
+                    }
+                } catch (err) {
+                    document.getElementById('status').innerText = "";
+                    alert("Fehler: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
