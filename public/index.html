@@ -846,7 +846,11 @@ function editItem(idx) {
 		// Falls in der DB nichts steht, nimm 200 als Standard-Anzeige im Edit-Modus
 		heightInput.value = item.imgHeight || 200; 
 	}
-
+    const heightHandyInput = document.getElementById('inImgHeightHandy'); // Prüfe, ob die ID in deinem HTML so heißt
+	if (heightHandyInput) {
+		// Falls in der DB nichts steht, nimm 100 als Standard-Anzeige im Edit-Modus
+		heightHandyInput.value = item.imgHeightHandy || 100; 
+	}
     // ... deine anderen Felder (Name, Desc) ...
     let catInput
     // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
@@ -895,7 +899,11 @@ function editItem(idx) {
 		preview.style.height = item.imgHeight + "px";
 		preview.style.objectFit = "cover"; // Sorgt für eine saubere Vorschau
 	}
-
+    // Falls du die Vorschau im Admin-Bereich auch direkt in der Höhe anpassen willst:
+	if (preview && item.imgHeightHandy) {
+		preview.style.height = item.imgHeightHandy + "px";
+		preview.style.objectFit = "cover"; // Sorgt für eine saubere Vorschau
+	}
 
 
     editIndex = idx; // Position speichern!
@@ -1163,9 +1171,15 @@ function render() {
 					<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
 						<label style="font-size: 0.8rem; font-weight: bold;">Höhe:</label>
 						<input type="text" id="inImgHeight" placeholder="200" style="width: 70px; padding: 5px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 3px;">
-						<span style="font-size: 0.7rem; color: #666;">[px]</span>
+						<span style="font-size: 0.7rem; color: #666;">[px] PC</span>
 					</div>
 
+					<!-- NEU: EINGABE FÜR DIE BILDHÖHE HANDY-->
+					<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+						<label style="font-size: 0.8rem; font-weight: bold;">Höhe:</label>
+						<input type="text" id="inImgHeightHandy" placeholder="100" style="width: 70px; padding: 5px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 3px;">
+						<span style="font-size: 0.7rem; color: #666;">[px] Handy</span>
+					</div>
 
 					<div id="preview-box" style="margin-top: 10px; text-align: center; min-height: 50px;">
 						<img id="img-preview" src="" style="max-height:120px; border-radius:5px; display:none; border:2px solid var(--red);">
@@ -1478,6 +1492,19 @@ function render() {
     // 2. ANDERE SEITEN ALS STARTSEITE 
 	//=====================================
     
+	
+	// a. Prüfen, ob es ein Handy ist (Standard-Breakpoint 768px)
+    const isMobile = window.innerWidth <= 768;
+	
+	// b. Die richtige Höhe auswählen
+	// Logik: Wenn Handy UND imgHeightHandy da -> nimm imgHeightHandy. 
+	// Sonst nimm imgHeight (PC) oder den Standard 200px.
+	//const currentHeight=item.imgHeight;
+	const hPc=data[currentTab].imgHeight;
+	const hHandy=data[currentTab].imgHeightHandy;
+	const currentHeight = isMobile && hHandy 
+		? hHandy 
+		: (hPc || '200');
 
     if (!data[currentTab]) {
         area.innerHTML = '<p>Lade Daten...</p>';
@@ -1529,7 +1556,7 @@ function render() {
     else {
         // ÜBERSCHRIFT NUR EINMAL (vor der Schleife)
         const title = currentTab === 'tv' ? (lang === 'DE' ? 'TV-Sport' : 'TV-Sport') : (lang === 'DE' ? 'Events' : 'Eventi');
-        area.innerHTML += `
+		area.innerHTML += `
             <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0;">
                 <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">${title}</h1>
             </div>
@@ -1554,13 +1581,30 @@ function render() {
 					<div class="event-card">
 						<!--<div>${item.img}</div>-->
 					  
-						<div class="event-date">
+						
+						<div class="event-date">-->
 							<!-- HIER ENTSCHEIDET DER BROWSER: DE -> Original, IT -> Übersetzung -->
 							${lang === 'DE' ? textDE : textIT}
-						</div> 					
+						 </div> 					
 						<hr class="event-line">
-                        ${item.img ? `<img src="${item.img}" class="item-img" style="height: ${item.imgHeight ? item.imgHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}						
+											
+						 ${item.img ? `
+							<img src="${item.img}" 
+								 class="item-img" 
+								 style="height: ${currentHeight}px !important; object-fit: fill;" 
+								 alt="Bild">
+						` : ''}		
+						
+						
+						
+						<!--
+                        ${item.img ? `<img src="${item.img}" class="item-img" style="height: ${item.imgHeight ? item.imgHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}-->
 						<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;"  alt="Bild">` : ''}-->
+						
+						
+						
+						
+						
 						<div class="event-grid">
 							<!--<div class="event-time">${item.right || ''}</div>-->
 							<div class="event-time">${item.right}</div>
