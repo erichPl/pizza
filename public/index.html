@@ -1419,11 +1419,10 @@ function getAdminConsoleHtml(tab, label, labelDesc, descITField) {
 
 // --- STARTSEITE VOLL-LAYOUT FABRIK ---
 // --- STARTSEITE VOLL-LAYOUT FABRIK ---
-// --- STARTSEITE VOLL-LAYOUT FABRIK ---
 function getStartPageFullLayout(data, lang, editMode) {
     const q = "'"; 
 
-    // 1. ZEITEN-SCHLEIFE GENERIEREN
+    // 1. ZEITEN-SCHLEIFE GENERIEREN (Saubere vertikale Struktur)
     const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
         data.start.zeiten.map((z, idx) => `
             <div style="display: block; width: 100%; margin-bottom: 12px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: 5px; box-sizing: border-box;">
@@ -1433,6 +1432,7 @@ function getStartPageFullLayout(data, lang, editMode) {
                     </span> 
                     <span style="font-size: 1.1rem; white-space: nowrap;">${z.zeit || ''}</span>
                 </div>
+                <!-- ADMIN CONTROLS pro Zeile -->
                 ${editMode ? `
                 <div style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
                     <button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️</button>
@@ -1444,6 +1444,7 @@ function getStartPageFullLayout(data, lang, editMode) {
             </div>
         `).join('') : `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`;
 
+    // 2. ADMIN-KOMPONENTEN VORBEREITEN
     const adminBox = editMode ? (typeof getAdminPopupBoxHtml === 'function' ? getAdminPopupBoxHtml(data) : '') : '';
     const addTimeBtn = editMode ? `
         <div style="text-align:center; margin: 15px 0;">
@@ -1452,76 +1453,105 @@ function getStartPageFullLayout(data, lang, editMode) {
             </button>
         </div>` : '';
 
+    // 3. DAS GESAMTE HTML ZURÜCKGEBEN
     return `
     <style>
-        .start-container * { box-sizing: border-box !important; }
-        @media (max-width: 600px) {
+        /* Fix für Box-Berechnungen und horizontales Scrollen auf Handys */
+        .main-content-wrapper * { box-sizing: border-box !important; }
+        @media (max-width: 768px) {
             .hero-h2 { font-size: 1.8rem !important; }
             .hero-p { font-size: 1.1rem !important; }
-            .info-card { min-width: 100% !important; padding: 15px !important; }
+            .info-card-responsive { min-width: 100% !important; max-width: 100% !important; padding: 15px !important; }
+            .about-image { max-width: 100% !important; width: 100% !important; }
         }
     </style>
 
-    <div class="hero" style="height: 500px; position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white; background: #000;">
-        <img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
-        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
-        <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
-            <h2 class="hero-h2" style="font-size: 2.5rem; margin-bottom: 10px;">${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}</h2>
-            <p class="hero-p" style="font-size: 1.5rem; font-weight: 500;">${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}</p>
-        </div>
-    </div>
-
-    <div class="start-container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px; overflow: hidden;">
-        <!-- ABOUT SECTION MIT VOLLSTÄNDIGEM TEXT -->
-        <div class="about-section" style="padding: 40px 0; display: flex; gap: 30px; flex-wrap: wrap; align-items: center;">
-            <img src="pizza.webp" alt="Pizza" style="max-width: 100%; width: 400px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto;">
-            <div style="flex: 1; min-width: 300px; font-size: 1.1rem; line-height: 1.6;">
-                ${lang === 'DE' ? 
-                    '<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
-                    '<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und sorgen mit verschiedenen Events und Specials für beste Stimmung und Abwechslung in der Pizzeria Pub St. Sisinius.</p>' +
-                    '<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
-                    : 
-                    '<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparate con ingredienti freschi e molta cura per i dettagli.</p>' +
-                    '<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
-                    '<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
-                }
+    <div class="main-content-wrapper" style="width: 100%; overflow-x: hidden;">
+        <!-- HERO SECTION (Fix: width 100% statt 100vw verhindert Rausragen) -->
+        <div class="hero" style="height: 500px; position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white; background: #000;">
+            <img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+            <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+            <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+                <h2 class="hero-h2" style="font-size: 2.5rem; margin-bottom: 10px;">${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}</h2>
+                <p class="hero-p" style="font-size: 1.5rem; font-weight: 500;">${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}</p>
             </div>
         </div>
 
-        <div style="display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0;">
-            <!-- KONTAKT -->
-            <div class="info-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 300px; max-width: 100%;">
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 1; min-width: 180px;">
-                        <h3 style="color:#dc3545; margin-top: 0;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-                        <a href="tel:+393898334004" style="font-weight: bold; text-decoration: none; font-size: 1.3rem; color: #333;">+39 389 833 4004</a>
-                        <p style="font-size: 0.9rem; font-weight: bold; color: #666; margin-top: 10px;">${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}</p>
-                    </div>
-                    <div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 10px;">
-                        <a href="https://www.google.com..." target="_blank" style="text-decoration: none; width: 110px;">
-                            <div style="background: white; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
-                                <img src="orthofoto.jpg" style="width: 100%; height: 75px; object-fit: cover;">
-                                <div style="background: #4285F4; color: white; text-align: center; padding: 4px; font-size: 9px; font-weight: bold;">MAPPA</div>
-                            </div>
-                        </a>
-                        <a href="https://www.instagram.com" target="_blank" style="text-decoration: none; display: block; width: 105px; background: linear-gradient(45deg, #f09433, #bc1888); color: white; text-align: center; border-radius: 6px; padding: 6px 0; font-size: 10px; font-weight: bold;">📸 INSTAGRAM</a>
-                        <a href="https://www.facebook.com..." target="_blank" style="text-decoration: none; display: block; width: 105px; background: #1877F2; color: white; text-align: center; border-radius: 6px; padding: 6px 0; font-size: 10px; font-weight: bold;">f FACEBOOK</a>
-                    </div>
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+            <!-- ABOUT SECTION MIT VOLLSTÄNDIGEM TEXT -->
+            <div class="about-section" style="padding: 40px 0; display: flex; gap: 30px; flex-wrap: wrap; align-items: center;">
+                <img src="pizza.webp" alt="Pizza" class="about-image" style="max-width: 400px; width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto;">
+                <div style="flex: 1; min-width: 300px; font-size: 1.1rem; line-height: 1.7;">
+                    ${lang === 'DE' ? 
+                        '<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
+                        '<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und sorgen mit verschiedenen Events und Specials für beste Stimmung und Abwechslung in der Pizzeria Pub St. Sisinius.</p>' +
+                        '<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
+                        : 
+                        '<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparate mit ingredienti freschi e molta cura per i dettagli.</p>' +
+                        '<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
+                        '<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
+                    }
                 </div>
             </div>
 
-            <!-- ÖFFNUNGSZEITEN & EDITOR -->
-            <div class="info-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.8; min-width: 300px; max-width: 100%;">			
-                <h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 15px; margin-bottom: 20px;">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari'}</h3>
-                ${zeitenListe}
-                ${editMode ? `
-                    <div style="margin-top: 25px; border-top: 2px dashed #ffc107; padding-top: 20px;">
-                        ${addTimeBtn}
-                        <div style="width: 100%;">${adminBox}</div>
-                    </div>` : ''}
-            </div>
-        </div>
-    </div>`;
+            <!-- INFO WRAPPER: KONTAKT & ZEITEN -->
+            <div style="display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0;">
+                
+                <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
+                <div class="info-card-responsive contact-card-large" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 310px; max-width: 100%;">
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                        <div style="flex: 1; min-width: 150px;">
+                            <h3 style="color:#dc3545; margin-top: 0; font-size: 1.5rem;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+                            <a href="tel:+393898334004" style="font-weight: bold; text-decoration: none; font-size: 1.3rem; color: #333; display: block; margin-bottom: 5px;">+39 389 833 4004</a>
+                            <p style="font-size: 0.9rem; font-weight: bold; color: #666; margin-top: 10px;">${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}</p>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 10px;">
+                            <!-- GOOGLE MAPS -->
+                            <a href="https://www.google.com" target="_blank" style="text-decoration: none; display: block; width: 110px;">
+                                <div style="background: white; border: 1px solid #eee; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    <div style="position: relative; width: 110px; height: 80px;">
+                                        <img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 18px;">📍</div>
+                                    </div>
+                                    <div style="background: #4285F4; color: white; text-align: center; padding: 4px; font-size: 9px; font-weight: bold; line-height: 1.2;">
+                                        ${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
+                                    </div>
+                                </div>
+                            </a>
+                            <p style="font-size: 8px; color: #999; margin: -5px 0 0 0; text-align: right; line-height: 1.1;">© Prov. BZ - CC BY 4.0</p>
+                            <!-- INSTAGRAM -->
+                            <a href="https://www.instagram.com" target="_blank" style="text-decoration: none; display: block; width: 105px; background: linear-gradient(45deg, #f09433, #bc1888); color: white; text-align: center; border-radius: 6px; padding: 6px 0; font-size: 10px; font-weight: bold;">📸 INSTAGRAM</a>
+                            <!-- FACEBOOK -->
+                            <a href="https://www.facebook.com" target="_blank" style="text-decoration: none; display: block; width: 105px; background: #1877F2; color: white; text-align: center; border-radius: 6px; padding: 6px 0; font-size: 10px; font-weight: bold;">f FACEBOOK</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECHTER RAHMEN: ÖFFNUNGSZEITEN & EDITOR -->
+                <div class="info-card-responsive opening-hours-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.6; min-width: 310px; max-width: 100%;">			
+                    <h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 15px; margin-bottom: 20px;">
+                        ${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}
+                    </h3>
+                    
+                    <div style="display: block; width: 100%;">
+                        ${zeitenListe}
+                    </div>
+
+                    <!-- ADMIN BEREICH (Innerhalb der Box) -->
+                    ${editMode ? `
+                        <div style="margin-top: 25px; border-top: 2px dashed #ffc107; padding-top: 20px;">
+                            ${addTimeBtn}
+                            <div style="width: 100%; overflow-x: auto;">
+                                ${adminBox}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div> <!-- Ende Info Wrapper -->
+        </div> <!-- Ende Container -->
+    </div> <!-- Ende main-content-wrapper -->
+    `;
 }
 
 function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
