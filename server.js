@@ -115,13 +115,18 @@ app.get('/api/fix-all-heights', async (req, res) => {
         // Funktion zum sicheren Hinzufügen/Überschreiben (bzw. nicht überschreiben) von imgHeightHeight
         const addHeight = (arr) => {
             if (!Array.isArray(arr)) return arr;
-            return arr.map(item => ({
-                ...item,        // Behält alle alten Felder (img, text, etc.)
-				//NICHT ÜBERSCHREIBEN
-                imgHeightHandy: hasHeight ? item.imgHeightHandy : 100 // Falls vorhanden: behalte alten Wert, sonst: setze 100
-				//ÜBERSCHREIBEN
-                //imgHeightHandy: 100  // Setzt imgHeightHandy auf 100 (überschreibt falls vorhanden)
-            }));
+            return arr.map(item => {
+				
+				// Hier definieren wir hasHeight für jedes einzelne Element im Array
+                const hasHeight = item.imgHeightHandy !== undefined && item.imgHeightHandy !== null;
+				return {
+					...item,        // Behält alle alten Felder (img, text, etc.)
+					//NICHT ÜBERSCHREIBEN
+					imgHeightHandy: hasHeight ? item.imgHeightHandy : 100 // Falls vorhanden: behalte alten Wert, sonst: setze 100
+					//ÜBERSCHREIBEN
+					//imgHeightHandy: 100  // Setzt imgHeightHandy auf 100 (überschreibt falls vorhanden)
+				}
+            });
         };
 
         // Auf alle drei Kategorien anwenden
