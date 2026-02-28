@@ -1,0 +1,22 @@
+
+Webseite: 
+------------
+sisinius.it   bzw. zum Editieren sisinius.it?pw=xxxxxxxx
+--------------------------------------------------------
+Github: server.js und index.html
+MongoDb Datenbank  (/test/pizzadatas)
+Render Verknüfung mit Github (pizza-m26c.onrender.com)
+cron-job.org: pings an Render.com alle 14 Minuten (damit nicht in Ruhemodus)
+floutclare.com Domain sisinius.it
+
+Backup und Restore Datenbank:
+---------------------------------
+sisinius.it/backup.html?pw=xxxxxxxx
+-----------------------------------
+
+
+Hinweis:
+--------
+In PIZZA, EVENTS und TV-SPORT können auch Bilder jpg hinzugefügt werden, 
+wobei die Höhe für PC und Handy separat angegeben werden können
+
