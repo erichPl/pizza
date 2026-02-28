@@ -4,646 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pizzeria Pub St. Sisinius</title>
-    <style>
-/*
-.item-img {
-    /* FIX 2: Begrenze das Bild radikal! */
-    max-height: 200px; /* Oder der Wert, den du willst */
-    width: auto;
-    display: block;
-    margin: 10px auto; /* Zentriert das Bild */
-    object-fit: contain;
-}*/
-
-
-/*.item-img {
-    display: block;
-    max-height: 150px; /* Begrenzt die Höhe des Logos/Bildes */
-    width: auto;
-    margin: 0 auto 15px auto; /* Zentriert das Bild mit Abstand nach unten */
-    object-fit: contain;
-}*/
-
-.item-img {
-    display: block;
-    width: auto;
-    max-height: 150px; /* Begrenzt die Höhe radikal */
-    margin: 10px auto;  /* Zentriert das Bild und gibt Abstand */
-    object-fit: contain; /* Verhindert Verzerrungen */
-}
-
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-* {
-    box-sizing: border-box;
-}
-
-
-/* Grunddesign für den Header */
-.main-header {
-    /*background-color: rgb(144, 41, 50);*/
-	background-color: var(--red);
-    color: white;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    border-bottom: none;
-}
-
-.main-header .logo {
-    width: 100px; /* Etwas kleiner für mehr Platz */
-    height: 100px;
-    border: 2px solid white;
-    object-fit: cover;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.header-text {
-    margin-left: 30px;
-}
-
-.header-text h1 {
-    margin: 0;
-    font-size: 1.6rem;
-    line-height: 1.2;
-    color: white;
-    /* WICHTIG: Kein white-space: nowrap mehr! */
-    white-space: normal !important; 
-    overflow-wrap: break-word;
-}
-
-.header-text p {
-    margin: 5px 0 0 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-    letter-spacing: 1px;
-}
-
-/* HANDY-SPEZIALKORREKTUR */
-@media (max-width: 600px) {
-    .header-text h1 {
-        font-size: 1.2rem !important; /* Kleinerer Text auf dem Handy */
-    }
-    .main-header .logo {
-        width: 55px; /* Kleineres Logo spart Platz */
-        height: 55px;
-    }
-}
-	
-	
-	
-	
-footer { 
-	position: relative; /* Nicht fixed, damit es am Ende der Seite mitscrollt */
-	width: 100%; 
-	background: #1a1a1a; 
-	color: white; 
-	padding: 30px 0; 
-	border-top: 4px solid var(--red); 
-	display: grid; 
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-	gap: 20px; 
-	text-align: center; 
-	font-size: 0.85rem; 
-	line-height: 1.2 !important; /* Hier wird der Abstand eng gemacht */
-}
-
-.footer-section {
-    display: block !important; /* Verhindert den flex-Abstand (gap) */
-    margin-bottom: 10px;
-}
-
-.footer-section strong {
-    display: block;
-    margin-bottom: 4px;
-    color: var(--white);
-}
-
-.footer-section a, 
-.footer-section span {
-    display: block;
-    color: white;
-    text-decoration: none;
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 1.2 !important; /* Garantiert den engen Abstand wie bei der Adresse */
-}
-
-footer a:hover {
-    color: var(--red);
-    text-decoration: underline;
-}
-
-
-
-footer {
-    display: flex;
-    flex-wrap: wrap; /* WICHTIG: Erlaubt das Umbrechen in die nächste Zeile */
-    justify-content: space-between;
-    padding: 20px;
-}
-
-.footer-bottom {
-    flex-basis: 100%; /* Erzwingt, dass dieser Block die volle Breite einnimmt */
-    margin-top: 20px;
-    text-align: center;
-}
-
-.footer-divider {
-    border: 0;
-    border-top: 1px solid rgba(255,255,255,0.2);
-    margin-bottom: 15px;
-    width: 100%;
-}
-
-.copyright-text {
-    color: white;
-    font-size: 0.85rem;
-    opacity: 0.7;
-    margin: 0;
-}
-	
-	
-    /* Nur die Admin-Elemente standardmäßig ausblenden */
-        .admin-only, .btn-ctrl, .admin-panel { 
-            display: none !important; 
-        }
-        
-        /* Nur einblenden, wenn die Klasse am body aktiv ist */
-        body.admin-mode .admin-only, 
-        body.admin-mode .btn-ctrl, 
-        body.admin-mode .admin-panel { 
-            display: block !important; 
-        }
-        
-        /* Spezialfall für die Button-Reihe (Flex-Layout erhalten) */
-        body.admin-mode .btn-row.admin-only {
-            display: flex !important;
-        }
-        
-       
-:root { 
-    --red: rgb(144, 41, 50); /* Dein neues dunkles Rot */
-    --dark: #1a1a1a; 
-    --light: #f4f4f4; 
-    --white: #ffffff; 
-}
-
-/* Stelle sicher, dass die Überschrift im Header keinen Schatten von alten Styles hat */
-header h1 {
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-}
-
-      .container { 
-			max-width: 1100px; 
-			width: 95%; /* Sorgt für einen kleinen Rand links/rechts auf dem Handy */
-			margin: 20px auto; 
-			padding: 0; 
-		}
-
-/* Verhindert, dass lange Wörter (wie Willkommen) am Handy rauswandern */
-h1, h2, h3, p {
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    max-width: 100%;
-}
-
-
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--light);}
-        /*header { background: var(--white); padding: 15px 20px; display: flex; align-items: center; border-bottom: 4px solid var(--red); }*/        
-        /*.logo { width: 70px; height: 70px; object-fit: cover; margin-right: 20px; border-radius: 50%; border: 2px solid var(--red);  margin-left:10%;}*/
-        h1 { margin: 0; font-size: 1.6rem; }
-        .nav-container { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 5px 20px; position: sticky; top: 0; z-index: 1000;}
-        .tabs { display: flex; flex-wrap: wrap;  margin-left:20%;}
-        .tab-btn { background: none; border: none; color: white; cursor: pointer; padding: 12px 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; }
-        .tab-btn.active { color: var(--red); border-bottom: 3px solid var(--red); }
-        .lang-switch { display: flex; gap: 5px; }
-        .lang-btn { background: #444; border: 1px solid #666; color: white; padding: 4px 10px; cursor: pointer; border-radius: 3px; }
-        .lang-btn.active { background: var(--red); border-color: var(--red); }
     
-        #content-area { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media (min-width: 850px) { #content-area.grid-mode { grid-template-columns: repeat(3, 1fr); } }
-        @media (min-width: 850px) { #content-area.list-mode { grid-template-columns: 1fr; /* Nur eine Spalte = volle Breite */} }
-        .entry { background: var(--white); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; border: 1px solid #ddd; }
-        .entry-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        .entry-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
-        .price { color: var(--red); white-space: nowrap; margin-left: 10px; }
-        .desc { font-size: 0.9rem; color: #555; font-style: italic; flex-grow: 1; }
-        /*.item-img { width: 100%; height: 50%; object-fit: cover; }*/
-        .item-img {
-			width: 100%;    /* Nutzt die volle Breite der Karte */
-			height: 250px;  /* Deine Wunschhöhe (verringert den leeren Raum) */
-			
-			/* FIX: Das Bild wird jetzt verzerrt, um genau in den Rahmen zu passen */
-			object-fit: fill; 
-			
-			display: block;
-			margin-bottom: 10px;
-		}
-		
-		.admin-only { display: none; }
-        body.admin-mode .admin-only { display: block; }
-        .admin-panel { background: #eee; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed #999; }
-        .admin-panel div { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .admin-panel input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
-        .btn-row { display: flex; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee; }
-        .btn-ctrl { padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; font-size: 0.8rem; background: #555; color: white; }
-       
-    /* Rahmen für das gesamte Event */
-.event-card {
-    border: 2px solid #8B4513;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    padding: 15px;
-    background-color: #fffaf0; /* Cremiger Hintergrund */
-}
-
-/*.event-card {
-    border: 2px solid #8B4513;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    padding: 15px;
-    background-color: #fffaf0;
-    
-    /* NEU: Zwingt den Rahmen, eng am Inhalt zu liegen */
-    display: flex;
-    flex-direction: column;
-    height: auto; 
-    overflow: hidden; 
-}*/
-
-
-
-
-
-.event-card {
-    border: 2px solid #8B4513;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    padding: 15px;
-    background-color: #fffaf0;
-    
-    /* NEU: Zwingt den Rahmen, eng am Inhalt zu liegen */
-    display: flex;
-    flex-direction: column;
-    height: auto; 
-    overflow: hidden; 
-}
-
-/* Datum als Überschrift */
-.event-date {
-    color: #8B4513;
-    font-size: 1.4rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 5px;
-}
-
-/* Die braune Linie */
-.event-line {
-    border: none;
-    height: 2px;
-    background-color: #8B4513;
-    margin-bottom: 15px;
-}
-
-/* 3-Spalten-Layout */
-.event-grid {
-    display: grid;
-    grid-template-columns: 80px 1fr 100px; /* Zeit, Teams, League */
-    gap: 15px;
-    align-items: center;
-    font-size: 1.1rem;
-}
-
-.event-time {
-    color: #8B4513;
-    font-weight: bold;
-}
-
-.event-teams {
-    font-weight: bold;
-    color: #333;
-}
-
-.event-league {
-    text-align: right;
-    font-style: italic;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-
-
-
-        /* HERO SECTION */
-.hero {
-    position: relative;
-    height: 450px;
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-align: center;
-}
-
-.hero-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 1;
-}
-
-.hero-overlay {
-    position: relative;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 1.5rem; /* Etwas weniger Padding spart Platz */
-    border-radius: 10px;
-    backdrop-filter: blur(3px);
-    max-width: 90%; /* Erhöht auf 90%, damit mehr Text in eine Zeile passt */
-    box-sizing: border-box; /* Verhindert, dass Padding den Kasten sprengt */
-}
-
-.hero-overlay h2 {
-    font-size: 2.5rem;
-    margin: 0;
-    text-transform: none; /* 'uppercase' macht Wörter oft zu breit für das Handy */
-    overflow-wrap: break-word; /* Erzwingt den Umbruch bei langen Wörtern */
-    word-wrap: break-word;
-    line-height: 1.2;
-}
-
-/* --- ABOUT SECTION (Bild & Text) --- */
-.about-section {
-    display: flex;
-    flex-direction: column; /* Standard für Handy: Untereinander */
-    align-items: center;
-    gap: 30px;
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    margin: 40px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    box-sizing: border-box;
-    width: 100%;
-}
-
-.about-image {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    border-radius: 10px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.about-text {
-    flex: 1;
-    color: #333;
-    text-align: center; /* Handy: Zentriert */
-}
-
-/* WICHTIG: Entfernt den Abstand oberhalb des ersten Absatzes */
-.about-text p:first-child {
-    margin-top: 0 !important;
-}
-
-.about-text p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 15px;
-}
-
-/* PC-ANPASSUNG (Ab 850px) */
-@media (min-width: 850px) {
-    .about-section {
-        flex-direction: row !important; /* Bild links, Text rechts */
-        align-items: flex-start !important; /* Text beginnt ganz oben bündig mit Bild */
-        text-align: left !important;
-    }
-
-    .about-text {
-        text-align: left !important;
-        padding-top: 0 !important;
-    }
-}
-
-/* --- INFO CARDS (Kontakt & Öffnungszeiten) --- */
-.info-section-compact {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 25px;
-    margin-top: 40px;
-}
-
-/* Erkennt "Ruhetag", "ruhetag" und "RUHETAG" für die italienische Übersetzung */
-html[lang="it"] .zeit-spalte[data-wert="Ruhetag" i]::after {
-    content: "Giorno di riposo";
-}
-
-/* 1. Standard-Anzeige für Deutsch */
-html[lang="de"] .zeit-spalte::after {
-    content: attr(data-wert);
-}
-
-/* 2. Spezial-Regel für Italienisch: Wenn NICHT "Ruhetag" drinsteht (also eine Uhrzeit) */
-html[lang="it"] .zeit-spalte::after {
-    content: attr(data-wert);
-}
-
-/* 3. DIE ÜBERSETZUNG: Wenn exakt "Ruhetag" im Attribut steht und Sprache Italienisch ist */
-html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
-    content: "Giorno di riposo";
-}
-
-
-
-.contact-card-large, .hours-card-large {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    text-align: center;
-    border-top: 5px solid var(--red);
-}
-
-.contact-icon, .hours-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-}
-
-.phone-number {
-    font-size: 1.5rem;
-    color: var(--red);
-    text-decoration: none;
-    font-weight: bold;
-    display: block;
-    margin: 15px 0;
-}
-
-.hours-list {
-    margin: 20px 0; /* Sorgt für vertikalen Abstand */
-    padding: 0;     /* Verhindert ungewollte Einrückungen */
-    width: 100%;    /* Nutzt die volle Breite der Karte */
-}
-
-/* Die Zeile als Ganzes */
-.hours-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* Zentriert Text vertikal */
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 1rem;
-	gap: 10px; /* Kleiner Abstand zwischen Tag und Zeit */
-}
-
-/* Der Wochentag (links) */
-.tag-spalte {
-    flex: 0 0 100px; /* Der Tag hat eine feste Basisbreite */
-	text-align: left;
-    font-weight: bold;
-    color: var(--dark);
-}
-
-/* Die Zeit-Spalte (rechts) */
-.zeit-spalte {
-    /* Nutzt eine feste Breite für alle Zahlen-Blöcke */
-    margin-left: auto; /* SCHIEBT DIE ZEIT NACH RECHTS */
-	min-width: 140px; 
-    text-align: right;
-    /* Monospace sorgt dafür, dass die '1' genau so breit ist wie die '0' */
-    font-family: 'Courier New', Courier, monospace; 
-    color: var(--red);
-    white-space: nowrap; /* Verhindert Umbruch innerhalb der Uhrzeit */
-}
-
-
-
-.hours-item:last-child { border-bottom: none; }
-
-/* Admin-Buttons Box */
-.admin-btns-row {
-    display: flex;
-    gap: 4px;
-    margin-left: 15px; /* Abstand zur Zeit-Spalte */
-    flex-shrink: 0;   /* Buttons dürfen nicht schrumpfen */
-}
-
-.admin-btns-row button {
-    padding: 4px 8px;
-    cursor: pointer;
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 0.8rem;
-}
-
-
-
-/* --- FINALE HANDY-ANPASSUNG (max-width: 850px) --- */
-@media (max-width: 850px) {
-    /* 1. Container & Scroll-Schutz */
-    .container { 
-        width: 95% !important; 
-        max-width: 100% !important;
-        margin: 10px auto !important;
-        overflow-x: hidden !important; 
-    }
-
-    /* 2. Startseite: Bild und Text untereinander */
-    .about-section { flex-direction: column !important; padding: 20px !important; text-align: center !important; }
-    .about-image { width: 100% !important; max-width: 320px !important; height: auto !important; }
-
-    /* 4. FIX FÜR "WILLKOMMEN" & "LAAS - VINSCHGAU" */
-    .hero-overlay {
-        width: 92% !important;
-        max-width: 92% !important;
-        padding: 15px 10px !important;
-        /*left: 50% !important;
-        transform: translateX(-50%) !important;*/
-        box-sizing: border-box !important;
-        position: relative !important; /* Wichtig für das Zentrieren */
-    }
-
-    .hero-overlay h2 { 
-        font-size: 1.5rem !important; 
-        line-height: 1.2 !important;
-        white-space: normal !important; 
-        word-break: break-word !important; 
-        overflow-wrap: break-word !important;
-        hyphens: auto !important; 
-        display: block !important;
-        width: 100% !important;
-        margin: 0 auto !important;
-        text-transform: none !important; /* 'uppercase' braucht zu viel Platz */
-    }
-    
-    .hero-overlay p { 
-        font-size: 1.0rem !important; 
-        white-space: normal !important;
-        margin-top: 10px !important;
-    }
-
-    /* 5. Kontakt & Öffnungszeiten */
-    .info-section-compact { grid-template-columns: 1fr !important; }
-
-    /* 6. TV-Events einspaltig */
-    .event-grid { grid-template-columns: 1fr !important; text-align: center !important; }
-}
-@media (max-width: 600px) {
-    .hours-item {
-        flex-wrap: wrap; /* Erlaubt den Umbruch, falls es zu eng wird */
-        justify-content: space-between;
-        gap: 5px;
-    }
-
-    .tag-spalte {
-        flex: 1 1 auto; /* Tag nimmt Platz ein, schiebt Rest nach rechts */
-        font-size: 0.9rem;
-    }
-
-    .zeit-spalte {
-        min-width: auto; /* Hebt die starre Breite auf */
-        margin-left: auto;
-        font-size: 0.9rem;
-        text-align: right;
-    }
-
-@media (max-width: 600px) {
-    /* Stapelt Zeit, Teams und Liga untereinander, damit nichts rechts rausragt */
-    .event-grid {
-        grid-template-columns: 1fr !important; 
-        gap: 5px;
-        text-align: center;
-    }
-    
-    .event-time {
-        color: var(--red);
-        font-size: 1.1rem;
-    }
-
-    .event-league {
-        text-align: center !important;
-        font-style: normal;
-        font-weight: bold;
-        background: #eee; /* Kleine optische Trennung */
-        border-radius: 4px;
-        padding: 2px 0;
-    }
-}
-
-
-</style>
+	<link rel="stylesheet" href="style.css">
 </head>
+
+<!--==============================================
+ STATISCHES HTML LAYOUT
+==================================================-->
+
 <body>
     
 <header class="main-header">
@@ -702,88 +70,80 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 
 <script>
  
+// 1. STYLE-BLOCK ALS VARIABLE (Ganz oben im Script)
+// Wir brechen die Tags auf: '<' + 'style>'
+const styleOpen = '<' + 'style>';
+const styleClose = '<' + '/' + 'style>';
+// Hilfsvariablen für "gefährliche" Zeichen
+const q = "'";  // Ein einfaches Anführungszeichen
+const dq = '"'; // Ein doppeltes Anführungszeichen
 
+const bt = '`'; // Das Backtick-Zeichen als String
 
-
-function renderNoticePopup(data, lang, container) {
-    if (!data.notice || !data.notice.active || sessionStorage.getItem('noticeSeen')) {
-        return;
+const popupStyles = styleOpen + `
+    @keyframes bounce { 
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 
+        40% {transform: translateY(-5px);} 
+        60% {transform: translateY(-3px);} 
     }
+    .scroll-hint { 
+        position: absolute; bottom: 100px; right: 25px; 
+        background: white; padding: 8px 12px; border-radius: 20px; 
+        font-size: 13px; color: var(--red); font-weight: bold; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        cursor: pointer; display: flex; align-items: center; gap: 5px; 
+        animation: bounce 2s infinite; z-index: 11000; 
+        border: 2px solid var(--red); transition: opacity 0.3s, transform 0.2s;
+        user-select: none;
+    }
+    .scroll-hint:active { transform: scale(0.95); }
+` + styleClose;
 
-    const title = lang === 'DE' ? (data.notice.titleDE || 'Wichtige Info') : (data.notice.titleIT || 'Info importante');
+
+
+
+
+
+// POPUP
+//=========================================================
+function renderNoticePopup(data, lang, container) {
+    if (!data.notice || !data.notice.active || sessionStorage.getItem('noticeSeen')) return;
+
+    const title = lang === 'DE' ? data.notice.titleDE : data.notice.titleIT;
     const scrollHint = lang === 'DE' ? 'Mehr lesen' : 'Leggi di più';
     
+    // Bild-Logik (Notepad++ sicher in einer Zeile)
+    //const imageHtml = data.notice.img ? `<img src="${data.notice.img}" style="max-width:100%; border-radius:8px;">` : '📢';
+    
+	const imageHtml = data.notice.img 
+    ? `<img src="${data.notice.img}" style="max-width:100%; max-height:40vh; object-fit:contain; display:block; margin:0 auto 15px; border-radius:8px;">` 
+    : '📢';
+	
+	
+	
+    // TEXT-LOGIK: Hier muss die Linie wieder rein!
     let rawText = (lang === 'DE' ? data.notice.textDE : data.notice.textIT) || "";
     const formattedText = rawText
         .replace(/\n/g, '<br>') 
         .replace(/%25|%/g, '<div style="display:block; width:80%; height:2px; background-color:var(--red); margin:15px auto; border-radius:2px;"></div>');
 
-    container.innerHTML += `
-        <style>
-            @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-5px);} 60% {transform: translateY(-3px);} }
-            .scroll-hint { 
-                position: absolute; bottom: 100px; right: 25px; 
-                background: white; padding: 8px 12px; border-radius: 20px; 
-                font-size: 13px; color: var(--red); font-weight: bold; 
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-                cursor: pointer; display: flex; align-items: center; gap: 5px; 
-                animation: bounce 2s infinite; z-index: 11000; 
-                border: 2px solid var(--red); transition: opacity 0.3s, transform 0.2s;
-                user-select: none;
-            }
-            .scroll-hint:active { transform: scale(0.95); }
-        </style>
-
-        <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; animation: fadeIn 0.3s ease-out;">
-            
-            <div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column; position: relative;">
-                
-                <!-- SCROLL-HINWEIS (Anklickbar) -->
-                <!--<div id="popup-scroll-hint" class="scroll-hint" onclick="document.getElementById('popup-scroll-content').scrollBy({top: 150, behavior: 'smooth'})">
-                    ${scrollHint} <span style="font-size: 16px;">↓</span>
-                </div>-->
-				<div id="popup-scroll-hint" 
-					 class="scroll-hint" 
-					 onclick="this.style.opacity='0'; this.style.pointerEvents='none'; document.getElementById('popup-scroll-content').scrollBy({top: 150, behavior: 'smooth'});"
-					 style="transition: opacity 0.3s ease;">
-					${scrollHint} <span style="font-size: 16px;">↓</span>
-				</div>
-
-
-
-
-                <!-- HEADER -->
-                <div style="padding:20px 20px 10px 20px; flex-shrink:0; background: white; z-index: 10;">
-                    <h2 style="color:var(--red); margin:0;">${title}</h2>
-                </div>
-
-                <!-- SCROLL-BEREICH -->
-                <div id="popup-scroll-content" 
-                     onscroll="if(this.scrollTop > 50) document.getElementById('popup-scroll-hint').style.opacity='0';" 
-                     style="overflow-y:auto; flex-grow:1; padding:0 25px; scroll-behavior: smooth;">
-                    
-                    ${data.notice.img ? `
-                        <img src="${data.notice.img}" 
-                             style="max-width:100%; max-height:45vh; object-fit:contain; display:block; margin:0 auto 15px; border-radius:8px;">
-                    ` : '<div style="font-size:50px; margin-bottom:15px;">📢</div>'}
-                    
-                    <div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.5; text-align:center; padding-bottom:40px;">
-                        ${formattedText}
-                    </div>
-                </div>
-
-                <!-- FOOTER -->
-                <div style="padding:15px 20px 25px 20px; flex-shrink:0; border-top:1px solid #eee; background: white; z-index: 10;">
-                    <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%;">
-                        OK
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
+    // Wir rufen die externe "Fabrik" auf
+    container.innerHTML += getPopupTemplate(title, scrollHint, imageHtml, formattedText);
+	
+/*	
+		// Warte 1,5 Sekunden, dann scrolle sanft 100 Pixel nach unten
+	setTimeout(() => {
+		const scrollContent = document.getElementById('popup-scroll-content');
+		if (scrollContent) {
+			scrollContent.scrollBy({
+				top: 120, // Pixel-Anzahl
+				behavior: 'smooth'
+			});
+		}
+	}, 3000);
+*/	
+	
 }
-
-
 
 let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
 let data = { start: {}, pizzas: [], events: [], tv: [] };
@@ -1114,378 +474,36 @@ function render() {
     }
 
 //ADMIN
-	// 2.1. ADMIN-KONSOLE
-	//-------------------------------
-//ADMIN '!start'
+// =========================================================
+// 2. ADMIN-KONSOLE (Logik & Anzeige)
+// =========================================================
 	if (editMode && currentTab !== 'start') {
-		let label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+		const label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+		const labelDesc = currentTab === 'tv' ? 'Datum (z.B. Samstag 14.02.26)' : (currentTab === 'events' ? 'Uhrzeit (z.B. ab 20:00 Uhr)' : 'Beschreibung');
 		
-		
-		 // NEU: Platzhalter für Beschreibung je nach Tab (TV = Datum, Events = Uhrzeit, Rest = Beschreibung)
-		let labelDesc = 'Beschreibung';
-		let labelDescIT = 'Descrizione';
-		
-		if (currentTab === 'tv') {
-			labelDesc = 'Datum (z.B. Samstag 14.02.26)';
-			labelDescIT = 'Data (p.es. Sabato 14/02/26)';
-		} else if (currentTab === 'events') {
-			labelDesc = 'Uhrzeit (z.B. ab 20:00 Uhr)';
-			labelDescIT = 'Orario (p.es. dalle ore 20:00)';
-		}
+		const descITField = (currentTab === 'pizzas') 
+			? '<input type="text" id="inDescIT" placeholder="Descrizione (IT)">' 
+			: '<input type="hidden" id="inDescIT" value="">';
 
-
-		// Vor dem area.innerHTML += Block:
-		let descITField = '';
-
-		// Nur bei Pizzen brauchen wir das zweite Beschreibungsfeld (Zutaten IT)
-		if (currentTab === 'pizzas') {
-			descITField = `<input type="text" id="inDescIT" placeholder="Descrizione (IT)">`;
-		} else {
-			// Bei TV-Sport und Events nutzen wir die Automatik -> Feld verstecken
-			descITField = `<input type="hidden" id="inDescIT" value="">`;
-		}
-
-		area.innerHTML += `
-			<div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-				<strong id="admin-title" style="color: var(--red);">Admin-Konsole (${currentTab.toUpperCase()})</strong>
-				
-				<div class="input-grid" style="margin-top: 10px;">
-					<input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
-					<input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
-					
-					<!-- Hier werden die Platzhalter jetzt variabel genutzt -->
-					<input type="text" id="inDescDE" placeholder="${labelDesc}">
-					<!-- Hier wird nun das variable Feld eingesetzt -->
-					${descITField}
-					<input type="text" id="inRight" placeholder="${label}">
-				</div>
-
-				<!-- BILD-UPLOAD BEREICH -->
-				<div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: white;">
-					<label style="display:block; font-weight:bold; margin-bottom:5px; font-size: 0.9rem;">Bild für ${currentTab.toUpperCase()}:</label>
-					
-					<input type="file" id="inImgFile" accept="image/*" onchange="encodeImageFileAsURL(this)" style="width:100%; font-size: 0.8rem;">
-					
-					
-					<!-- NEU: EINGABE FÜR DIE BILDHÖHE -->
-					<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-						<label style="font-size: 0.8rem; font-weight: bold;">Höhe:</label>
-						<input type="text" id="inImgHeight" placeholder="200" style="width: 70px; padding: 5px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 3px;">
-						<span style="font-size: 0.7rem; color: #666;">[px] PC</span>
-					</div>
-
-					<!-- NEU: EINGABE FÜR DIE BILDHÖHE HANDY-->
-					<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-						<label style="font-size: 0.8rem; font-weight: bold;">Höhe:</label>
-						<input type="text" id="inImgHeightHandy" placeholder="100" style="width: 70px; padding: 5px; font-size: 0.8rem; border: 1px solid #ccc; border-radius: 3px;">
-						<span style="font-size: 0.7rem; color: #666;">[px] Handy</span>
-					</div>
-
-					<div id="preview-box" style="margin-top: 10px; text-align: center; min-height: 50px;">
-						<img id="img-preview" src="" style="max-height:120px; border-radius:5px; display:none; border:2px solid var(--red);">
-						<p id="no-img-text" style="font-size: 0.8rem; color: #888; margin: 5px 0;">Kein Bild gewählt</p>
-					</div>
-
-					<input type="hidden" id="inImgBase64">
-					<div id="upload-status" style="font-size: 0.8rem; color: green; display: none; text-align: center;">✅ Bild bereit!</div>
-				</div>
-
-				<!-- KATEGORIE-WAHL -->
-				${(currentTab === 'pizzas' || currentTab === 'tv') ? `
-					<div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
-						<label style="font-weight: bold; font-size: 0.9rem;">${currentTab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}</label>
-						${currentTab === 'pizzas' ? `
-							<select id="inCat" style="width:100%; padding:8px; margin-top:5px;">
-								<option value="pizza">Standard Pizza</option>
-								<option value="bianche">Pizza Bianche</option>
-								<option value="kinder">Kinderpizza</option>
-								<option value="extras">Extras</option>
-							</select>
-						` : `
-							<input type="text" id="inCatTv" placeholder="z.B. Champions League" style="width:100%; padding:8px; margin-top:5px;">
-						`}
-					</div>
-				` : ''}
-				
-				<div style="margin-top: 20px; display: flex; gap: 10px;">
-					<button onclick="addItem()" style="flex: 1; background: #2e7d32; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Eintrag speichern</button>
-					<button onclick="location.reload()" style="flex: 1; background: #757575; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer;">Abbrechen</button>
-				</div>
-			</div>
-		`;
-	
+		// Aufruf der externen Admin-Fabrik (siehe unten)
+		area.innerHTML += getAdminConsoleHtml(currentTab, label, labelDesc, descITField);
 	}
-//User 'start'
-    // 1. STARTSEITE (Sonderlayout)
-	//=====================================
-    if (currentTab === 'start') {
-        const s = data.start || { 
-            img: 'lokal.webp', 
-            textDE: 'Willkommen bei Pizzeria Pub St. Sisinius', 
-            textIT: 'Benvenuti alla Pizzeria Pub St. Sisinius' 
-        };
-        
+
+	// =========================================================
+	// 1. STARTSEITE (Sonderlayout GAST & ADMIN)
+	// =========================================================
+	if (currentTab === 'start') {
 		area.className = 'list-mode';
 		
-		area.innerHTML += `
-			<div class="hero" style="
-				height: 500px; 
-				position: relative; 
-				width: 100vw; 
-				left: 50%; 
-				right: 50%; 
-				margin-left: -50vw; 
-				margin-right: -50vw; 
-				overflow: hidden; 
-				display: flex; 
-				align-items: center; 
-				justify-content: center; 
-				color: white;">
-				
-				<!-- 1. Haupt-Hintergrundbild -->
-				<img src="lokal.webp" style="
-					position: absolute; 
-					top: 0;
-					left: 0;
-					width: 100%; 
-					height: 100%; 
-					object-fit: fill;
-					<!--object-fit: cover; -->
-					z-index: 1;">
-					
-				<!-- 2. Dunkler Schleier -->
-				<div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5; pointer-events: none;"></div>
+		// Aufruf der externen Startseiten-Fabrik (siehe unten)
+		// Diese enthält Hero, About, Kontakt, Orthofoto, Social-Buttons & Admin-Popup-Box
+		area.innerHTML += getStartPageFullLayout(data, lang, editMode);
 
-				 <!-- 3. Mini-Container für Luftbild + Punkt (Bündig unten rechts) -->
-				<!--<a href="https://www.google.com/maps/search/?api=1&destination=46.6171,10.6948" -->
-				<!--<a href="https://www.google.com/maps/place/46%C2%B037'01.6%22N+10%C2%B041'41.3%22E(Pizzeria+St.+Sisinius)/@46.6171,10.6948,18z?entry=ttu"-->
-				
-
-				<!-- 4. Text-Inhalt -->
-				<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
-					<h2 style="font-size: 2.5rem; margin-bottom: 10px; text-transform: none;">
-						${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
-					</h2>
-					<p style="font-size: 1.5rem; font-weight: 500;">
-						${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}
-					</p>
-				</div>
-			</div>
-			<!--<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
-							   target="_blank" -->
-		<div class="container">
-			<div class="about-section">
-				<img src="pizza.webp" alt="Pizza" class="about-image">
-				<div class="about-text">
-					${lang === 'DE' ? 
-						'<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
-						'<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und sorgen mit verschiedenen Events und Specials für beste Stimmung und Abwechslung in der Pizzeria Pub St. Sisinius.</p>' +
-						'<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
-						: 
-						'<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparate con ingredienti freschi e molta cura per i dettagli.</p>' +
-						'<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
-						'<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
-					}
-				</div>
-			</div> <!-- Ende about-section -->
-
-			<!-- Dieser Container sorgt dafür, dass Kontakt und Öffnungszeiten nebeneinander stehen -->
-			<div class="info-section-compact" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
-				
-					
-					
-					
-					<!-- KONTAKT KARTE -->
-				<div class="contact-card-large" style="position: relative; overflow: hidden; min-height: 180px;">
-				
-					<!-- Kopfzeile: Icon, Titel und das Bild rechts daneben -->
-					<div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 15px;">
-							
-						<div style="flex: 1;">
-							<div class="contact-icon">📞</div>
-							<h3 style="color:var(--red); margin: 5px 0;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-							
-							<a href="tel:+393898334004" class="phone-number" style="display: block; font-weight: bold; text-decoration: none; font-size: 1.2rem;">
-								+39 389 833 4004
-							</a>
-							<p style="font-size: 0.85rem; margin-top: 8px; line-height: 1.3; max-width: 180px; font-weight: bold;">
-								${lang === 'DE' ? 'Reservierung und Pizza zum Abholen' : 'Prenotazioni e pizza da asporto'}
-							</p>
-						</div>
-
-					
-						<!-- Rechte Spalte: Alles exakt rechtsbündig untereinander -->
-						<div style="display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; width: 110px;">
-
-
-
-					
-							<!-- 1. GOOGLE MAPS WIDGET (Dein bisheriges Design) -->
-							<!-- Das Orthofoto: Jetzt oben rechts neben dem Text -->
-							<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
-								target="_blank" 
-							   style="text-decoration: none; display: block; cursor: pointer; margin-bottom: 0px; width: 110px;">
-								
-								<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
-									<div style="position: relative; width: 110px; height: 90px;">
-										<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-										<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
-									</div>
-									<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
-										${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
-									</div>
-								</div>
-							</a>
-							<!-- 3. QUELLENNACHWEIS (Dezent & Rechtsbündig für Südtirol) -->
-							<p style="font-size: 8px; color: #999; margin: 0 0 15px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
-								© Prov. BZ - CC BY 4.0<br>
-								<span style="font-size: 7px;">Geoportal Südtirol</span>
-							</p>
-							 <!-- 1. INSTAGRAM BUTTON -->
-							<a href="https://www.instagram.com/stsisinius
-"
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-								<span style="font-size: 12px; margin-right: 5px;">📸</span> 
-								INSTAGRAM
-							</a>
-							
-							
-							<!-- 2. FACEBOOK BUTTON (Rechtsbündig ausgerichtet) -->
-							<a href="https://www.facebook.com/61585930843655/"
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-right: 0; margin-left: auto;">
-								<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
-								FACEBOOK
-							</a>
-							<!-- 3. WHATSAPP GRUPPEN BUTTON -->
-							<!--<a href="https://chat.whatsapp.com" 
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #25D366; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-top: 8px; margin-left: auto;">
-								<span style="font-size: 14px; margin-right: 5px;">✆</span> 
-								WHATSAPP
-							</a>-->
-						</div>
-					</div>
-				</div>
-
-
-				<!-- ÖFFNUNGSZEITEN KARTE -->
-				<div class="hours-card-large" style="flex: 1; min-width: 300px;">
-					<div class="hours-icon">🕐</div>
-					<h3 style="color:var(--red)">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}</h3>
-					<div class="hours-list">
-						${(data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
-							data.start.zeiten.map((z, idx) => `
-								<div class="hours-item" style="display: flex; flex-direction: column; margin-bottom: 15px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: ${editMode ? '10px' : '0'};">
-									<!-- Anzeige der Zeit -->
-									<div style="display: flex; justify-content: space-between; width: 100%;">
-										<span class="tag-spalte" style="font-weight: bold;">
-											${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
-										</span> 
-										<span class="zeit-spalte">${z.zeit ? z.zeit.trim() : ''}</span>
-									</div>
-
-									<!-- Admin Controls: Nur im EditMode sichtbar -->
-									${editMode ? `
-									<div class="admin-row-controls" style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
-										<button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️ Edit</button>
-										<button onclick="moveTimeRow(${idx}, -1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
-										<button onclick="moveTimeRow(${idx}, 1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === data.start.zeiten.length - 1 ? 'disabled' : ''}>↓</button>
-										<button onclick="deleteTimeRow(${idx})" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">🗑️</button>
-									</div>
-									` : ''}
-								</div>
-							`).join('') 
-							: `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`
-						}
-					</div>
-				</div>
-			</div> <!-- Ende info-section-compact -->
-		</div> <!-- Ende container -->
-		<!--</div>-->
+		// Ruft das Popup auf und übergibt die Daten
+		renderNoticePopup(data, lang, area);
 		
-		${editMode ? `
-			<div style="text-align:center; margin:20px;">
-				<button class="btn-ctrl" onclick="addTimeRow()" style="background-color: var(--red); color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-					+ Neue Öffnungszeit hinzufügen
-				</button>
-			</div> 
-			
-			
-		
-			<div class="admin-box" style="margin: 30px auto; padding: 20px; border: 3px solid var(--red); border-radius: 12px; background: #fff; max-width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-				<h3 style="color:var(--red); margin-top: 0;">📢 Admin: Info-Popup & Events</h3>
-				
-				<!-- Status -->
-				<label style="display:block; margin-bottom:15px; font-weight:bold; cursor:pointer; background: #f9f9f9; padding: 10px; border-radius: 6px;">
-					<input type="checkbox" id="edit-notice-active" ${data.notice && data.notice.active ? 'checked' : ''}> 
-					Popup auf Startseite AKTIVIEREN
-				</label>
-
-                 <!-- HIER DIE NEUEN TITEL-FELDER EINFÜGEN -->
-				<p><strong>Überschrift (DE):</strong></p>
-				<input type="text" id="edit-notice-title-de" 
-					   value="${(data.notice && data.notice.titleDE) ? data.notice.titleDE : 'Wichtige Info'}" 
-					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
-
-				<p><strong>Titolo (IT):</strong></p>
-				<input type="text" id="edit-notice-title-it" 
-					   value="${(data.notice && data.notice.titleIT) ? data.notice.titleIT : 'Info importante'}" 
-					   style="width:100%; padding: 8px; margin-bottom:15px; border: 1px solid #ccc; border-radius: 4px;">
-
-			    <!-- Bild-Upload für das POPUP -->
-				<div style="margin-bottom: 15px;">
-					<p style="margin-bottom: 5px;"><strong>Event-Bild / Foto (JPG/PNG):</strong></p>
-					
-					<input type="file" id="file-input-notice" accept="image/*" onchange="encodeNoticeImage(this)" style="width: 100%;">
-					
-					<!-- Hidden Input für Base64 -->
-					<input type="hidden" id="inImgBase64Notice" value="${(data.notice && data.notice.img) ? data.notice.img : ''}">
-					
-					<div style="margin-top: 10px; text-align: center; background: #eee; border-radius: 8px; padding: 10px; position: relative;">
-						
-						<!-- Lösch-Button (wird nur angezeigt, wenn ein Bild da ist) -->
-						<button onclick="removeNoticeImage()" id="btn-remove-notice" 
-								style="display: ${(data.notice && data.notice.img) ? 'block' : 'none'}; 
-								position: absolute; top: 5px; right: 5px; background: #dc3545; color: white; 
-								border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;">
-							Bild löschen 🗑️
-						</button>
-
-						<img id="img-preview-notice" src="${(data.notice && data.notice.img) ? data.notice.img : ''}" 
-							 style="max-width: 100%; max-height: 150px; display: ${(data.notice && data.notice.img) ? 'inline-block' : 'none'}; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-						
-						<p id="no-img-text-notice" style="display: ${(data.notice && data.notice.img) ? 'none' : 'block'}; color: #999; font-size: 0.9rem;">
-							Kein Bild ausgewählt
-						</p>
-					</div>
-				</div>
-
-							
-				
-
-				<!-- Nachrichtentext (vorhanden) -->
-				<p><strong>Nachricht (Deutsch) (% zeichnet eine Linie):</strong></p>
-				<textarea id="edit-notice-de" style="width:100%; height:70px; margin-bottom:10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">${(data.notice && data.notice.textDE) ? data.notice.textDE : ''}</textarea>
-				
-				<p><strong>Messaggio (Italiano) (% disegna linea):</strong></p>
-				<textarea id="edit-notice-it" style="width:100%; height:70px; margin-bottom:20px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">${(data.notice && data.notice.textIT) ? data.notice.textIT : ''}</textarea>
-				
-				<!-- Speichern Button -->
-				<button onclick="saveNoticeSettings()" style="width:100%; background:#28a745; color:white; padding:15px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:1.1rem; transition: background 0.3s;">
-					Änderungen in Datenbank speichern
-				</button>
-			</div>
-	
-		`: ''}
-		`;		
-		// Ruft die Funktion auf und übergibt die benötigten Daten
-        renderNoticePopup(data, lang, area);
-        
-		return;  //bricht render() ab
-		
-    }
+		return; // Bricht render() hier sauber ab
+	}
 	
 	//---------------------------------------------------------------
 	
@@ -1512,36 +530,23 @@ function render() {
     }
 
     // 2.2 LISTEN RENDERING
-    area.className = (currentTab === 'pizzas') ? 'grid-mode' : 'list-mode';
-    // area.innerHTML = ''; // Falls du oben am Anfang der Funktion schon leerst, bleibt das auskommentiert
-//User 'pizzas'
     // --- FALL 1: PIZZAS ---
     if (currentTab === 'pizzas') {
-        area.innerHTML += `
-            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">
-                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">
-                    ${lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza'}
-                </h1>
-            </div>
-        `;
+        // Aufruf der kleinen Hilfsfunktion (Notepad++ bleibt bunt!)
+        area.innerHTML += getSectionTitleHtml(lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza');
         
         const kats = [
             { id: 'pizza', de: 'Pizza', it: 'Pizza' },
             { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' },
             { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' },
-			{ id: 'extras', de: 'Extras', it: 'Extra' } // <--- Das hier hinzufügen!
+            { id: 'extras', de: 'Extras', it: 'Extra' }
         ];
 
         kats.forEach(kat => {
-            // Erst filtern...
             const filtered = data.pizzas.filter(p => (p.cat || 'pizza') === kat.id);
-            
-            // ...dann prüfen und anzeigen
             if (filtered.length > 0) {
-                area.innerHTML += `
-                    <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">
-                        <h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">${lang === 'DE' ? kat.de : kat.it}</h2>
-                    </div>`;
+                // Auch hier: HTML-String durch Funktion ersetzen
+                area.innerHTML += getCategoryHeaderHtml(lang === 'DE' ? kat.de : kat.it);
                 
                 filtered.forEach(item => {
                     const realIdx = data.pizzas.findIndex(p => p === item);
@@ -1549,137 +554,34 @@ function render() {
                 });
             }
         });
-		renderNoticePopup(data, lang, area);
+        renderNoticePopup(data, lang, area);
     } 
-//User 'TV & EVENTS' 
     // --- FALL 2: TV & EVENTS ---
     else {
-        // ÜBERSCHRIFT NUR EINMAL (vor der Schleife)
-        const title = currentTab === 'tv' ? (lang === 'DE' ? 'TV-Sport' : 'TV-Sport') : (lang === 'DE' ? 'Events' : 'Eventi');
-		area.innerHTML += `
-            <div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0;">
-                <h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">${title}</h1>
-            </div>
-            <div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>
-        `;
+        const title = currentTab === 'tv' ? 'TV-Sport' : (lang === 'DE' ? 'Events' : 'Eventi');
+        
+        // Titelbalken für TV/Events
+        area.innerHTML += getSectionTitleHtml(title);
+        area.innerHTML += '<div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>';
+
+        data[currentTab].forEach((item, idx) => {
+            const hPc = item.imgHeight;
+            const hHandy = item.imgHeightHandy;
+            const isMobile = window.innerWidth <= 768;
+            const currentHeight = (isMobile && hHandy) ? hHandy : (hPc || '200');
+
+            if (currentTab === 'tv') {
+                area.innerHTML += getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml);
+            } else {
+                area.innerHTML += renderPizzaOrEvent(item, idx, false);
+            }
+        });
+
+        renderNoticePopup(data, lang, area);
+    }
+} // Ende render()
 
 
-
-		data[currentTab].forEach((item, idx) => {
-			//console.log("Preis von Item " + idx + ":", item.price); // <--- Das hier einfügen
-			const hPc=item.imgHeight;
-			const hHandy=item.imgHeightHandy;
-			const currentHeight = isMobile && hHandy 
-				? hHandy 
-				: (hPc || '200');
-//tv anzeigen
-			if (currentTab === 'tv') {
-				// 1. Wir holen den Text direkt aus descDE (wo dein Datum steht)
-				const textDE = item.descDE || '';
-				
-				
-				// 2. Wir rufen die Funktion auf, die bei den Events schon funktioniert
-				// Wir machen das AUSSERHALB des Strings, um Fehler zu vermeiden
-				const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
-
-				area.innerHTML += `
-					<div class="event-card">
-						<!--<div>${item.img}</div>-->
-					  
-						
-						<div class="event-date">-->
-							<!-- HIER ENTSCHEIDET DER BROWSER: DE -> Original, IT -> Übersetzung -->
-							${lang === 'DE' ? textDE : textIT}
-						 </div> 					
-						<hr class="event-line">
-											
-						 ${item.img ? `
-							<img src="${item.img}" 
-								 class="item-img" 
-								 style="height: ${currentHeight}px !important; object-fit: fill;" 
-								 alt="Bild">
-						` : ''}		
-						
-						
-						
-						<!--
-                        ${item.img ? `<img src="${item.img}" class="item-img" style="height: ${item.imgHeight ? item.imgHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}-->
-						<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;"  alt="Bild">` : ''}-->
-						
-						
-						
-						
-						
-						<div class="event-grid">
-							<!--<div class="event-time">${item.right || ''}</div>-->
-							<div class="event-time">${item.right}</div>
-							<div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
-							<div class="event-league">${item.cat || 'LIVE'}</div>
-						</div>
-						${getAdminButtonsHtml(idx)}
-					</div>`;
-			} else {
-				// Events nutzen renderPizzaOrEvent, wo es ja schon klappt
-				area.innerHTML += renderPizzaOrEvent(item, idx, false);
-			}
-	});  //wo ist öffnende Klammer?
-				
-		// Ruft die Funktion auf und übergibt die benötigten Daten
-		renderNoticePopup(data, lang, area);
-		
-	} // <--- Ende des else-Blocks (für {start} else {TV/Events})
-	
-} // <--- Ende der render() Funktion
-
-
-// Hilfsfunktion, um doppelten Code zu vermeiden
-// Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
-function renderPizzaOrEvent(item, idx, isPizza) {    
-    const isMobile = window.innerWidth <= 768;
-	const hPc=item.imgHeight;
-	const hHandy=item.imgHeightHandy;
-	const currentHeight = isMobile && hHandy 
-		? hHandy 
-		: (hPc || '200');
-	
-	
-	let displayRight = item.right || '';
-    if (!isPizza){
-	  if (lang ==='DE'){}else{displayRight=translateDate(displayRight);}
-	}
-	
-    // (Deine Logik...)
-   
-	const imgHTML = item.img ? `<img src="${item.img}" class="item-img" alt="Bild">` : '';
-   
-    // KEIN Semikolon direkt nach return!    
-	return `
-	
-	
-	<div class="entry">
-		${item.img ? `<img src="${item.img}" class="item-img" style="height: ${currentHeight ? currentHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}											
-		<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;" alt="Bild">` : ''}-->
-		
-		<div class="entry-content">
-			<div class="entry-header">
-				<span style="font-weight: bold; font-size: 1.1rem;">
-					${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}
-				</span>
-				
-				<span class="price" style="color: var(--red); font-weight: bold; white-space: nowrap;">
-					${displayRight}${isPizza ? ' €' : ''}
-				</span>
-			</div>
-
-			<div class="desc" style="font-size: 0.9rem; color: #555; font-style: italic; margin: 10px 0; flex-grow: 1;">
-				${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}
-			</div>
-
-			${typeof getAdminButtonsHtml === 'function' ? getAdminButtonsHtml(idx) : ''}
-		</div>
-	</div>
-    `; // Hier am Ende ist das Semikolon richtig.
-}
 
 
 function translateDate(str) {
@@ -1704,20 +606,7 @@ function translateDate(str) {
     return res;
 }
 
-// HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
-function getAdminButtonsHtml(idx) {
-    if (!editMode) return '';
-    return `
-        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">           
-			 <!-- Pfeile NUR im Pizza-Tab anzeigen -->
-            ${currentTab === 'pizzas' ? `
-			  <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
-              <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
-            ` : ''}			
-			<button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
-            <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
-        </div>`;
-}
+
 
 // 1. Neue Zeile hinzufügen
 /*async function addTimeRow() {
@@ -2276,48 +1165,75 @@ async function saveNoticeSettings() {
     if (popup) popup.remove();
 }*/
 
-window.closeNoticePopup = function() {
+/*window.closeNoticePopup = function() {
     const popup = document.getElementById('notice-popup');
     if (popup) {
         popup.remove();
         sessionStorage.setItem('noticeSeen', 'true');
     }
+};*/
+
+
+window.closeNoticePopup = function() {
+    const popup = document.getElementById('notice-popup');
+    const scrollContent = document.getElementById('popup-scroll-content');
+
+    if (popup) {
+        // 1. SCHRITT: Nach UNTEN scrollen (z.B. 300 Pixel weiter)
+        if (scrollContent) {
+            scrollContent.scrollBy({
+                top: 300, // Positiver Wert = scrollt nach unten
+                behavior: 'smooth'
+            });
+        }
+
+        // 2. SCHRITT: Warten (0,5 Sek), damit man die Abwärtsbewegung sieht
+        setTimeout(() => {
+            // 3. SCHRITT: Ausfaden
+            popup.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            popup.style.opacity = '0';
+            popup.style.transform = 'translateY(20px)'; // Karte sinkt leicht ab
+
+            // 4. SCHRITT: Endgültig löschen
+            setTimeout(() => {
+                popup.remove();
+                sessionStorage.setItem('noticeSeen', 'true');
+            }, 400);
+            
+        }, 500); 
+    }
 };
-
-
 function showPopup() {
-    if (data.notice && data.notice.active) {
-		if (!sessionStorage.getItem('noticeSeen')) {
-			area.innerHTML += `
-			<div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px;">
-				<div style="background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
-					
-					<!-- BILD-BEREICH: max-height auf 40% des Bildschirms begrenzt, damit Button sichtbar bleibt -->
-					${data.notice.img ? `
-						<div style="width: 100%; max-height: 40vh; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid #eee; flex-shrink: 0;">
-							<img src="${data.notice.img}" 
-								 style="max-width: 100%; max-height: 40vh; object-fit: contain; display: block;" 
-								 alt="Event">
-						</div>
-					` : '<div style="font-size: 50px; margin: 20px 0; text-align: center; flex-shrink: 0;">📢</div>'}
+    // 1. Prüfen, ob eine Nachricht aktiv ist und noch nicht gesehen wurde
+    if (data.notice && data.notice.active && !sessionStorage.getItem('noticeSeen')) {
+        
+        // 2. Werte für die neue "Fabrik" vorbereiten
+        const title = lang === 'DE' ? (data.notice.titleDE || 'Wichtige Info') : (data.notice.titleIT || 'Info importante');
+        const scrollHint = lang === 'DE' ? 'Mehr lesen' : 'Leggi di più';
+        
+        // Bild-HTML (PC/Handy sicher)
+        const imageHtml = data.notice.img 
+            ? `<img src="${data.notice.img}" style="max-width:100%; max-height:40vh; object-fit:contain; display:block; margin:0 auto 15px; border-radius:8px;">` 
+            : '📢';
+            
+        // Text formatieren (Linie % einfügen)
+        let rawText = (lang === 'DE' ? data.notice.textDE : data.notice.textIT) || "";
+        const formattedText = rawText
+            .replace(/\n/g, '<br>') 
+            .replace(/%25|%/g, '<div style="display:block; width:80%; height:2px; background-color:var(--red); margin:15px auto; border-radius:2px;"></div>');
 
-					<!-- TEXT-BEREICH: Scrollt, falls der Text zu lang für das Handy ist -->
-					<div style="padding:25px; overflow-y: auto; flex-grow: 1;">
-						<h2 style="color:var(--red); margin-top:0;">
-							${lang === 'DE' 
-								? (data.notice.titleDE || 'Wichtige Info') 
-								: (data.notice.titleIT || 'Info importante')}
-						</h2>
-						<p style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.4;">
-							${lang === 'DE' ? data.notice.textDE : data.notice.textIT}
-						</p>
-						<button onclick="closeNoticePopup()" style="margin-top:20px; background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width: 100%;">OK</button>
-					</div>
-				</div>
-			</div>`;
-		}
-	}
+        // 3. NUR NOCH DIE NEUE FUNKTION AUFRUFEN
+        // Das sorgt dafür, dass alle IDs (popup-scroll-content) vorhanden sind!
+        area.innerHTML += getPopupTemplate(title, scrollHint, imageHtml, formattedText);
+        
+        // Optional: Automatischer kleiner Scroll-Check nach 2 Sek
+        setTimeout(() => {
+            const sc = document.getElementById('popup-scroll-content');
+            if(sc) sc.scrollBy({top: 50, behavior: 'smooth'});
+        }, 2000);
+    }
 }
+
 function removeNoticeImage() {
     // 1. Hidden Input leeren
     document.getElementById('inImgBase64Notice').value = "";
@@ -2332,6 +1248,329 @@ function removeNoticeImage() {
     
     // 4. Lösch-Button verstecken
     document.getElementById('btn-remove-notice').style.display = "none";
+}
+
+
+// Hilfsfunktion, um doppelten Code zu vermeiden
+// Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
+function renderPizzaOrEvent(item, idx, isPizza) {    
+    const isMobile = window.innerWidth <= 768;
+	const hPc=item.imgHeight;
+	const hHandy=item.imgHeightHandy;
+	const currentHeight = isMobile && hHandy 
+		? hHandy 
+		: (hPc || '200');
+	
+	
+	let displayRight = item.right || '';
+    if (!isPizza){
+	  if (lang ==='DE'){}else{displayRight=translateDate(displayRight);}
+	}
+	
+    // (Deine Logik...)
+   
+	const imgHTML = item.img ? '<img src="${item.img}" class="item-img" alt="Bild">' : '';
+   
+    // KEIN Semikolon direkt nach return!    
+	return `
+	
+	
+	<div class="entry">
+		${item.img ? `<img src="${item.img}" class="item-img" style="height: ${currentHeight ? currentHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}											
+		<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;" alt="Bild">` : ''}-->
+		
+		<div class="entry-content">
+			<div class="entry-header">
+				<span style="font-weight: bold; font-size: 1.1rem;">
+					${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}
+				</span>
+				
+				<span class="price" style="color: var(--red); font-weight: bold; white-space: nowrap;">
+					${displayRight}${isPizza ? ' €' : ''}
+				</span>
+			</div>
+
+			<div class="desc" style="font-size: 0.9rem; color: #555; font-style: italic; margin: 10px 0; flex-grow: 1;">
+				${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}
+			</div>
+
+			${typeof getAdminButtonsHtml === 'function' ? getAdminButtonsHtml(idx) : ''}
+		</div>
+	</div>
+    `; // Hier am Ende ist das Semikolon richtig.
+}
+
+
+// HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
+function getAdminButtonsHtml(idx) {
+    if (!editMode) return '';
+    return `
+        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">           
+			 <!-- Pfeile NUR im Pizza-Tab anzeigen -->
+            ${currentTab === 'pizzas' ? `
+			  <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+              <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+            ` : ''}			
+			<button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
+            <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
+        </div>`;
+}
+
+
+
+// GANZ UNTEN IN DER DATEI
+function getPopupTemplate(title, scrollHint, imageHtml, formattedText) {
+    const q = "'"; 
+    return `
+        ${popupStyles} 
+        <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; animation: fadeIn 0.3s ease-out;">
+            
+            <!-- WICHTIG: Dieses DIV braucht position: relative, damit der Button sich daran orientiert -->
+            <div style="position: relative; background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
+                
+                <!-- 1. Der Button (Absolut innerhalb der Karte positioniert) -->
+                <div id="popup-scroll-hint" 
+                     class="scroll-hint" 
+                     onclick="this.style.opacity=${q}0${q}; this.style.pointerEvents=${q}none${q}; document.getElementById(${q}popup-scroll-content${q}).scrollBy({top: 150, behavior: ${q}smooth${q}});"
+                     style="transition: opacity 0.3s ease; z-index: 100;">
+                    ${scrollHint} <span style="font-size: 16px;">↓</span>
+                </div>
+
+                <!-- 2. Header (Titel) -->
+                <div style="padding:20px 20px 10px 20px; flex-shrink:0; background: white; z-index: 10;">
+                    <h2 style="color:var(--red); margin:0;">${title}</h2>
+                </div>
+
+                <!-- 3. Scroll-Bereich (Bild & Text) -->
+                <div id="popup-scroll-content" 
+                     onscroll="if(this.scrollTop > 50) document.getElementById(${q}popup-scroll-hint${q}).style.opacity=${q}0${q};" 
+                     style="overflow-y:auto; flex-grow:1; padding:0 25px; scroll-behavior: smooth;">
+                    
+                    ${imageHtml}       
+					<div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.5; text-align:center; padding-bottom:40px;">
+						${formattedText}
+					</div>
+                </div>
+
+                <!-- 4. Footer (OK Button) -->
+                <div style="padding:15px 20px 25px 20px; flex-shrink:0; border-top:1px solid #eee; background: white; z-index: 10;">
+                    <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%;">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>`;
+}
+
+// --- ADMIN KONSOLE FABRIK ---
+// GANZ UNTEN IN DER DATEI - Die komplette Admin-Fabrik
+function getAdminConsoleHtml(tab, label, labelDesc, descITField) {
+    const q = "'"; 
+    return `
+    <div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+        <strong style="color: var(--red);">Admin-Konsole (${tab.toUpperCase()})</strong>
+        
+        <div class="input-grid" style="margin-top: 10px;">
+            <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+            <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+            <input type="text" id="inDescDE" placeholder="${labelDesc}">
+            ${descITField}
+            <input type="text" id="inRight" placeholder="${label}">
+        </div>
+
+        <!-- BILD & HÖHEN BEREICH -->
+        <div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: white;">
+            <label style="font-weight:bold; font-size: 0.9rem;">Bild & Anzeigehöhen:</label>
+            <input type="file" id="inImgFile" onchange="encodeImageFileAsURL(this)" style="width:100%; margin-bottom:10px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span>PC:</span> <input type="text" id="inImgHeight" placeholder="200" style="width:60px;">
+                <span>Handy:</span> <input type="text" id="inImgHeightHandy" placeholder="100" style="width:60px;">
+            </div>
+            <input type="hidden" id="inImgBase64">
+        </div>
+
+        <!-- KATEGORIE-WAHL (WICHTIG: Hier fehlte inCatTv) -->
+        ${(tab === 'pizzas' || tab === 'tv') ? `
+            <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
+                <label style="font-weight: bold; font-size: 0.9rem;">
+                    ${tab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}
+                </label>
+                ${tab === 'pizzas' ? `
+                    <select id="inCat" style="width:100%; padding:8px; margin-top:5px;">
+                        <option value="pizza">Standard Pizza</option>
+                        <option value="bianche">Pizza Bianche</option>
+                        <option value="kinder">Kinderpizza</option>
+                        <option value="extras">Extras</option>
+                    </select>
+                ` : `
+                    <!-- DAS FEHLENDE FELD -->
+                    <input type="text" id="inCatTv" placeholder="z.B. Champions League oder Serie A" style="width:100%; padding:8px; margin-top:5px;">
+                `}
+            </div>
+        ` : ''}
+
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="addItem()" style="flex:1; background:#2e7d32; color:white; padding:12px; border-radius:4px; font-weight:bold; cursor:pointer;">Eintrag speichern</button>
+            <button onclick="location.reload()" style="flex:1; background:#757575; color:white; padding:12px; border-radius:4px; cursor:pointer;">Abbrechen</button>
+        </div>
+    </div>`;
+}
+
+// --- STARTSEITE VOLL-LAYOUT FABRIK ---
+function getStartPageFullLayout(data, lang, editMode) {
+    const q = "'"; 
+
+    // 1. Zuerst die Zeiten-Schleife generieren (MUSS vor dem return stehen!)
+    const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
+        data.start.zeiten.map((z, idx) => `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: 5px;">
+                <span style="font-weight: bold;">
+                    ${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
+                </span> 
+                <span>${z.zeit || ''}</span>
+            </div>
+        `).join('') : `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`;
+
+    // 2. Admin Box vorbereiten
+    const adminBox = editMode ? (typeof getAdminPopupBoxHtml === 'function' ? getAdminPopupBoxHtml(data) : '') : '';
+
+    // 3. Das gesamte HTML in EINEM großen Block zurückgeben
+    return `
+    <div class="hero" style="height: 500px; position: relative; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white;">
+        <img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: fill; z-index: 1;">
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+        <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 10px;">
+                ${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti alla Pizzeria Pub St. Sisinius'}
+            </h2>
+            <p style="font-size: 1.5rem; font-weight: 500;">
+                ${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="about-section" style="padding: 40px 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+            <img src="pizza.webp" alt="Pizza" class="about-image" style="max-width: 400px; width: 100%; border-radius: 12px;">
+            <div class="about-text" style="flex: 1; min-width: 300px; font-size: 1.1rem; line-height: 1.6;">
+                ${lang === 'DE' ? 
+					'<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>' +
+					'<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig. Wir übertragen die wichtigsten Sportereignisse und sorgen mit verschiedenen Events und Specials für beste Stimmung und Abwechslung in der Pizzeria Pub St. Sisinius.</p>' +
+					'<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>' 
+					: 
+					'<p>Benvenuti alla Pizzeria Pub St. Sisinius a Lasa! Serviamo pizze cotte nel tradizionale forno a legna, preparate con ingredienti freschi e molta cura per i dettagli.</p>' +
+					'<p>Godetevi le nostre deliziose pizze in un\'atmosfera accogliente mentre seguite i più importanti eventi sportivi sui nostri schermi.</p>' +
+					'<p><strong>Non vediamo l\'ora di darvi il benvenuto!</strong></p>'
+                }
+            </div>
+        </div>
+
+        <div class="info-section-compact" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding: 20px;">
+            <!-- KONTAKT & SOCIAL MEDIA -->
+            <div class="contact-card-large" style="position: relative; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex: 1; min-width: 300px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="flex: 1;">
+                        <h3 style="color:var(--red); margin-top: 0;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+                        <a href="tel:+393898334004" style="font-weight: bold; text-decoration: none; font-size: 1.2rem; color: black;">+39 389 833 4004</a>
+                        <p style="font-size: 0.85rem; font-weight: bold; margin-top: 10px;">${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}</p>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 8px;">
+                         <!-- GOOGLE MAPS (Öffnet direkt deinen Standort) -->
+							 <!-- 1. GOOGLE MAPS WIDGET MIT ORTHOFOTO -->
+					<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
+					   target="_blank" 
+					   style="text-decoration: none; display: block; cursor: pointer; margin-bottom: 0px; width: 110px;">
+						
+						<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
+							<div style="position: relative; width: 110px; height: 90px;">
+								<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+								<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
+							</div>
+							<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
+								${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
+							</div>
+						</div>
+					</a>
+
+					<!-- 2. QUELLENNACHWEIS SÜDTIROL -->
+					<p style="font-size: 8px; color: #999; margin: 0 0 15px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
+						© Prov. BZ - CC BY 4.0<br>
+						<span style="font-size: 7px;">Geoportal Südtirol</span>
+					</p>
+
+					<!-- 3. INSTAGRAM BUTTON -->
+					<a href="https://www.instagram.com/stsisinius"
+					   target="_blank" 
+					   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-bottom: 8px;">
+						<span style="font-size: 12px; margin-right: 5px;">📸</span> 
+						INSTAGRAM
+					</a>
+
+					<!-- 4. FACEBOOK BUTTON -->
+					<a href="https://www.facebook.com/61585930843655/"
+					   target="_blank" 
+					   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 100px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); margin-left: auto;">
+						<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
+						FACEBOOK
+					</a>
+					</div>
+                </div>
+            </div>
+
+            <!-- ÖFFNUNGSZEITEN -->
+            <div class="hours-card-large" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex: 1; min-width: 300px;">
+                <h3 style="color:var(--red); margin-top: 0;">${lang === 'DE' ? 'Öffnungszeiten' : 'Orari'}</h3>
+                <div class="hours-list">
+                    ${zeitenListe}
+                </div>
+            </div>
+        </div>
+
+        ${adminBox}
+    </div>`;
+}
+
+function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
+    // Falls translateDate existiert, nutzen wir es, sonst Fallback
+    const textDE = item.descDE || '';
+    const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
+    
+    return `
+        <div class="event-card">
+            <div class="event-date">
+                ${lang === 'DE' ? textDE : textIT}
+            </div> 					
+            <hr class="event-line">
+            ${item.img ? `
+                <img src="${item.img}" 
+                     class="item-img" 
+                     style="height: ${currentHeight}px !important; object-fit: fill;" 
+                     alt="Bild">
+            ` : ''}		
+            <div class="event-grid">
+                <div class="event-time">${item.right || ''}</div>
+                <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
+                <div class="event-league">${item.cat || 'LIVE'}</div>
+            </div>
+            ${getAdminButtonsHtml(idx)}
+        </div>`;
+}
+
+
+// Hilfsfunktion für Haupt-Überschriften (Pizzakarte / TV-Sport)
+function getSectionTitleHtml(txt) {
+    // Wir nutzen hier klassische Anführungszeichen statt Backticks, das ist 100% Notepad++ sicher
+    return '<div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">' +
+           '<h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">' + txt + '</h1>' +
+           '</div>';
+}
+
+// Hilfsfunktion für Kategorie-Trenner (Pizza, Bianche etc.)
+function getCategoryHeaderHtml(txt) {
+    return '<div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">' +
+           '<h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">' + txt + '</h2>' +
+           '</div>';
 }
 
 	
