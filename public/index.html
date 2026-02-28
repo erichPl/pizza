@@ -1500,11 +1500,11 @@ function render() {
 	// Logik: Wenn Handy UND imgHeightHandy da -> nimm imgHeightHandy. 
 	// Sonst nimm imgHeight (PC) oder den Standard 200px.
 	//const currentHeight=item.imgHeight;
-	const hPc=data[currentTab].imgHeight;
-	const hHandy=data[currentTab].imgHeightHandy;
+	/*const hPc=data[currentTab].item.imgHeight;
+	const hHandy=data[currentTab].item.imgHeightHandy;
 	const currentHeight = isMobile && hHandy 
 		? hHandy 
-		: (hPc || '200');
+		: (hPc || '200');*/
 
     if (!data[currentTab]) {
         area.innerHTML = '<p>Lade Daten...</p>';
@@ -1567,6 +1567,11 @@ function render() {
 
 		data[currentTab].forEach((item, idx) => {
 			//console.log("Preis von Item " + idx + ":", item.price); // <--- Das hier einfügen
+			const hPc=item.imgHeight;
+			const hHandy=item.imgHeightHandy;
+			const currentHeight = isMobile && hHandy 
+				? hHandy 
+				: (hPc || '200');
 //tv anzeigen
 			if (currentTab === 'tv') {
 				// 1. Wir holen den Text direkt aus descDE (wo dein Datum steht)
@@ -1630,7 +1635,15 @@ function render() {
 // Hilfsfunktion, um doppelten Code zu vermeiden
 // Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
 function renderPizzaOrEvent(item, idx, isPizza) {    
-    let displayRight = item.right || '';
+    const isMobile = window.innerWidth <= 768;
+	const hPc=item.imgHeight;
+	const hHandy=item.imgHeightHandy;
+	const currentHeight = isMobile && hHandy 
+		? hHandy 
+		: (hPc || '200');
+	
+	
+	let displayRight = item.right || '';
     if (!isPizza){
 	  if (lang ==='DE'){}else{displayRight=translateDate(displayRight);}
 	}
@@ -1644,7 +1657,7 @@ function renderPizzaOrEvent(item, idx, isPizza) {
 	
 	
 	<div class="entry">
-		${item.img ? `<img src="${item.img}" class="item-img" style="height: ${item.imgHeight ? item.imgHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}											
+		${item.img ? `<img src="${item.img}" class="item-img" style="height: ${currentHeight ? currentHeight + 'px' : '200px'} !important; object-fit: fill;" alt="Bild">` : ''}											
 		<!--${item.img ? `<img src="${item.img}" class="item-img"  style="height: ${item.imgHeight || '120px'} !important; object-fit: fill;" alt="Bild">` : ''}-->
 		
 		<div class="entry-content">
@@ -1826,7 +1839,8 @@ async function saveHoursToDB(newArray) {
         right: document.getElementById('inRight').value,
         img: document.getElementById('inImgBase64').value || "",
 		//img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
-		imgHeight:document.getElementById('inImgHeight').value || "200" 
+		imgHeight:document.getElementById('inImgHeight').value || "200", 
+		imgHeightHandy:document.getElementById('inImgHeightHandy').value || "100" 
     };
 
    // WICHTIG: Hier wird die Kategorie ausgelesen
@@ -1871,7 +1885,7 @@ async function saveHoursToDB(newArray) {
             console.log("Neuer Eintrag am Ende hinzugefügt.");
         }
     }
-
+alert("Sende Wert: " + newItem.imgHeightHandy);
     // 3. SYNCHRONISATION MIT SERVER
     try {
         const res = await fetch('/api/data?pw=leon2208', {
