@@ -1471,27 +1471,34 @@ function getAdminConsoleHtml(tab, label, labelDesc, descITField) {
 function getStartPageFullLayout(data, lang, editMode) {
     const q = "'"; 
 
-    // 1. ZEITEN-SCHLEIFE GENERIEREN (Saubere vertikale Struktur)
-    const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
-        data.start.zeiten.map((z, idx) => `
-            <div style="display: block; width: 100%; margin-bottom: 12px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: 5px; box-sizing: border-box;">
-                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <span style="font-weight: bold; font-size: 1.1rem; padding-right: 10px;">
-                        ${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
-                    </span> 
-                    <span style="font-size: 1.1rem; white-space: nowrap;">${z.zeit || ''}</span>
-                </div>
-                <!-- ADMIN CONTROLS pro Zeile -->
-                ${editMode ? `
-                <div style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
-                    <button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️</button>
-                    <button onclick="moveTimeRow(${idx}, -1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
-                    <button onclick="moveTimeRow(${idx}, 1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === data.start.zeiten.length - 1 ? 'disabled' : ''}>↓</button>
-                    <button onclick="deleteTimeRow(${idx})" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">🗑️</button>
-                </div>
-                ` : ''}
+// 1. ZEITEN-SCHLEIFE GENERIEREN (Flexibel: Einzeilig wenn möglich, Umbruch wenn nötig)
+const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
+    data.start.zeiten.map((z, idx) => `
+        <div style="display: block; width: 100%; margin-bottom: 12px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: 5px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; flex-wrap: wrap; gap: 5px;">
+                
+                <!-- TAG (Bleibt links) -->
+                <span style="font-weight: bold; font-size: 1.1rem; flex: 1; min-width: 100px;">
+                    ${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
+                </span> 
+                
+                <!-- ZEIT (Bricht nur um, wenn der Platz rechts nicht reicht) -->
+                <span style="font-size: 1.1rem; text-align: right; min-width: fit-content; white-space: normal; word-break: keep-all; line-height: 1.2;">
+                    ${(z.zeit || '').replace('-', ' - ')}
+                </span>
             </div>
-        `).join('') : `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`;
+
+            <!-- ADMIN CONTROLS -->
+            ${editMode ? `
+            <div style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
+                <button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️</button>
+                <button onclick="moveTimeRow(${idx}, -1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                <button onclick="moveTimeRow(${idx}, 1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === data.start.zeiten.length - 1 ? 'disabled' : ''}>↓</button>
+                <button onclick="deleteTimeRow(${idx})" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">🗑️</button>
+            </div>
+            ` : ''}
+        </div>
+    `).join('') : `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`;
 
     // 2. ADMIN-KOMPONENTEN VORBEREITEN
     const adminBox = editMode ? (typeof getAdminPopupBoxHtml === 'function' ? getAdminPopupBoxHtml(data) : '') : '';
