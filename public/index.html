@@ -145,6 +145,9 @@ function renderNoticePopup(data, lang, container) {
 	
 }
 
+
+
+
 let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
 let data = { start: {}, pizzas: [], events: [], tv: [] };
 let currentTab = 'start';
@@ -1093,6 +1096,34 @@ function encodeNoticeImage(element) {
     reader.readAsDataURL(file);
 }
 
+function handleNoticeImageUpload(event) {
+    const file = event.target.files[0]; // Das ausgewählte Bild
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Image = e.target.result; // Das Bild als Text-String
+
+        // 1. Die Bild-Vorschau im Admin-Bereich sofort aktualisieren
+        const previewImg = document.getElementById('noticePreviewImg');
+        if (previewImg) {
+            previewImg.src = base64Image;
+        } else {
+            // Falls vorher "Kein Bild" stand, neuen Img-Tag erzeugen
+            document.getElementById('noticePreviewContainer').innerHTML = 
+                `<img id="noticePreviewImg" src="${base64Image}" style="max-width:100%; max-height:150px; object-fit:contain; border-radius:8px;">`;
+        }
+
+        // 2. Den Base64-String in das versteckte Input-Feld schreiben
+        // Nur was hier drin steht, wird von saveNoticeSettings() an die DB geschickt!
+        const hiddenInput = document.getElementById('inImgBase64Notice');
+        if (hiddenInput) {
+            hiddenInput.value = base64Image;
+            console.log("Bild geladen und im Hidden-Feld bereitgestellt.");
+        }
+    };
+    reader.readAsDataURL(file);
+}
 
 async function saveNoticeSettings___() {
     // 1. Elemente holen
@@ -1324,38 +1355,37 @@ function getPopupTemplate(title, scrollHint, imageHtml, formattedText) {
     const q = "'"; 
     return `
         ${popupStyles} 
-        <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; animation: fadeIn 0.3s ease-out;">
+        <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; animation: fadeIn 0.3s ease-out; opacity: 1;">
             
-            <!-- WICHTIG: Dieses DIV braucht position: relative, damit der Button sich daran orientiert -->
-            <div style="position: relative; background:white; border-radius:15px; max-width:450px; width:100%; max-height:90vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
+            <div style="position: relative; background:white; border-radius:15px; max-width:450px; width:100%; max-height:85vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
                 
-                <!-- 1. Der Button (Absolut innerhalb der Karte positioniert) -->
+                <!-- Scroll Hint Pfeil -->
+                ${scrollHint ? `
                 <div id="popup-scroll-hint" 
                      class="scroll-hint" 
-                     onclick="this.style.opacity=${q}0${q}; this.style.pointerEvents=${q}none${q}; document.getElementById(${q}popup-scroll-content${q}).scrollBy({top: 150, behavior: ${q}smooth${q}});"
+                     onclick="document.getElementById(${q}popup-scroll-content${q}).scrollBy({top: 150, behavior: ${q}smooth${q}});"
                      style="transition: opacity 0.3s ease; z-index: 100;">
                     ${scrollHint} <span style="font-size: 16px;">↓</span>
-                </div>
+                </div>` : ''}
 
-                <!-- 2. Header (Titel) -->
-                <div style="padding:20px 20px 10px 20px; flex-shrink:0; background: white; z-index: 10;">
+                <!-- Header: Titel (Fest oben) -->
+                <div style="padding:20px; flex-shrink:0; background: white; border-bottom: 1px solid #eee;">
                     <h2 style="color:var(--red); margin:0;">${title}</h2>
                 </div>
 
-                <!-- 3. Scroll-Bereich (Bild & Text) -->
+                <!-- WICHTIG: Der Scroll-Bereich mit fester Begrenzung -->
                 <div id="popup-scroll-content" 
-                     onscroll="if(this.scrollTop > 50) document.getElementById(${q}popup-scroll-hint${q}).style.opacity=${q}0${q};" 
-                     style="overflow-y:auto; flex-grow:1; padding:0 25px; scroll-behavior: smooth;">
+                     style="overflow-y:auto; flex-grow:1; padding:20px 25px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
                     
                     ${imageHtml}       
-					<div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.5; text-align:center; padding-bottom:40px;">
-						${formattedText}
-					</div>
+                    <div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.5; text-align:center; padding-bottom:20px;">
+                        ${formattedText}
+                    </div>
                 </div>
 
-                <!-- 4. Footer (OK Button) -->
-                <div style="padding:15px 20px 25px 20px; flex-shrink:0; border-top:1px solid #eee; background: white; z-index: 10;">
-                    <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px 30px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%;">
+                <!-- Footer: OK Button (Fest unten) -->
+                <div style="padding:15px 20px 20px 20px; flex-shrink:0; border-top:1px solid #eee; background: white;">
+                    <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%;">
                         OK
                     </button>
                 </div>
@@ -1567,62 +1597,73 @@ function getStartPageFullLayout(data, lang, editMode) {
                 </div>
             </div> <!-- Ende Info Wrapper -->
 			 
-           <!-- NEUER ADMIN-BEREICH: POPUP / NOTICE EINSTELLUNGEN -->
-     <!-- ADMIN-BEREICH: POPUP / NOTICE MIT DATEI-UPLOAD -->
+  <!-- ADMIN-BEREICH: POPUP / NOTICE -->
             ${editMode ? `
-            <div class="admin-notice-settings" style="margin-top: 30px; background: #fff9e6; border: 2px dashed #ffc107; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;">
-                <h3 style="margin-top: 0; color: #856404; display: flex; align-items: center; gap: 10px;">
+            <div class="admin-notice-settings" style="margin-top: 30px; background: #fff9e6; border: 2px dashed #ffc107; padding: 25px; border-radius: 15px; width: 100%; box-sizing: border-box;">
+                <h3 style="margin-top: 0; color: #856404; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     📢 Popup / Notice bearbeiten
+                    <label style="font-size: 0.9rem; cursor: pointer; background: #eee; padding: 5px 10px; border-radius: 5px; color: #333; display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="edit-notice-active" ${data.notice && data.notice.active ? 'checked' : ''}> Aktivieren
+                    </label>
                 </h3>
                 
-                <!-- BILD-VORSCHAU AUS DER DB -->
-                <div style="text-align: center; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 10px;">
-                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Aktuelle Bildvorschau:</p>
-                    <div id="noticePreviewContainer">
-                        ${data.notice && data.notice.img 
-                            ? `<img id="noticePreviewImg" src="${data.notice.img}" style="max-width:100%; max-height:200px; object-fit:contain; border-radius:8px; display:block; margin: 0 auto;">` 
-                            : '<div style="font-size: 2rem;">📢</div><p style="font-size: 0.8rem;">Kein Bild vorhanden</p>'
-                        }
-                    </div>
-                </div>
+                <!-- BILD-UPLOAD BEREICH IM ADMIN-FENSTER -->
+<div style="text-align: center; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 10px;">
+    <div id="noticePreviewContainer">
+        <!-- Vorschau-Bild -->
+        <img id="img-preview-notice" 
+             src="${data.notice && data.notice.img ? data.notice.img : ''}" 
+             style="max-width:100%; max-height:150px; object-fit:contain; border-radius:8px; display: ${data.notice && data.notice.img ? 'block' : 'none'}; margin: 0 auto;">
+        
+        <!-- Platzhalter-Text -->
+        <span id="no-img-text-notice" style="display: ${data.notice && data.notice.img ? 'none' : 'block'}; color: #666;">
+            Kein Bild vorhanden
+        </span>
+    </div>
+
+    <input type="file" id="file-input-notice" accept="image/*" onchange="handleNoticeImageUpload(event)" style="margin-top: 10px; font-size: 0.8rem; width: 100%;">
+    <input type="hidden" id="inImgBase64Notice" value="${data.notice && data.notice.img ? data.notice.img : ''}">
+
+    <!-- Der Lösch-Button -->
+    <button id="btn-remove-notice" 
+            onclick="removeNoticeImage()" 
+            style="display: ${data.notice && data.notice.img ? 'inline-block' : 'none'}; margin-top: 10px; background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">
+        🗑️ Bild entfernen
+    </button>
+</div>
 
                 <div style="display: flex; flex-direction: column; gap: 15px;">
-                    
-                    <!-- DATEI ÖFFNEN / UPLOAD -->
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="font-weight: bold; font-size: 0.9rem; color: #555;">Bilddatei auswählen:</label>
-                        <input type="file" id="noticeFileInput" accept="image/*" onchange="handleNoticeImageUpload(event)"
-                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background: white;">
-                        <!-- Verstecktes Feld für den Base64-String oder Pfad -->
-                        <input type="hidden" id="noticeImgData" value="${data.notice && data.notice.img ? data.notice.img : ''}">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="font-weight:bold; font-size:0.8rem; display: block;">Titel (DE):</label>
+                            <input type="text" id="edit-notice-title-de" style="width:100%; padding:8px; border: 1px solid #ccc; border-radius: 4px;" value="${data.notice && data.notice.titleDE ? data.notice.titleDE : ''}">
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="font-weight:bold; font-size:0.8rem; display: block;">Titolo (IT):</label>
+                            <input type="text" id="edit-notice-title-it" style="width:100%; padding:8px; border: 1px solid #ccc; border-radius: 4px;" value="${data.notice && data.notice.titleIT ? data.notice.titleIT : ''}">
+                        </div>
                     </div>
 
-                    <!-- Text Deutsch -->
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
-                        <label style="font-weight: bold; font-size: 0.9rem; color: #555;">Text Deutsch (DE):</label>
-                        <textarea id="noticeTextDE" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-height: 80px;">${data.notice && data.notice.textDE ? data.notice.textDE : ''}</textarea>
+                    <div>
+                        <label style="font-weight:bold; font-size:0.8rem; display: block;">Nachricht (DE):</label>
+                        <textarea id="edit-notice-de" style="width:100%; padding:8px; min-height:60px; border: 1px solid #ccc; border-radius: 4px;">${data.notice && data.notice.textDE ? data.notice.textDE : ''}</textarea>
+                    </div>
+                    <div>
+                        <label style="font-weight:bold; font-size:0.8rem; display: block;">Messaggio (IT):</label>
+                        <textarea id="edit-notice-it" style="width:100%; padding:8px; min-height:60px; border: 1px solid #ccc; border-radius: 4px;">${data.notice && data.notice.textIT ? data.notice.textIT : ''}</textarea>
                     </div>
 
-                    <!-- Text Italienisch -->
-                    <div style="display: flex; flex-direction: column; gap: 5px;">
-                        <label style="font-weight: bold; font-size: 0.9rem; color: #555;">Testo Italiano (IT):</label>
-                        <textarea id="noticeTextIT" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-height: 80px;">${data.notice && data.notice.textIT ? data.notice.textIT : ''}</textarea>
-                    </div>
-
-                    <div style="text-align: right; margin-top: 10px;">
-                        <button onclick="saveNoticeSettings()" 
-                                style="background: #28a745; color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                            💾 Änderungen speichern
-                        </button>
-                    </div>
+                    <button onclick="saveNoticeSettings()" style="background: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        💾 Popup erfolgreich speichern (MongoDB)
+                    </button>
                 </div>
             </div>
             ` : ''}
 
-        </div> <!-- Ende Container -->
+        </div> <!-- Ende start-container -->
     </div> <!-- Ende main-content-wrapper -->
-    `; // WICHTIG: Hier endet der Template-String
-} // WICHTIG: Hier endet die Funktion
+    `;
+}
 
 function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
     // Falls translateDate existiert, nutzen wir es, sonst Fallback
