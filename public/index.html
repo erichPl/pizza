@@ -372,12 +372,18 @@ async function save() {
     // aufrufenden Funktion (z.B. move oder addItem) nach dem await.
 }
 
+
+// Tab start, pizza,events,tv einstellen
+//----------------------------------------
 function setTab(t) { 
 	currentTab = t; 
 	document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
 	render(); 
 }
 
+
+// Sprache bei start DE IT einstellen
+//----------------------------------------
 function setLang(l) { 
 	lang = l; 
 	
@@ -439,8 +445,12 @@ function setLang(l) {
 	render(); 
 }
 
+
+
+// RENDERN
+//----------------------------------------
 function render() {    
-	// --- AUTOMATISCHE SORTIERUNG ---
+	// --- AUTOMATISCHE SORTIERUNG NACH DATUM BEI TV UND EVENTS---
 	if (currentTab === 'tv' || currentTab === 'events') {
 		data[currentTab].sort((a, b) => {
 			let dateStrA, timeStrA, dateStrB, timeStrB;
@@ -518,10 +528,10 @@ function render() {
         document.body.classList.remove('admin-mode');
     }
 
-//ADMIN
-// =========================================================
-// 2. ADMIN-KONSOLE (Logik & Anzeige)
-// =========================================================
+	//ADMIN
+	// =========================================================
+	// 2. ADMIN-KONSOLE (Logik & Anzeige)
+	// =========================================================
 	if (editMode && currentTab !== 'start') {
 		const label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
 		const labelDesc = currentTab === 'tv' ? 'Datum (z.B. Samstag 14.02.26)' : (currentTab === 'events' ? 'Uhrzeit (z.B. ab 20:00 Uhr)' : 'Beschreibung');
@@ -575,7 +585,9 @@ function render() {
     }
 
     // 2.2 LISTEN RENDERING
-    // --- FALL 1: PIZZAS ---
+    //------------------------------- 
+	//--- FALL 1: PIZZAS ---
+	//-------------------------------
     if (currentTab === 'pizzas') {
         // Aufruf der kleinen Hilfsfunktion (Notepad++ bleibt bunt!)
         area.innerHTML += getSectionTitleHtml(lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza');
@@ -624,8 +636,10 @@ function render() {
         });
         renderNoticePopup(data, lang, area);
     }
+	//-----------------------------------------
     // --- FALL 2: TV & EVENTS ---
-    else {
+    //-----------------------------------------
+	else {
         const title = currentTab === 'tv' ? 'TV-Sport' : (lang === 'DE' ? 'Events' : 'Eventi');
         
         // Titelbalken für TV/Events
@@ -651,7 +665,8 @@ function render() {
 
 
 
-
+//Datum Sprache übersetzen
+//----------------------------------
 function translateDate(str) {
     if (!str || lang === 'DE') return str;
 
@@ -696,7 +711,9 @@ function translateDate(str) {
     render();
 }*/
 
+
 // Hilfsfunktion zum Speichern der gesamten Daten
+//------------------------------------------------------
 async function saveAllData() {
     try {
         const response = await fetch(apiUrl, {
@@ -717,6 +734,9 @@ function deleteTimeRow(index) {
     }
 }
 
+//------------------------------------
+//Verschieben, editieren, hinzufügen
+//------------------------------------
 // Zeile verschieben (hoch/runter)
 function moveTimeRow(index, direction) {
     const targetIndex = index + direction;
@@ -786,7 +806,7 @@ async function saveHoursToDB(newArray) {
 
 // ITEM HINZUFÜGEN
 //===================================================
-    async function addItem() {
+async function addItem() {
     // 1. Werte aus den Feldern holen
     const newItem = {
         nameDE: document.getElementById('inNameDE').value,
@@ -800,7 +820,9 @@ async function saveHoursToDB(newArray) {
 		imgHeightHandy:document.getElementById('inImgHeightHandy').value || "100" 
     };
 
-   // WICHTIG: Hier wird die Kategorie ausgelesen
+    //pizzas und tv besitzen Kategorie
+	//---------------------------------
+    // WICHTIG: Hier wird die Kategorie ausgelesen
     if (currentTab === 'pizzas' || currentTab === 'tv') {
         const catDropdown = document.getElementById('inCat');
         if (currentTab === 'pizzas'){
@@ -822,12 +844,15 @@ async function saveHoursToDB(newArray) {
 
 
     // Sicherheitscheck: Falls Name leer ist
+	//----------------------------------------
     if (!newItem.nameDE && currentTab !== 'start') {
         alert("Bitte Namen eingeben!");
         return;
     }
 
+
     // 2. ENTSCHEIDUNG: Bearbeiten oder Neu?
+	//--------------------------------------------
     if (editIndex !== null) {
         // BEARBEITEN: Bestehenden Index überschreiben
         data[currentTab][editIndex] = newItem;
@@ -842,8 +867,11 @@ async function saveHoursToDB(newArray) {
             console.log("Neuer Eintrag am Ende hinzugefügt.");
         }
     }
-alert("Sende Wert: " + newItem.imgHeightHandy);
-    // 3. SYNCHRONISATION MIT SERVER
+	
+	
+    //alert("Sende Wert: " + newItem.imgHeightHandy);
+    
+	// 3. SYNCHRONISATION MIT SERVER
     try {
         const res = await fetch(apiUrl, {
             method: 'POST',
@@ -905,27 +933,32 @@ async function editStartInfo() {
 
     
 
-    
-	// Hilfsfunktion zum Leeren der Felder
-	function clearFields() {
-		document.getElementById('inNameDE').value = "";
-		document.getElementById('inNameIT').value = "";
-		document.getElementById('inDescDE').value = "";
-		document.getElementById('inDescIT').value = "";
-		document.getElementById('inRight').value = "";
-		if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
-		const title = document.getElementById('admin-title');
-		if(title) title.innerText = "Neuen Eintrag hinzufügen";
+
+// Hilfsfunktion zum Leeren der Felder im Browser
+//-----------------------------------------------
+function clearFields() {
+	document.getElementById('inNameDE').value = "";
+	document.getElementById('inNameIT').value = "";
+	document.getElementById('inDescDE').value = "";
+	document.getElementById('inDescIT').value = "";
+	document.getElementById('inRight').value = "";
+	if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
+	const title = document.getElementById('admin-title');
+	if(title) title.innerText = "Neuen Eintrag hinzufügen";
+}
+
+/*function move(index, dir) {
+	const list = data[currentTab];
+	if (index + dir >= 0 && index + dir < list.length) {
+		[list[index], list[index + dir]] = [list[index + dir], list[index]];
+		save();
 	}
-	
-    /*function move(index, dir) {
-        const list = data[currentTab];
-        if (index + dir >= 0 && index + dir < list.length) {
-            [list[index], list[index + dir]] = [list[index + dir], list[index]];
-            save();
-        }
-    }*/
-	
+}*/
+
+
+
+// nach oben und unten verschieben
+//-------------------------------------	
 async function move(index, direction) {
     const items = data[currentTab];
     const targetIndex = index + direction;
@@ -956,75 +989,82 @@ async function move(index, direction) {
 }
   
 	
-	
-	
+// remove für closeNoticePopup 
+//-------------------------------------			
+function remove(idx) {
+	if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); render();save(); }
+}
 
-    function remove(idx) {
-        if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); render();save(); }
-    }
 
-    function editStart() {
-        const txt = prompt("Text eingeben / Inserire testo:", lang === 'DE' ? data.start.textDE : data.start.textIT);
-        if(txt !== null) {
-            if(lang === 'DE') data.start.textDE = txt; else data.start.textIT = txt;
-            save();
-        }
-    }
-
-	function encodeImageFileAsURL(element) {
-		const file = element.files[0];
-		if (!file) return;
-
-		const reader = new FileReader();
-		reader.onload = function(e) {
-			const img = new Image();
-			img.onload = function() {
-				// 1. Leinwand erstellen
-				const canvas = document.createElement('canvas');
-				const MAX_WIDTH = 800; // Maximale Breite für die Pizzeria-Webseite
-				
-				let width = img.width;
-				let height = img.height;
-
-				// 2. Proportionen berechnen
-				if (width > MAX_WIDTH) {
-					height *= MAX_WIDTH / width;
-					width = MAX_WIDTH;
-				}
-
-				canvas.width = width;
-				canvas.height = height;
-
-				// 3. Bild auf Leinwand zeichnen (verkleinern)
-				const ctx = canvas.getContext('2d');
-				ctx.drawImage(img, 0, 0, width, height);
-
-				// 4. Als komprimiertes JPG exportieren (Qualität 0.7 = 70%)
-				const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-				// 5. In das versteckte Feld und die Vorschau schreiben
-				document.getElementById('inImgBase64').value = compressedBase64;
-				
-				const preview = document.getElementById('img-preview');
-				if (preview) {
-					preview.src = compressedBase64;
-					preview.style.display = 'block';
-				}
-				if (document.getElementById('no-img-text')) document.getElementById('no-img-text').style.display = 'none';
-				
-				console.log("Bild für St. Sisinius optimiert: " + Math.round(compressedBase64.length / 1024) + " KB");
-			};
-			img.src = e.target.result;
-		};
-		reader.readAsDataURL(file);
+// editStart
+//-------------------------------------		
+function editStart() {
+	const txt = prompt("Text eingeben / Inserire testo:", lang === 'DE' ? data.start.textDE : data.start.textIT);
+	if(txt !== null) {
+		if(lang === 'DE') data.start.textDE = txt; else data.start.textIT = txt;
+		save();
 	}
-		
+}
+
+// Bild jpg in base64 umwandeln
+//-------------------------------------	
+
+function encodeImageFileAsURL(element) {
+	const file = element.files[0];
+	if (!file) return;
+
+	const reader = new FileReader();
+	reader.onload = function(e) {
+		const img = new Image();
+		img.onload = function() {
+			// 1. Leinwand erstellen
+			const canvas = document.createElement('canvas');
+			const MAX_WIDTH = 800; // Maximale Breite für die Pizzeria-Webseite
+			
+			let width = img.width;
+			let height = img.height;
+
+			// 2. Proportionen berechnen
+			if (width > MAX_WIDTH) {
+				height *= MAX_WIDTH / width;
+				width = MAX_WIDTH;
+			}
+
+			canvas.width = width;
+			canvas.height = height;
+
+			// 3. Bild auf Leinwand zeichnen (verkleinern)
+			const ctx = canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0, width, height);
+
+			// 4. Als komprimiertes JPG exportieren (Qualität 0.7 = 70%)
+			const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+			// 5. In das versteckte Feld und die Vorschau schreiben
+			document.getElementById('inImgBase64').value = compressedBase64;
+			
+			const preview = document.getElementById('img-preview');
+			if (preview) {
+				preview.src = compressedBase64;
+				preview.style.display = 'block';
+			}
+			if (document.getElementById('no-img-text')) document.getElementById('no-img-text').style.display = 'none';
+			
+			console.log("Bild für St. Sisinius optimiert: " + Math.round(compressedBase64.length / 1024) + " KB");
+		};
+		img.src = e.target.result;
+	};
+	reader.readAsDataURL(file);
+}
 	
 
-    load();
+// load: data von DB laden
+//-------------------------------------	
+load();
 	
-	
-	async function importPizzeriaDataComplete() {
+// Funktion um die Pizzas in die leere Datenbank einzufügen
+//---------------------------------------------------------		
+async function importPizzeriaDataComplete() {
     const fullList = [
         { n: "Margherita", p: "7.50", dDE: "Tomaten, Fior di Latte, Basilikum", dIT: "Pomodoro, fior di latte, basilico", c: "pizza" },
         { n: "Marinara", p: "6.50", dDE: "Tomaten, Knoblauch, Olivenöl", dIT: "Pomodoro, aglio, olio d´oliva", c: "pizza" },
@@ -1085,13 +1125,14 @@ async function move(index, direction) {
 }
 
 
-
+// Datum erkennen
+//-------------------------------------	
 function parseSisiniusDate(dateStr, timeStr) {
     if (!dateStr) return new Date(2099, 0, 1); 
 
     try {
         // Sucht nach TT.MM. (2 oder 4 Stellen beim Jahr)
-        // Erkennt: 13.02.26, 13.02.2026, Freitag 13.02.26 etc.
+        // Erkennt: 14.02.26, 14.02.2026, Samstag 14.02.26 etc.
         const match = dateStr.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
         
         if (match) {
@@ -1116,6 +1157,9 @@ function parseSisiniusDate(dateStr, timeStr) {
     return new Date(2099, 0, 1);
 }	
 
+
+// encodeNoticeImage: nicht verwendet
+//-------------------------------------	
 function encodeNoticeImage(element) {
     const file = element.files[0];
     if (!file) return;
@@ -1161,6 +1205,9 @@ function encodeNoticeImage(element) {
     reader.readAsDataURL(file);
 }
 
+
+// Bild für POPUP hochladen
+//-------------------------
 function handleNoticeImageUpload(event) {
     const file = event.target.files[0]; // Das ausgewählte Bild
     if (!file) return;
@@ -1218,7 +1265,8 @@ async function saveNoticeSettings___() {
     location.reload();
 }
 
-
+//saveNoticeSettings: Daten popup speichern
+//--------------------------------------------
 async function saveNoticeSettings() {
     // 1. Alle Felder präzise auslesen (inklusive der neuen Titel)
     const noticeData = {
@@ -1271,7 +1319,8 @@ async function saveNoticeSettings() {
     }
 };*/
 
-
+//Popup schließen
+//-----------------------------------------
 window.closeNoticePopup = function() {
     const popup = document.getElementById('notice-popup');
     const scrollContent = document.getElementById('popup-scroll-content');
@@ -1301,6 +1350,9 @@ window.closeNoticePopup = function() {
         }, 500); 
     }
 };
+
+//Popup anzeigen
+//----------------------
 function showPopup() {
     // 1. Prüfen, ob eine Nachricht aktiv ist und noch nicht gesehen wurde
     if (data.notice && data.notice.active && !sessionStorage.getItem('noticeSeen')) {
@@ -1332,6 +1384,9 @@ function showPopup() {
     }
 }
 
+
+//Bild von Popup entfernen
+//-----------------------------
 function removeNoticeImage() {
     // 1. Hidden Input leeren
     document.getElementById('inImgBase64Notice').value = "";
@@ -1348,7 +1403,8 @@ function removeNoticeImage() {
     document.getElementById('btn-remove-notice').style.display = "none";
 }
 
-
+//Pizza und Event anzeigen
+//-----------------------------------------
 // Hilfsfunktion, um doppelten Code zu vermeiden
 // Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
 function renderPizzaOrEvent(item, idx, isPizza) {    
@@ -1400,6 +1456,8 @@ function renderPizzaOrEvent(item, idx, isPizza) {
 }
 
 
+//Buttons für edit
+//--------------------------------------
 // HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
 function getAdminButtonsHtml(idx) {
     if (!editMode) return '';
@@ -1416,7 +1474,8 @@ function getAdminButtonsHtml(idx) {
 }
 
 
-
+//Template für popup
+//--------------------------------
 // GANZ UNTEN IN DER DATEI
 function getPopupTemplate(title, scrollHint, imageHtml, formattedText) {
     const q = "'"; 
@@ -1461,6 +1520,8 @@ function getPopupTemplate(title, scrollHint, imageHtml, formattedText) {
         </div>`;
 }
 
+//Edit Konsole
+//----------------------------
 // --- ADMIN KONSOLE FABRIK ---
 // GANZ UNTEN IN DER DATEI - Die komplette Admin-Fabrik
 function getAdminConsoleHtml(tab, label, labelDesc, descITField) {
@@ -1515,7 +1576,8 @@ function getAdminConsoleHtml(tab, label, labelDesc, descITField) {
     </div>`;
 }
 
-// --- STARTSEITE VOLL-LAYOUT FABRIK ---
+//Startseite LAYOUT
+//--------------------
 // --- STARTSEITE VOLL-LAYOUT FABRIK ---
 function getStartPageFullLayout(data, lang, editMode) {
     const q = "'"; 
@@ -1560,119 +1622,119 @@ const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length
 
     // 3. DAS GESAMTE HTML ZURÜCKGEBEN
     return `
-<style>
-    /* Absolute Absicherung gegen seitliches Rausragen */
-    .start-container * { box-sizing: border-box !important; }
-    
-    @media (max-width: 768px) {
-        .about-section { 
-            flex-direction: column !important; 
-            align-items: center !important; 
-            text-align: center !important;
-            padding: 20px 0 !important;
-        }
-        .about-image { 
-            width: 100% !important; 
-            max-width: 100% !important; 
-            margin-bottom: 20px !important;
-        }
-        .about-text { 
-            min-width: 100% !important; 
-            width: 100% !important;
-        }
-        .info-card-responsive { 
-            min-width: 100% !important; 
-            padding: 15px !important; 
-        }
-    }
-</style>
+	<style>
+		/* Absolute Absicherung gegen seitliches Rausragen */
+		.start-container * { box-sizing: border-box !important; }
+		
+		@media (max-width: 768px) {
+			.about-section { 
+				flex-direction: column !important; 
+				align-items: center !important; 
+				text-align: center !important;
+				padding: 20px 0 !important;
+			}
+			.about-image { 
+				width: 100% !important; 
+				max-width: 100% !important; 
+				margin-bottom: 20px !important;
+			}
+			.about-text { 
+				min-width: 100% !important; 
+				width: 100% !important;
+			}
+			.info-card-responsive { 
+				min-width: 100% !important; 
+				padding: 15px !important; 
+			}
+		}
+	</style>
 
-<div class="main-content-wrapper" style="width: 100%; overflow-x: hidden;">
-    <!-- HERO SECTION (Fix: 100% Breite) -->
-    <div class="hero" style="height: 450px; position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white; background: #000;">
-        <img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
-        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
-        <div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
-            <h2 style="font-size: 2.2rem; margin-bottom: 10px;">${lang === 'DE' ? 'Willkommen' : 'Benvenuti'}</h2>
-            <p style="font-size: 1.2rem;">${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}</p>
-        </div>
-    </div>
+	<div class="main-content-wrapper" style="width: 100%; overflow-x: hidden;">
+		<!-- HERO SECTION (Fix: 100% Breite) -->
+		<div class="hero" style="height: 450px; position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white; background: #000;">
+			<img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+			<div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+			<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+				<h2 style="font-size: 2.2rem; margin-bottom: 10px;">${lang === 'DE' ? 'Willkommen' : 'Benvenuti'}</h2>
+				<p style="font-size: 1.2rem;">${lang === 'DE' ? 'Pizza, Cocktails und Live-Sport' : 'Pizza, cocktail e sport dal vivo'}</p>
+			</div>
+		</div>
 
-    <div class="start-container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
-        
-        <!-- ABOUT SECTION (FIX: flex-wrap + min-width 0 verhindert Overflow) -->
-        <div class="about-section" style="padding: 40px 0; display: flex; gap: 30px; flex-wrap: wrap; align-items: center; width: 100%; overflow: hidden;">
-            <img src="pizza.webp" alt="Pizza" class="about-image" style="max-width: 400px; width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; flex-shrink: 0;">
-            
-            <div class="about-text" style="flex: 1; min-width: 300px; font-size: 1.1rem; line-height: 1.7; word-wrap: break-word;">
-                ${lang === 'DE' ? 
-                    `<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
-                     <p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig.</p>
-                     <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>` 
-                    : 
-                    `<p>Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
-                     <p>Godetevi le nostre pizze in un'atmosfera accogliente. Non vediamo l'ora di darvi il benvenuto!</p>`
-                }
-            </div>
-        </div>
+		<div class="start-container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+			
+			<!-- ABOUT SECTION (FIX: flex-wrap + min-width 0 verhindert Overflow) -->
+			<div class="about-section" style="padding: 40px 0; display: flex; gap: 30px; flex-wrap: wrap; align-items: center; width: 100%; overflow: hidden;">
+				<img src="pizza.webp" alt="Pizza" class="about-image" style="max-width: 400px; width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; flex-shrink: 0;">
+				
+				<div class="about-text" style="flex: 1; min-width: 300px; font-size: 1.1rem; line-height: 1.7; word-wrap: break-word;">
+					${lang === 'DE' ? 
+						`<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
+						 <p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend mit Live-Sport – bei uns sind Sie richtig.</p>
+						 <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>` 
+						: 
+						`<p>Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
+						 <p>Godetevi le nostre pizze in un'atmosfera accogliente. Non vediamo l'ora di darvi il benvenuto!</p>`
+					}
+				</div>
+			</div>
 
-            <!-- INFO WRAPPER: KONTAKT & ZEITEN -->
-            <div style="display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0;">
-                
-           <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
-<div class="info-card-responsive contact-card-large" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 310px; max-width: 100%;">
-    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-        
-        <!-- Text-Teil (Links) -->
-        <div style="flex: 1; min-width: 150px;">
-            <h3 style="color:#dc3545; margin-top: 0; font-size: 1.5rem;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
-            <a href="tel:+393898334004" style="font-weight: bold; text-decoration: none; font-size: 1.3rem; color: #333; display: block; margin-bottom: 5px;">+39 389 833 4004</a>
-            <p style="font-size: 0.9rem; font-weight: bold; color: #666; margin-top: 10px;">${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}</p>
-        </div>
-        
-        <!-- Widget-Teil (Rechts) -->
-        <div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 10px;">
-            
-            <!-- 1. GOOGLE MAPS WIDGET MIT ORTHOFOTO -->
-            <a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
-               target="_blank" 
-               style="text-decoration: none; display: block; cursor: pointer; width: 110px;">
-                <div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
-                    <div style="position: relative; width: 110px; height: 90px;">
-                        <img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                        <!-- Der 📍 Marker -->
-                        <div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
-                    </div>
-                    <div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
-                        ${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
-                    </div>
-                </div>
-            </a>
+			<!-- INFO WRAPPER: KONTAKT & ZEITEN -->
+			<div style="display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0;">
+					
+			   <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
+				<div class="info-card-responsive contact-card-large" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 310px; max-width: 100%;">
+					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+						
+						<!-- Text-Teil (Links) -->
+						<div style="flex: 1; min-width: 150px;">
+							<h3 style="color:#dc3545; margin-top: 0; font-size: 1.5rem;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+							<a href="tel:+393898334004" style="font-weight: bold; text-decoration: none; font-size: 1.3rem; color: #333; display: block; margin-bottom: 5px;">+39 389 833 4004</a>
+							<p style="font-size: 0.9rem; font-weight: bold; color: #666; margin-top: 10px;">${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}</p>
+						</div>
+						
+						<!-- Widget-Teil (Rechts) -->
+						<div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 10px;">
+							
+							<!-- 1. GOOGLE MAPS WIDGET MIT ORTHOFOTO -->
+							<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
+							   target="_blank" 
+							   style="text-decoration: none; display: block; cursor: pointer; width: 110px;">
+								<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
+									<div style="position: relative; width: 110px; height: 90px;">
+										<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+										<!-- Der 📍 Marker -->
+										<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
+									</div>
+									<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
+										${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
+									</div>
+								</div>
+							</a>
 
-            <!-- 2. QUELLENNACHWEIS SÜDTIROL -->
-            <p style="font-size: 8px; color: #999; margin: -5px 0 5px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
-                © Prov. BZ - CC BY 4.0<br>
-                <span style="font-size: 7px;">Geoportal Südtirol</span>
-            </p>
+							<!-- 2. QUELLENNACHWEIS SÜDTIROL -->
+							<p style="font-size: 8px; color: #999; margin: -5px 0 5px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
+								© Prov. BZ - CC BY 4.0<br>
+								<span style="font-size: 7px;">Geoportal Südtirol</span>
+							</p>
 
-            <!-- 3. INSTAGRAM BUTTON -->
-            <a href="https://www.instagram.com/stsisinius"
-               target="_blank" 
-               style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-                <span style="font-size: 12px; margin-right: 5px;">📸</span> 
-                INSTAGRAM
-            </a>
+							<!-- 3. INSTAGRAM BUTTON -->
+							<a href="https://www.instagram.com/stsisinius"
+							   target="_blank" 
+							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+								<span style="font-size: 12px; margin-right: 5px;">📸</span> 
+								INSTAGRAM
+							</a>
 
-            <!-- 4. FACEBOOK BUTTON -->
-            <a href="https://www.facebook.com/61585930843655/"
-               target="_blank" 
-               style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-                <span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
-                FACEBOOK
-            </a>
-        </div>
-    </div>
-</div>
+							<!-- 4. FACEBOOK BUTTON -->
+							<a href="https://www.facebook.com/61585930843655/"
+							   target="_blank" 
+							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+								<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
+								FACEBOOK
+							</a>
+						</div>
+					</div>
+				</div>
 
                 <!-- RECHTER RAHMEN: ÖFFNUNGSZEITEN & EDITOR -->
                 <div class="info-card-responsive opening-hours-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.6; min-width: 310px; max-width: 100%;">			
@@ -1696,7 +1758,7 @@ const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length
                 </div>
             </div> <!-- Ende Info Wrapper -->
 			 
-  <!-- ADMIN-BEREICH: POPUP / NOTICE -->
+			<!-- ADMIN-BEREICH: POPUP / NOTICE -->
             ${editMode ? `
             <div class="admin-notice-settings" style="margin-top: 30px; background: #fff9e6; border: 2px dashed #ffc107; padding: 25px; border-radius: 15px; width: 100%; box-sizing: border-box;">
                 <h3 style="margin-top: 0; color: #856404; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -1707,45 +1769,45 @@ const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length
                 </h3>
                 
                 <!-- BILD-UPLOAD BEREICH IM ADMIN-FENSTER -->
-<div style="text-align: center; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 10px;">
-    <div id="noticePreviewContainer">
-        <!-- Vorschau-Bild -->
-        <img id="img-preview-notice" 
-             src="${data.notice && data.notice.img ? data.notice.img : ''}" 
-             style="max-width:100%; max-height:150px; object-fit:contain; border-radius:8px; display: ${data.notice && data.notice.img ? 'block' : 'none'}; margin: 0 auto;">
-        
-        <!-- Platzhalter-Text -->
-        <span id="no-img-text-notice" style="display: ${data.notice && data.notice.img ? 'none' : 'block'}; color: #666;">
-            Kein Bild vorhanden
-        </span>
-    </div>
+				<div style="text-align: center; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 10px;">
+					<div id="noticePreviewContainer">
+						<!-- Vorschau-Bild -->
+						<img id="img-preview-notice" 
+							 src="${data.notice && data.notice.img ? data.notice.img : ''}" 
+							 style="max-width:100%; max-height:150px; object-fit:contain; border-radius:8px; display: ${data.notice && data.notice.img ? 'block' : 'none'}; margin: 0 auto;">
+						
+						<!-- Platzhalter-Text -->
+						<span id="no-img-text-notice" style="display: ${data.notice && data.notice.img ? 'none' : 'block'}; color: #666;">
+							Kein Bild vorhanden
+						</span>
+					</div>
 
-    <input type="file" id="file-input-notice" accept="image/*" onchange="handleNoticeImageUpload(event)" style="margin-top: 10px; font-size: 0.8rem; width: 100%;">
-    <input type="hidden" id="inImgBase64Notice" value="${data.notice && data.notice.img ? data.notice.img : ''}">
+					<input type="file" id="file-input-notice" accept="image/*" onchange="handleNoticeImageUpload(event)" style="margin-top: 10px; font-size: 0.8rem; width: 100%;">
+					<input type="hidden" id="inImgBase64Notice" value="${data.notice && data.notice.img ? data.notice.img : ''}">
 
-    <!-- Der Lösch-Button -->
-    <button id="btn-remove-notice" 
-            onclick="removeNoticeImage()" 
-            style="display: ${data.notice && data.notice.img ? 'inline-block' : 'none'}; margin-top: 10px; background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">
-        🗑️ Bild entfernen
-    </button>
-</div>
+					<!-- Der Lösch-Button -->
+					<button id="btn-remove-notice" 
+							onclick="removeNoticeImage()" 
+							style="display: ${data.notice && data.notice.img ? 'inline-block' : 'none'}; margin-top: 10px; background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">
+						🗑️ Bild entfernen
+					</button>
+				</div>
 
-<!-- Im Admin-Bereich unter dem Bild-Upload -->
-<div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
-    <div style="flex: 1;">
-        <label style="font-size: 0.75rem; display: block; font-weight: bold;">Bildhöhe PC (px):</label>
-        <input type="number" id="edit-notice-img-height-pc" 
-               style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" 
-               value="${data.notice.imgHeightPC || '250'}">
-    </div>
-    <div style="flex: 1;">
-        <label style="font-size: 0.75rem; display: block; font-weight: bold;">Bildhöhe Handy (px):</label>
-        <input type="number" id="edit-notice-img-height-mobile" 
-               style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" 
-               value="${data.notice.imgHeightMobile || '180'}">
-    </div>
-</div>
+				<!-- Im Admin-Bereich unter dem Bild-Upload -->
+				<div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
+					<div style="flex: 1;">
+						<label style="font-size: 0.75rem; display: block; font-weight: bold;">Bildhöhe PC (px):</label>
+						<input type="number" id="edit-notice-img-height-pc" 
+							   style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" 
+							   value="${data.notice.imgHeightPC || '250'}">
+					</div>
+					<div style="flex: 1;">
+						<label style="font-size: 0.75rem; display: block; font-weight: bold;">Bildhöhe Handy (px):</label>
+						<input type="number" id="edit-notice-img-height-mobile" 
+							   style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" 
+							   value="${data.notice.imgHeightMobile || '180'}">
+					</div>
+				</div>
 
 
 
@@ -1782,6 +1844,9 @@ const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length
     `;
 }
 
+
+//praktisch renderTv
+//--------------------------------
 function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
     // Falls translateDate existiert, nutzen wir es, sonst Fallback
     const textDE = item.descDE || '';
@@ -1810,6 +1875,7 @@ function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
 
 
 // Hilfsfunktion für Haupt-Überschriften (Pizzakarte / TV-Sport)
+//----------------------------------------------------------------
 function getSectionTitleHtml(txt) {
     // Wir nutzen hier klassische Anführungszeichen statt Backticks, das ist 100% Notepad++ sicher
     return '<div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">' +
@@ -1818,12 +1884,12 @@ function getSectionTitleHtml(txt) {
 }
 
 // Hilfsfunktion für Kategorie-Trenner (Pizza, Bianche etc.)
+//---------------------------------------------------------------
 function getCategoryHeaderHtml(txt) {
     return '<div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">' +
            '<h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">' + txt + '</h2>' +
            '</div>';
 }
-
 	
 </script>
 </body>
