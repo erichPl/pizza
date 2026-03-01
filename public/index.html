@@ -1566,10 +1566,63 @@ function getStartPageFullLayout(data, lang, editMode) {
                     ` : ''}
                 </div>
             </div> <!-- Ende Info Wrapper -->
+			 
+           <!-- NEUER ADMIN-BEREICH: POPUP / NOTICE EINSTELLUNGEN -->
+     <!-- ADMIN-BEREICH: POPUP / NOTICE MIT DATEI-UPLOAD -->
+            ${editMode ? `
+            <div class="admin-notice-settings" style="margin-top: 30px; background: #fff9e6; border: 2px dashed #ffc107; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; box-sizing: border-box;">
+                <h3 style="margin-top: 0; color: #856404; display: flex; align-items: center; gap: 10px;">
+                    📢 Popup / Notice bearbeiten
+                </h3>
+                
+                <!-- BILD-VORSCHAU AUS DER DB -->
+                <div style="text-align: center; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 10px;">
+                    <p style="font-size: 0.8rem; color: #666; margin-bottom: 8px;">Aktuelle Bildvorschau:</p>
+                    <div id="noticePreviewContainer">
+                        ${data.notice && data.notice.img 
+                            ? `<img id="noticePreviewImg" src="${data.notice.img}" style="max-width:100%; max-height:200px; object-fit:contain; border-radius:8px; display:block; margin: 0 auto;">` 
+                            : '<div style="font-size: 2rem;">📢</div><p style="font-size: 0.8rem;">Kein Bild vorhanden</p>'
+                        }
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    
+                    <!-- DATEI ÖFFNEN / UPLOAD -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-weight: bold; font-size: 0.9rem; color: #555;">Bilddatei auswählen:</label>
+                        <input type="file" id="noticeFileInput" accept="image/*" onchange="handleNoticeImageUpload(event)"
+                               style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background: white;">
+                        <!-- Verstecktes Feld für den Base64-String oder Pfad -->
+                        <input type="hidden" id="noticeImgData" value="${data.notice && data.notice.img ? data.notice.img : ''}">
+                    </div>
+
+                    <!-- Text Deutsch -->
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-weight: bold; font-size: 0.9rem; color: #555;">Text Deutsch (DE):</label>
+                        <textarea id="noticeTextDE" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-height: 80px;">${data.notice && data.notice.textDE ? data.notice.textDE : ''}</textarea>
+                    </div>
+
+                    <!-- Text Italienisch -->
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-weight: bold; font-size: 0.9rem; color: #555;">Testo Italiano (IT):</label>
+                        <textarea id="noticeTextIT" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; min-height: 80px;">${data.notice && data.notice.textIT ? data.notice.textIT : ''}</textarea>
+                    </div>
+
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button onclick="saveNoticeSettings()" 
+                                style="background: #28a745; color: white; border: none; padding: 12px 30px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                            💾 Änderungen speichern
+                        </button>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+
         </div> <!-- Ende Container -->
     </div> <!-- Ende main-content-wrapper -->
-    `;
-}
+    `; // WICHTIG: Hier endet der Template-String
+} // WICHTIG: Hier endet die Funktion
 
 function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
     // Falls translateDate existiert, nutzen wir es, sonst Fallback
