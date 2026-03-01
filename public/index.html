@@ -13,7 +13,8 @@
 ==================================================-->
 
 <body>
-    
+<!-- HEADER 
+------------------->    
 <header class="main-header">
     <img src="logo.webp" class="logo" alt="Logo">
     <div class="header-text">
@@ -21,7 +22,9 @@
 		<p id="ort">Laas - Vinschgau</p>	
     </div>
 </header>
-    
+
+<!-- NAV CONTAINER
+------------------->    
 <div class="nav-container">
     <div class="tabs">
         <button class="tab-btn active" id="tab-start" onclick="setTab('start')">Start</button>
@@ -38,7 +41,10 @@
 <div class="container">
     <div id="content-area"></div>
 </div>
-    
+  
+
+<!-- FOOTER
+------------------->   
 <footer>
     <div class="footer-section">
         <strong>Pizzeria Pub St. Sisinius</strong>
@@ -68,7 +74,20 @@
 	
 </footer>
 
+<!--==============================================
+               SCRIPT
+==================================================-->
 <script>
+ 
+// Liest das Passwort einmalig aus der URL
+const urlParams = new URLSearchParams(window.location.search);
+const currentPw = urlParams.get('pw') || ''; 
+
+// Basis-URL für deine API-Aufrufe
+const apiUrl = `/api/data?pw=${currentPw}`;
+ 
+ 
+ 
  
 // 1. STYLE-BLOCK ALS VARIABLE (Ganz oben im Script)
 // Wir brechen die Tags auf: '<' + 'style>'
@@ -80,6 +99,10 @@ const dq = '"'; // Ein doppeltes Anführungszeichen
 
 const bt = '`'; // Das Backtick-Zeichen als String
 
+
+
+// Styles für Popup (zusätzliche)
+//==================================================
 const popupStyles = styleOpen + `
     @keyframes bounce { 
         0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 
@@ -165,7 +188,7 @@ function renderNoticePopup(data, lang, container) {
 
 
 let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
-let data = { start: {}, pizzas: [], events: [], tv: [] };
+let data = { start: {}, pizzas: [], events: [], tv: [] }; //mit Funktion load() werden data geladen und dazu noch render() aufgerufen
 let currentTab = 'start';
 let lang = 'DE';
 const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
@@ -216,7 +239,8 @@ async function editSingleTime(idx) {
 //-----------------------------------------------------  
   
   
-
+// EDITITEM (für pizza, event, tv
+//=========================================================
 function editItem(idx) {
     const item = data[currentTab][idx];	
 
@@ -293,10 +317,11 @@ function editItem(idx) {
 }   
     
 
-    
+// LOAD (von DB in data) und zeichnen durch render()
+//=========================================================    
 async function load() {
 	try {
-		const res = await fetch('/api/data?pw=leon2208');
+		const res = await fetch(apiUrl);
 		const fetchedData = await res.json();
 		
 		// Sicherstellen, dass 'data' immer die richtige Struktur hat
@@ -317,7 +342,7 @@ async function load() {
 /* async function save() {
 	// Wenn wir auf 'start' sind, machen wir einfach gar nichts (da nichts zu ändern ist)
 	if (currentTab === 'start') return; 
-	await fetch('/api/data?pw=leon2208', {
+	await fetch(apiUrl, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: JSON.stringify(data)
@@ -325,11 +350,12 @@ async function load() {
 	render();
 }*/
 	
-	
+// SAVE (in DB in data) und zeichnen durch render()
+//=========================================================   	
 async function save() {
     // Wir entfernen die Start-Sperre, damit auch Öffnungszeiten gespeichert werden!
     try {
-        const res = await fetch('/api/data?pw=leon2208', {
+        const res = await fetch(apiUrl, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -673,7 +699,7 @@ function translateDate(str) {
 // Hilfsfunktion zum Speichern der gesamten Daten
 async function saveAllData() {
     try {
-        const response = await fetch('/api/data?pw=leon2208', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -741,7 +767,7 @@ async function saveHoursToDB(newArray) {
     };
 
     try {
-        const response = await fetch('/api/data?pw=leon2208', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedData)
@@ -819,7 +845,7 @@ async function saveHoursToDB(newArray) {
 alert("Sende Wert: " + newItem.imgHeightHandy);
     // 3. SYNCHRONISATION MIT SERVER
     try {
-        const res = await fetch('/api/data?pw=leon2208', {
+        const res = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -856,7 +882,7 @@ async function editStartInfo() {
 
         // 3. An deine bestehende API senden (Passwort in der URL wegen deiner Route)
         try {
-            const response = await fetch('/api/data?pw=leon2208', {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData)
@@ -1212,7 +1238,7 @@ async function saveNoticeSettings() {
 
     try {
         // 3. Deine zentrale save() Funktion aufrufen
-        // Diese schickt 'data' an /api/data?pw=leon2208
+        // Diese schickt 'data' an /api/data?pw=xxxxxx
         await save(); 
 
         // 4. Erfolgsmeldung erzwingen
