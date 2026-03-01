@@ -567,14 +567,37 @@ function render() {
                 // Auch hier: HTML-String durch Funktion ersetzen
                 area.innerHTML += getCategoryHeaderHtml(lang === 'DE' ? kat.de : kat.it);
                 
+                 // --- NEU: GRID-CONTAINER START ---
+                // Am Handy 1 Spalte, ab 768px 2 Spalten, ab 1024px 3 Spalten
+                let gridHtml = `
+                <style>
+                    .pizza-grid {
+                        display: grid;
+                        gap: 20px;
+                        grid-template-columns: repeat(1, 1fr);
+                        width: 100%;
+                        padding: 10px 0;
+                    }
+                    @media (min-width: 768px) { .pizza-grid { grid-template-columns: repeat(2, 1fr); } }
+                    @media (min-width: 1024px) { .pizza-grid { grid-template-columns: repeat(3, 1fr); } }
+                    
+                    /* Verhindert, dass die Pizza-Karten im Grid zu viel Abstand nach unten haben */
+                    .pizza-grid .entry { margin-bottom: 0 !important; height: 100%; }
+                </style>
+                <div class="pizza-grid">`;
+
                 filtered.forEach(item => {
                     const realIdx = data.pizzas.findIndex(p => p === item);
-                    area.innerHTML += renderPizzaOrEvent(item, realIdx, true);
+                    gridHtml += renderPizzaOrEvent(item, realIdx, true);
                 });
+
+                gridHtml += `</div>`; // Grid-Container schließen
+                area.innerHTML += gridHtml;
+                // --- GRID-CONTAINER ENDE ---
             }
         });
         renderNoticePopup(data, lang, area);
-    } 
+    }
     // --- FALL 2: TV & EVENTS ---
     else {
         const title = currentTab === 'tv' ? 'TV-Sport' : (lang === 'DE' ? 'Events' : 'Eventi');
