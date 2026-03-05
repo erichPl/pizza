@@ -416,10 +416,6 @@ footer {
 
 
 /* ==========================================================================
-   TV-SPORT LISTE: WIEDERHERSTELLUNG ORIGINAL FARBE & STÄRKE
-   ========================================================================== */
-
-/* ==========================================================================
    TV-SPORT LISTE: DATUM OBEN, REST IN EINER ZEILE
    ========================================================================== */
 
@@ -479,4 +475,43 @@ footer {
     border-radius: 8px !important;
     display: flex !important;
     flex-direction: column !important;
+}
+
+
+
+
+/* ==========================================================================
+   HANDY: UNTEREINANDER & GRAUER RAHMEN FÜR LEAGUE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .event-grid {
+        flex-direction: column !important; /* Stapeln */
+        align-items: center !important;    /* Zentrieren */
+        gap: 12px !important;              /* Abstand zwischen den Zeilen */
+    }
+
+    .event-date {
+        margin-bottom: 30px !important;    /* Die gewünschte "Leerzeile" nach Datum */
+    }
+
+    .event-time, .event-teams {
+        text-align: center !important;
+        margin-left: 0 !important;
+        min-width: 0 !important;
+    }
+
+    /* League auf HANDY: Mit grauem Kasten & Einrückung */
+    .event-league {
+        background-color: #f0f0f0 !important; /* Leichtes Grau */
+        border: 1px solid #ccc !important;    /* Dezenter Rand */
+        border-radius: 6px !important;
+        padding: 6px 15px !important;        /* Innenabstand */
+        color: #444 !important;
+        text-align: center !important;
+        display: inline-block !important;
+        /* Einrückung vom Hauptrahmen */
+        margin: 0 20px !important; 
+        font-size: 0.95rem !important;
+    }
 }
