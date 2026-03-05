@@ -545,28 +545,55 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 }
 
 /* Die Zeit-Spalte (rechts) */
-/* Ersetze oder ergänze diesen Teil */
+/* 1. GRUNDSTELLUNG (PC & große Tablets) */
 .zeit-spalte {
     margin-left: auto;
-    /* Entferne oder verringere min-width für Mobile */
-    min-width: 110px; 
+    min-width: 140px; /* Hier darf es am PC ruhig breit sein */
     text-align: right;
     font-family: 'Courier New', Courier, monospace; 
     color: var(--red);
     white-space: nowrap; 
-    flex-shrink: 1; /* Erlaubt dem Element im Notfall zu schrumpfen */
+    flex-shrink: 1;
 }
 
-@media (max-width: 400px) {
-    .tag-spalte {
-        flex: 0 0 80px; /* Weniger Platz für den Wochentag auf Kleinstgeräten */
-        font-size: 0.85rem;
+/* 2. HANDY & TABLET (bis 600px) */
+@media (max-width: 600px) {
+    .hours-item {
+        flex-wrap: wrap !important; /* Erlaubt das Springen in die nächste Zeile */
+        justify-content: space-between;
+        gap: 5px;
+        padding: 10px 0;
     }
+
+    .tag-spalte {
+        flex: 1 1 auto;
+        font-size: 0.95rem;
+        min-width: 100px;
+    }
+
     .zeit-spalte {
-        font-size: 0.85rem;
-        min-width: auto;
+        min-width: auto !important; /* Hebt die 140px auf */
+        margin-left: auto;
+        font-size: 0.95rem;
+        white-space: normal !important; /* WICHTIG: Erlaubt Zeilenumbruch der Uhrzeit */
+        text-align: right;
+    }
+
+}
+
+/* 3. SEHR SCHMALE HANDYS (bis 400px) - Spezifische Korrektur */
+@media (max-width: 400px) {
+    .tag-spalte, .zeit-spalte {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Wenn es extrem eng wird, erzwingen wir, dass die Zeit unter den Tag rutscht */
+    .hours-item {
+        flex-direction: row; /* Bleibt nebeneinander, aber wrap erlaubt */
     }
 }
+
+
 
 
 
@@ -642,24 +669,6 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
     .event-grid { grid-template-columns: 1fr !important; text-align: center !important; }
 }
 @media (max-width: 600px) {
-    .hours-item {
-        flex-wrap: wrap; /* Erlaubt den Umbruch, falls es zu eng wird */
-        justify-content: space-between;
-        gap: 5px;
-    }
-
-    .tag-spalte {
-        flex: 1 1 auto; /* Tag nimmt Platz ein, schiebt Rest nach rechts */
-        font-size: 0.9rem;
-    }
-
-    .zeit-spalte {
-        min-width: auto; /* Hebt die starre Breite auf */
-        margin-left: auto;
-        font-size: 0.9rem;
-        text-align: right;
-    }
-
     /* Stapelt Zeit, Teams und Liga untereinander, damit nichts rechts rausragt */
     .event-grid {
         grid-template-columns: 1fr !important; 
