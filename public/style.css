@@ -1,6 +1,5 @@
 /* img
 ====*/
-
 /*
 .item-img {
     /* FIX 2: Begrenze das Bild radikal! */
@@ -546,15 +545,27 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 }
 
 /* Die Zeit-Spalte (rechts) */
+/* Ersetze oder ergänze diesen Teil */
 .zeit-spalte {
-    /* Nutzt eine feste Breite für alle Zahlen-Blöcke */
-    margin-left: auto; /* SCHIEBT DIE ZEIT NACH RECHTS */
-	min-width: 140px; 
+    margin-left: auto;
+    /* Entferne oder verringere min-width für Mobile */
+    min-width: 110px; 
     text-align: right;
-    /* Monospace sorgt dafür, dass die '1' genau so breit ist wie die '0' */
     font-family: 'Courier New', Courier, monospace; 
     color: var(--red);
-    white-space: nowrap; /* Verhindert Umbruch innerhalb der Uhrzeit */
+    white-space: nowrap; 
+    flex-shrink: 1; /* Erlaubt dem Element im Notfall zu schrumpfen */
+}
+
+@media (max-width: 400px) {
+    .tag-spalte {
+        flex: 0 0 80px; /* Weniger Platz für den Wochentag auf Kleinstgeräten */
+        font-size: 0.85rem;
+    }
+    .zeit-spalte {
+        font-size: 0.85rem;
+        min-width: auto;
+    }
 }
 
 
@@ -710,23 +721,35 @@ html[lang="it"] .zeit-spalte[data-wert="Ruhetag"]::after {
 .start-container * { box-sizing: border-box !important; }
 ischer sp
 @media (max-width: 768px) {
-	.about-section { 
-		flex-direction: column !important; 
-		align-items: center !important; 
-		text-align: center !important;
-		padding: 20px 0 !important;
-	}
-	.about-image { 
-		width: 100% !important; 
-		max-width: 100% !important; 
-		margin-bottom: 20px !important;
-	}
-	.about-text { 
-		min-width: 100% !important; 
-		width: 100% !important;
-	}
-	.info-card-responsive { 
-		min-width: 100% !important; 
-		padding: 15px !important; 
-	}
+.about-section {
+        flex-direction: column !important;
+        padding: 15px !important; /* Weniger Padding gibt dem Inhalt mehr Platz */
+        width: 100% !important;
+        margin: 20px 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .about-image {
+        width: 100% !important;
+        max-width: 100% !important; /* Bild darf den Container nie sprengen */
+        height: auto !important;
+        border-radius: 10px;
+    }
+
+    .about-text {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+}
+
+/* Verhindert, dass die gesamte Seite nach rechts wackelt */
+html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    position: relative;
+}
+
+/* Stellt sicher, dass alle Boxen korrekt berechnet werden */
+* {
+    box-sizing: border-box !important;
 }
