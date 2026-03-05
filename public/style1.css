@@ -9,6 +9,18 @@ Admin-Elemente		Integriert in Sektion 7 (Saubere display: none Logik).
 Popup / Scroll-Hint	Die Animationen und Styles sind in Sektion 5 erhalten geblieben.
    ========================================================================== */
 
+/*Damit das Handy wirklich aufhört zu wackeln, füge diese Zeilen ganz oben ein*/
+html, body {
+    max-width: 100%;
+    overflow-x: hidden; /* Das ist die wichtigste Zeile! */
+    position: relative;
+}
+
+* {
+    box-sizing: border-box !important;
+}
+
+
 /* ==========================================================================
    1. GLOBALE BASIS (Rausrück-Schutz)
    ========================================================================== */
@@ -92,10 +104,12 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 5px 10px;
     position: sticky;
     top: 0;
     z-index: 1000;
+    width: 100%;
+    flex-wrap: wrap; /* Erlaubt Umbruch, damit es nicht rechts rausdrückt */
 }
 
 .tabs {
@@ -173,18 +187,41 @@ html, body {
    ========================================================================== */
 @media (max-width: 768px) {
     .nav-container {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row; /* Behält DE/IT neben den Tabs */
+        justify-content: center;
+        gap: 5px;
     }
 
     .tabs {
         width: 100%;
-        justify-content: space-around;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; /* Tabs brechen um, wenn Platz nicht reicht */
+        margin-bottom: 5px;
     }
 
     .tab-btn {
-        padding: 8px 5px;
-        font-size: 0.7rem; /* Kleinerer Text für Handy-Buttons */
+        padding: 10px 6px !important;
+        font-size: 0.75rem !important;
+        background: transparent !important; /* Absicherung gegen Grau */
+    }
+    
+    .lang-switch {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-top: 5px;
+        border-top: 1px solid #444;
+    }
+
+    /* Container-Absicherung gegen Rechts-Wackeln */
+    .container, .about-section, .info-section-compact {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
     }
 
     /* WICHTIG: Hier nehmen wir Breiten weg, die das Handy sprengen */
@@ -202,3 +239,244 @@ html, body {
 body.admin-mode .admin-only, 
 body.admin-mode .btn-ctrl, 
 body.admin-mode .admin-panel { display: block !important; }
+
+
+/* ==========================================================================
+   TV-SPORT LISTE: WIEDERHERSTELLUNG DER ORIGINAL-OPTIK
+   ========================================================================== */
+.tv-sport-container {
+    max-width: 1000px; /* Oder deine ursprüngliche Breite */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #222; /* Falls die Liste einen eigenen Hintergrund hatte */
+    border-radius: 8px;
+}
+
+.tv-sport-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #333;
+    font-family: 'Oswald', sans-serif; /* Oft für Sport-Listen genutzt */
+}
+
+/* Die linke Seite: Uhrzeit & Datum */
+.sport-time {
+    color: var(--red);
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 100px;
+}
+
+/* Die Mitte: Das Event/Spiel */
+.sport-event {
+    flex-grow: 1;
+    color: #fff;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+/* Die rechte Seite: Der Kanal/Sender */
+.sport-channel {
+    background-color: var(--red);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Falls es eine Tabelle war, nimm diesen Stil: */
+.tv-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+}
+
+.tv-table th {
+    background-color: var(--red);
+    padding: 12px;
+    text-align: left;
+}
+
+.tv-table td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+
+
+
+
+/* ==========================================================================
+   FOOTER: 3-SPALTEN-LAYOUT (LINKS | MITTE | RECHTS)
+   ========================================================================== */
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 50px 0 30px 0;
+    margin-top: 60px;
+    border-top: 5px solid var(--red);
+    width: 100%;
+}
+
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    /* Erzeugt exakt 3 Spalten am PC */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 30px;
+}
+
+.footer-section {
+    text-align: left; /* Alles wird linksbündig innerhalb der Spalte */
+}
+
+.footer-section h3, 
+.footer-section h4 {
+    color: var(--red);
+    font-size: 1.2rem;
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+}
+
+/* Erzwingt die neuen Zeilen für die Adresse und Kontakt-Infos */
+.footer-section span, 
+.footer-section p,
+.footer-section a {
+    display: block; 
+    margin: 5px 0;
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    color: var(--red);
+}
+
+
+/* Das Copyright-Feld (muss außerhalb des Grids liegen) */
+.footer-bottom {
+    grid-column: 1 / -1; /* Sicherheitsregel, falls es doch im Grid landet */
+    width: 100%;
+    text-align: center;   /* Zentriert den Text */
+    margin-top: 40px;     /* Abstand zu den Spalten darüber */
+    padding-top: 20px;
+    border-top: 1px solid #333; /* Optionale feine Linie zur Abgrenzung */
+}
+
+.footer-bottom {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px; /* Abstand nach oben zu den Spalten */
+    padding-top: 20px; /* Abstand von der Linie zum Text */
+    
+    /* HIER ist die einzige Linie: */
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important; 
+    
+    /* Sicherheitshalber alle anderen Ränder auf 0 setzen */
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.copyright-text {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Wir löschen die alte Divider-Klasse komplett, falls sie noch drin ist */
+.footer-divider {
+    display: none !important;
+}
+
+/* HANDY-ANPASSUNG: Untereinander stapeln */
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr; /* Nur 1 Spalte am Handy */
+        text-align: center; /* Am Handy sieht zentriert meist besser aus */
+    }
+    
+    .footer-section {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #333;
+    }
+    
+    .footer-section:last-child {
+        border-bottom: none;
+    }
+}
+
+
+/* ==========================================================================
+   TV-SPORT LISTE: WIEDERHERSTELLUNG ORIGINAL FARBE & STÄRKE
+   ========================================================================== */
+
+/* ==========================================================================
+   TV-SPORT LISTE: DATUM OBEN, REST IN EINER ZEILE
+   ========================================================================== */
+
+.event-date {
+    color: #8B4513 !important;
+    text-align: center !important;
+    font-size: 1.4rem !important; 
+    font-weight: bold !important;    
+    margin-bottom: 15px !important;
+    display: block !important;
+}
+
+/* DAS GRID: Sorgt dafür, dass Zeit, Teams und League nebeneinander stehen */
+.event-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
+
+/* LINKS: Zeit bekommt eine feste Breite (ca. 2cm / 80px) */
+.event-time {
+    color: #8B4513 !important; 
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    min-width: 80px !important; /* Erzeugt den Abstand für die Teams */
+    text-align: left !important;
+}
+
+/* MITTE: Teams rückt nun automatisch nach rechts */
+.event-teams {
+    color: #333 !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    /*text-transform: uppercase !important;*/
+    text-align: left !important; /* Links ausgerichtet, damit der Abstand zur Zeit passt */
+    flex-grow: 1 !important;
+    margin-left: 20px !important; /* Zusätzlicher fixer Abstand */
+}
+
+/* RECHTS: League */
+.event-league {
+    color: #666 !important;
+	text-align: right;
+    font-style: italic;
+    /*font-weight: bold !important;*/
+    font-size: 0.9rem !important;
+    text-align: right !important;
+}
+
+.event-card {
+    background-color: #ffffff !important;
+    border: 1px solid #8B4513 !important; 
+    margin-bottom: 20px !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
