@@ -632,3 +632,31 @@ footer {
     }
 }
 
+
+/* --- HANDY OPTIK (Standard) --- */
+.mobile-price {
+    display: block !important; /* Preis unter Beschreibung anzeigen */
+    text-align: left;
+    margin-top: 5px;
+}
+
+.pc-price {
+    display: none !important; /* Preis oben neben Name ausblenden */
+}
+
+/* --- PC OPTIK (ab 850px) --- */
+@media (min-width: 850px) {
+    .mobile-price {
+        display: none !important; /* Handy-Preis verstecken */
+    }
+
+    .pc-price {
+        display: inline-block !important; /* PC-Preis neben Name anzeigen */
+    }
+
+    .entry-header {
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+}
+
