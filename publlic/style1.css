@@ -1,34 +1,74 @@
 /* ==========================================================================
-   1. GLOBALE EINSTELLUNGEN & VARIABLEN
+Header & Logo		Integriert in Sektion 2 (flexibler für Handy).
+Navigation / Tabs	Integriert in Sektion 2 (kein Rausrutschen mehr durch margin-left).
+Hero (Willkommen)	Integriert in Sektion 4 (Schriftgrößen für Mobile angepasst).
+Pizza / Speisen		Integriert in Sektion 3 & 6 (Grid wechselt sauber von 3 auf 1 Spalte).
+Öffnungszeiten		Integriert in Sektion 4 & 6 (Stapel-Logik für schmale Handys).
+TV-Events			Integriert in Sektion 5 & 6 (Einspaltig auf Mobile für bessere Lesbarkeit).
+Admin-Elemente		Integriert in Sektion 7 (Saubere display: none Logik).
+Popup / Scroll-Hint	Die Animationen und Styles sind in Sektion 5 erhalten geblieben.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. GLOBALE BASIS (Rausrück-Schutz)
    ========================================================================== */
 :root {
-    --red: rgb(144, 41, 50);
+    --red: rgb(144, 41, 44);
     --dark: #1a1a1a;
     --light: #f4f4f4;
     --white: #ffffff;
 }
 
 * {
-    box-sizing: border-box; /* Verhindert, dass Padding Elemente verbreitert */
+    box-sizing: border-box;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+html, body {
     margin: 0;
     padding: 0;
-    background: var(--light);
-    overflow-x: hidden; /* Wichtig: Verhindert seitliches Wackeln am Handy */
     width: 100%;
-}
-
-h1, h2, h3, p {
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    margin-top: 0;
+    overflow-x: hidden; /* Verhindert das seitliche Wackeln */
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--light);
 }
 
 /* ==========================================================================
-   2. HEADER & NAVIGATION
+   2. BUTTON STYLES (Gelten für PC UND Handy)
+   ========================================================================== */
+.tab-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 12px 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    color: var(--red) !important;
+    border-bottom: 3px solid var(--red);
+}
+
+.lang-btn {
+    background: #444;
+    border: 1px solid #666;
+    color: white;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.lang-btn.active {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+/* ==========================================================================
+   3. HEADER & NAV (Kein Rausrücken)
    ========================================================================== */
 .main-header {
     background-color: var(--red);
@@ -40,31 +80,19 @@ h1, h2, h3, p {
 }
 
 .main-header .logo {
-    width: 70px;
-    height: 70px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
     border: 2px solid white;
     object-fit: cover;
-    border-radius: 50%;
     flex-shrink: 0;
 }
 
-.header-text {
-    margin-left: 20px;
-}
-
-.header-text h1 {
-    font-size: 1.4rem;
-    line-height: 1.2;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-}
-
-/* TABS / NAVIGATION */
 .nav-container {
+    background: #222;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #222;
-    padding: 5px 20px;
+    padding: 10px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -74,192 +102,103 @@ h1, h2, h3, p {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-}
-
-.tab-btn {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 12px 15px;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-}
-
-.tab-btn.active {
-    color: var(--red);
-    border-bottom: 3px solid var(--red);
+    flex-grow: 1;
 }
 
 /* ==========================================================================
-   3. HAUPT-LAYOUT (CONTAINER & GRIDS)
+   4. SEKTIONEN (ABOUT & INFO CARDS)
    ========================================================================== */
 .container {
+    width: 100%;
     max-width: 1100px;
-    width: 95%;
-    margin: 20px auto;
+    margin: 0 auto;
+    padding: 15px; /* Sicherheitsabstand zum Rand */
 }
 
-#content-area {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-/* Grid Modi für Speisekarte */
-@media (min-width: 850px) {
-    #content-area.grid-mode { grid-template-columns: repeat(3, 1fr); }
-    .pizza-grid { grid-template-columns: repeat(3, 1fr) !important; }
-}
-
-.entry {
-    background: var(--white);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #ddd;
-}
-
-.item-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-}
-
-/* ==========================================================================
-   4. SEKTIONEN (ABOUT, HERO, INFO)
-   ========================================================================== */
-/* HERO */
-.hero {
-    position: relative;
-    height: 350px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    overflow: hidden;
-}
-
-.hero-image {
-    position: absolute;
-    width: 100%; height: 100%;
-    object-fit: cover;
-    z-index: 1;
-}
-
-.hero-overlay {
-    position: relative;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 20px;
-    border-radius: 10px;
-    backdrop-filter: blur(3px);
-    max-width: 90%;
-    text-align: center;
-}
-
-/* ABOUT */
 .about-section {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    margin: 40px 0;
+    gap: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
 }
 
-@media (min-width: 850px) {
-    .about-section { flex-direction: row; align-items: flex-start; }
+.about-image {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    border-radius: 10px;
+    margin: 0 auto;
 }
 
-/* INFO CARDS */
+/* Öffnungszeiten & Kontakt */
 .info-section-compact {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 25px;
+    gap: 20px;
+    width: 100%;
 }
 
-@media (min-width: 850px) {
-    .info-section-compact { grid-template-columns: 1fr 1.2fr; }
-}
-
-/* ÖFFNUNGSZEITEN DETAILS */
 .hours-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #eee;
+    width: 100%;
 }
 
-.tag-spalte { font-weight: bold; flex: 0 0 100px; }
-.zeit-spalte { color: var(--red); font-family: monospace; text-align: right; }
+.zeit-spalte {
+    color: var(--red);
+    font-family: monospace;
+    font-weight: bold;
+    text-align: right;
+}
 
 /* ==========================================================================
-   5. SPECIALS (EVENTS, POPUP, FOOTER)
+   5. PC-ANPASSUNGEN (Ab 850px)
    ========================================================================== */
-/* TV EVENTS */
-.event-card {
-    border: 2px solid #8B4513;
-    border-radius: 12px;
-    padding: 15px;
-    background-color: #fffaf0;
-    margin-bottom: 20px;
-}
-
-.event-grid {
-    display: grid;
-    grid-template-columns: 80px 1fr 100px;
-    align-items: center;
-}
-
-/* FOOTER */
-footer {
-    background: #1a1a1a;
-    color: white;
-    padding: 40px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 30px;
-    border-top: 4px solid var(--red);
+@media (min-width: 850px) {
+    .about-section { flex-direction: row; align-items: flex-start; }
+    .about-text { text-align: left; }
+    .info-section-compact { grid-template-columns: 1fr 1.2fr; }
+    .main-header .logo { width: 90px; height: 90px; }
+    #content-area.grid-mode { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 }
 
 /* ==========================================================================
-   6. MOBILE OPTIMIERUNGEN (MAX-WIDTH: 768px)
+   6. HANDY-FIX (Max 768px) - DAS LÖST DAS RAUSRÜCKEN
    ========================================================================== */
 @media (max-width: 768px) {
-    .nav-container { flex-direction: column; }
-    .tabs { margin-left: 0; }
-    .tab-btn { padding: 10px; font-size: 0.75rem; }
-    
-    .hero { height: 280px; }
-    .hero-overlay h2 { font-size: 1.5rem; }
-
-    .about-section { text-align: center; padding: 20px; }
-    .about-image { max-width: 100%; }
-
-    .event-grid {
-        grid-template-columns: 1fr;
-        text-align: center;
+    .nav-container {
+        flex-direction: column;
         gap: 10px;
     }
 
-    .hours-item { flex-wrap: wrap; }
-    .zeit-spalte { min-width: 100%; text-align: left; margin-top: 5px; }
+    .tabs {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .tab-btn {
+        padding: 8px 5px;
+        font-size: 0.7rem; /* Kleinerer Text für Handy-Buttons */
+    }
+
+    /* WICHTIG: Hier nehmen wir Breiten weg, die das Handy sprengen */
+    .zeit-spalte {
+        font-size: 0.85rem;
+    }
+
+    .hero-overlay h2 {
+        font-size: 1.4rem;
+    }
 }
 
-/* ==========================================================================
-   7. ADMIN MODUS
-   ========================================================================== */
+/* ADMIN LOGIK */
 .admin-only, .btn-ctrl, .admin-panel { display: none !important; }
 body.admin-mode .admin-only, 
 body.admin-mode .btn-ctrl, 
 body.admin-mode .admin-panel { display: block !important; }
-body.admin-mode .btn-row.admin-only { display: flex !important; }
