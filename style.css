@@ -1,0 +1,634 @@
+/* ==========================================================================
+Header & Logo		Integriert in Sektion 2 (flexibler für Handy).
+Navigation / Tabs	Integriert in Sektion 2 (kein Rausrutschen mehr durch margin-left).
+Hero (Willkommen)	Integriert in Sektion 4 (Schriftgrößen für Mobile angepasst).
+Pizza / Speisen		Integriert in Sektion 3 & 6 (Grid wechselt sauber von 3 auf 1 Spalte).
+Öffnungszeiten		Integriert in Sektion 4 & 6 (Stapel-Logik für schmale Handys).
+TV-Events			Integriert in Sektion 5 & 6 (Einspaltig auf Mobile für bessere Lesbarkeit).
+Admin-Elemente		Integriert in Sektion 7 (Saubere display: none Logik).
+Popup / Scroll-Hint	Die Animationen und Styles sind in Sektion 5 erhalten geblieben.
+   ========================================================================== */
+
+/*Damit das Handy wirklich aufhört zu wackeln, füge diese Zeilen ganz oben ein*/
+html, body {
+    max-width: 100%;
+    overflow-x: hidden; /* Das ist die wichtigste Zeile! */
+    position: relative;
+}
+
+* {
+    box-sizing: border-box !important;
+}
+
+
+/* ==========================================================================
+   1. GLOBALE BASIS (Rausrück-Schutz)
+   ========================================================================== */
+:root {
+    --red: rgb(144, 41, 44);
+    --dark: #1a1a1a;
+    --light: #f4f4f4;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden; /* Verhindert das seitliche Wackeln */
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--light);
+}
+
+/* ==========================================================================
+   2. BUTTON STYLES (Gelten für PC UND Handy)
+   ========================================================================== */
+.tab-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 12px 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    color: var(--red) !important;
+    border-bottom: 3px solid var(--red);
+}
+
+.lang-btn {
+    background: #444;
+    border: 1px solid #666;
+    color: white;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.lang-btn.active {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+/* ==========================================================================
+   3. HEADER & NAV (Kein Rausrücken)
+   ========================================================================== */
+.main-header {
+    background-color: var(--red);
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.main-header .logo {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.nav-container {
+    background: #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    flex-wrap: wrap; /* Erlaubt Umbruch, damit es nicht rechts rausdrückt */
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+/* ==========================================================================
+   4. SEKTIONEN (ABOUT & INFO CARDS)
+   ========================================================================== */
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 15px; /* Sicherheitsabstand zum Rand */
+}
+
+.about-section {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+}
+
+.about-image {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+/* Öffnungszeiten & Kontakt */
+.info-section-compact {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+}
+
+.hours-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    width: 100%;
+}
+
+.zeit-spalte {
+    color: var(--red);
+    font-family: monospace;
+    font-weight: bold;
+    text-align: right;
+}
+
+/* ==========================================================================
+   5. PC-ANPASSUNGEN (Ab 850px)
+   ========================================================================== */
+@media (min-width: 850px) {
+    .about-section { flex-direction: row; align-items: flex-start; }
+    .about-text { text-align: left; }
+    .info-section-compact { grid-template-columns: 1fr 1.2fr; }
+    .main-header .logo { width: 90px; height: 90px; }
+    #content-area.grid-mode { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}
+
+/* ==========================================================================
+   6. HANDY-FIX (Max 768px) - DAS LÖST DAS RAUSRÜCKEN
+   ========================================================================== */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: row; /* Behält DE/IT neben den Tabs */
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .tabs {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; /* Tabs brechen um, wenn Platz nicht reicht */
+        margin-bottom: 5px;
+    }
+
+    .tab-btn {
+        padding: 10px 6px !important;
+        font-size: 0.75rem !important;
+        background: transparent !important; /* Absicherung gegen Grau */
+    }
+    
+    .lang-switch {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-top: 5px;
+        border-top: 1px solid #444;
+    }
+
+    /* Container-Absicherung gegen Rechts-Wackeln */
+    .container, .about-section, .info-section-compact {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    /* WICHTIG: Hier nehmen wir Breiten weg, die das Handy sprengen */
+    .zeit-spalte {
+        font-size: 0.85rem;
+    }
+
+    .hero-overlay h2 {
+        font-size: 1.4rem;
+    }
+}
+
+/* ADMIN LOGIK */
+.admin-only, .btn-ctrl, .admin-panel { display: none !important; }
+body.admin-mode .admin-only, 
+body.admin-mode .btn-ctrl, 
+body.admin-mode .admin-panel { display: block !important; }
+
+
+/* ==========================================================================
+   TV-SPORT LISTE: WIEDERHERSTELLUNG DER ORIGINAL-OPTIK
+   ========================================================================== */
+.tv-sport-container {
+    max-width: 1000px; /* Oder deine ursprüngliche Breite */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #222; /* Falls die Liste einen eigenen Hintergrund hatte */
+    border-radius: 8px;
+}
+
+.tv-sport-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #333;
+    font-family: 'Oswald', sans-serif; /* Oft für Sport-Listen genutzt */
+}
+
+/* Die linke Seite: Uhrzeit & Datum */
+.sport-time {
+    color: var(--red);
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 100px;
+}
+
+/* Die Mitte: Das Event/Spiel */
+.sport-event {
+    flex-grow: 1;
+    color: #fff;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+/* Die rechte Seite: Der Kanal/Sender */
+.sport-channel {
+    background-color: var(--red);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Falls es eine Tabelle war, nimm diesen Stil: */
+.tv-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+}
+
+.tv-table th {
+    background-color: var(--red);
+    padding: 12px;
+    text-align: left;
+}
+
+.tv-table td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+
+
+
+
+/* ==========================================================================
+   FOOTER: 3-SPALTEN-LAYOUT (LINKS | MITTE | RECHTS)
+   ========================================================================== */
+footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 50px 0 30px 0;
+    margin-top: 60px;
+    border-top: 5px solid var(--red);
+    width: 100%;
+}
+
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    /* Erzeugt exakt 3 Spalten am PC */
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 30px;
+}
+
+.footer-section {
+    text-align: left; /* Alles wird linksbündig innerhalb der Spalte */
+}
+
+.footer-section h3, 
+.footer-section h4 {
+    color: var(--red);
+    font-size: 1.2rem;
+    margin: 0 0 15px 0;
+    text-transform: uppercase;
+}
+
+/* Erzwingt die neuen Zeilen für die Adresse und Kontakt-Infos */
+.footer-section span, 
+.footer-section p,
+.footer-section a {
+    display: block; 
+    margin: 5px 0;
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    color: var(--red);
+}
+
+
+/* Das Copyright-Feld (muss außerhalb des Grids liegen) */
+.footer-bottom {
+    grid-column: 1 / -1; /* Sicherheitsregel, falls es doch im Grid landet */
+    width: 100%;
+    text-align: center;   /* Zentriert den Text */
+    margin-top: 40px;     /* Abstand zu den Spalten darüber */
+    padding-top: 20px;
+    border-top: 1px solid #333; /* Optionale feine Linie zur Abgrenzung */
+}
+
+.footer-bottom {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px; /* Abstand nach oben zu den Spalten */
+    padding-top: 20px; /* Abstand von der Linie zum Text */
+    
+    /* HIER ist die einzige Linie: */
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important; 
+    
+    /* Sicherheitshalber alle anderen Ränder auf 0 setzen */
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.copyright-text {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Wir löschen die alte Divider-Klasse komplett, falls sie noch drin ist */
+.footer-divider {
+    display: none !important;
+}
+
+/* HANDY-ANPASSUNG: Untereinander stapeln */
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr; /* Nur 1 Spalte am Handy */
+        text-align: center; /* Am Handy sieht zentriert meist besser aus */
+    }
+    
+    .footer-section {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #333;
+    }
+    
+    .footer-section:last-child {
+        border-bottom: none;
+    }
+}
+
+
+/* ==========================================================================
+   TV-SPORT LISTE: DATUM OBEN, REST IN EINER ZEILE
+   ========================================================================== */
+
+.event-date {
+    color: #8B4513 !important;
+    text-align: center !important;
+    font-size: 1.4rem !important; 
+    font-weight: bold !important;    
+    margin-bottom: 15px !important;
+    display: block !important;
+}
+
+/* DAS GRID: Sorgt dafür, dass Zeit, Teams und League nebeneinander stehen */
+.event-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
+
+/* LINKS: Zeit bekommt eine feste Breite (ca. 2cm / 80px) */
+.event-time {
+    color: #8B4513 !important; 
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    min-width: 80px !important; /* Erzeugt den Abstand für die Teams */
+    text-align: left !important;
+}
+
+/* MITTE: Teams rückt nun automatisch nach rechts */
+.event-teams {
+    color: #333 !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    /*text-transform: uppercase !important;*/
+    text-align: left !important; /* Links ausgerichtet, damit der Abstand zur Zeit passt */
+    flex-grow: 1 !important;
+    margin-left: 20px !important; /* Zusätzlicher fixer Abstand */
+}
+
+/* RECHTS: League */
+/* League auf HANDY: Langgezogen, hellgrau, ohne Rahmenlinie */
+/* ==========================================================================
+   FINALE TV-SPORT LISTE: PC & HANDY OPTIMIERT
+   ========================================================================== */
+
+.event-card {
+    background-color: #ffffff !important;
+    border: 1px solid #8B4513 !important; 
+    margin-bottom: 20px !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.event-date {
+    color: #8B4513 !important;
+    text-align: center !important;
+    font-size: 1.4rem !important; 
+    font-weight: bold !important;    
+    margin-bottom: 15px !important;
+    display: block !important;
+}
+
+.event-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
+
+.event-time {
+    color: #8B4513 !important; 
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    min-width: 80px !important;
+    text-align: left !important;
+}
+
+.event-teams {
+    color: #333 !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    text-align: left !important;
+    flex-grow: 1 !important;
+    margin-left: 20px !important;
+}
+
+.event-league {
+    color: #666 !important;
+    font-style: italic;
+    font-size: 0.9rem !important;
+    text-align: right !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* HANDY ANPASSUNGEN */
+@media (max-width: 768px) {
+    .event-grid {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    .event-date {
+        margin-bottom: 30px !important;
+    }
+
+    .event-time, .event-teams {
+        text-align: center !important;
+        margin-left: 0 !important;
+        min-width: 0 !important;
+    }
+
+    .event-league {
+        background-color: #f2f2f2 !important;
+        border: none !important;
+        border-radius: 0 !important; /* Eckig */
+        padding: 2px 0 !important; /* Flach */
+        color: #555 !important;
+        text-align: center !important;
+        display: block !important;
+        width: 96% !important; /* Langgezogen */
+        margin: 8px auto 0 auto !important;
+        font-style: normal !important;
+    }
+}
+
+
+
+/* ==========================================================================
+   DER "ALLES-PASST-JETZT" FIX FÜR MOBILE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    /* 1. Den gesamten Wrapper zähmen */
+    html, body, .main-content-wrapper {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+    }
+
+    /* 2. Alle Container auf maximale Bildschirmbreite zwingen */
+    div, section, .start-container, .info-card-responsive {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important; /* Hebt feste min-widths auf */
+    }
+
+    /* 3. Bilder-Fix (lokal.webp und pizza.webp) */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* 4. Telefonnummer-Fix (Kein Rausdrücken mehr) */
+    a[href^="tel"] {
+        font-size: 1.1rem !important;
+        word-break: break-all !important;
+        display: block !important;
+    }
+
+    /* 5. Flex-Layouts untereinander stapeln */
+    .about-section, 
+    div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 15px !important;
+    }
+    
+    /* 6. Widget-Buttons (Insta, Google) zentrieren */
+    div[style*="width: 110px"] {
+        margin: 10px auto !important;
+        align-items: center !important;
+    }
+}
+
+
+/* Am Handy: Alles untereinander */
+.pizza-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Am PC (ab 850px): 3 Spalten nebeneinander */
+@media (min-width: 850px) {
+    .pizza-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 20px !important;
+        align-items: stretch;
+    }
+
+    /* Damit die Rahmen die volle Breite der Grid-Zelle nutzen */
+    .pizza-grid .entry {
+        width: 100% !important;
+        max-width: none !important;
+        margin-bottom: 0 !important;
+        height: 100%;
+    }
+}
+
