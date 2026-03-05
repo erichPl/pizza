@@ -46,32 +46,32 @@
 <!-- FOOTER
 ------------------->   
 <footer>
-    <div class="footer-section">
-        <strong>Pizzeria Pub St. Sisinius</strong>
-        <span id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</span>
-        <span id="footer-region">Südtirol, Italien)</span>
-    </div>
-    
-    <div class="footer-section">
-        <strong id="footer-contact">Kontakt</strong>
-        <a href="tel:+393898334004">Tel: +39 389 833 4004</a>
-        <span id="footer-mwst" style="opacity: 0.8; font-size: 0.8rem;">MwSt.-Nr.: 03317990210</span>
-    </div>
+	<div class="footer-container">
+		<div class="footer-section">
+			<strong>Pizzeria Pub St. Sisinius</strong>
+			<span id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</span>
+			<span id="footer-region">Südtirol, Italien</span>
+		</div>
+		
+		<div class="footer-section">
+			<strong id="footer-contact">Kontakt</strong>
+			<a href="tel:+393898334004">Tel: +39 389 833 4004</a>
+			<span id="footer-mwst" style="opacity: 0.8; font-size: 0.8rem;">MwSt.-Nr.: 03317990210</span>
+		</div>
 
-    <div class="footer-section">
-        <strong id="footer-rechtliches">Rechtliches</strong>
-        <a href="impressumDe.html" id="footer-impressum-link">Impressum / Note Legali</a>
-        <a href="datenschutzDe.html" id="footer-datenschutz-link">Datenschutz / Privacy</a>
-    </div>
-	  <!-- Trennlinie und Copyright -->
-    <!-- Diese Box erzwingt eine neue Zeile -->
-    <div class="footer-bottom">
-        <hr class="footer-divider">
+		<div class="footer-section">
+			<strong id="footer-rechtliches">Rechtliches</strong>
+			<a href="impressumDe.html" id="footer-impressum-link">Impressum / Note Legali</a>
+			<a href="datenschutzDe.html" id="footer-datenschutz-link">Datenschutz / Privacy</a>
+		</div>		
+	</div>
+    <!-- Trennlinie und Copyright -->
+	<!-- Diese Box erzwingt eine neue Zeile -->
+	</div> <div class="footer-bottom">
         <p class="copyright-text">
             &copy; 2026 Pizzeria Pub St. Sisinius. Alle Rechte vorbehalten.
         </p>
     </div>
-	
 </footer>
 
 
@@ -1326,18 +1326,20 @@ function getStartPageFullLayout(data, lang, editMode) {
 			<div style="display: flex; gap: 25px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0;">
 					
 			   <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
-				<div class="info-card-responsive contact-card-large" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 310px; max-width: 100%;">
+				<!--// ÄNDERUNG: min-width auf 280px senken und box-sizing hinzufügen-->
+				<div class="info-card-responsive contact-card-large" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 280px; max-width: 100%; box-sizing: border-box;">
 					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
 						
 						<!-- Text-Teil (Links) -->
-						<div style="flex: 1; min-width: 150px;">
-							<h3 style="color:#dc3545; margin-top: 0; font-size: 1.5rem;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
+						<div style="flex: 1; min-width: 0;">
+							<h3 style="color:#dc3545; margin-top: 0; font-size: 1.3rem; overflow-wrap: break-word;">${lang === 'DE' ? 'Kontakt' : 'Contatto'}</h3>
 							<a href="tel:+393898334004" style="font-weight: bold; text-decoration: none; font-size: 1.3rem; color: #333; display: block; margin-bottom: 5px;">+39 389 833 4004</a>
 							<p style="font-size: 0.9rem; font-weight: bold; color: #666; margin-top: 10px;">${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}</p>
 						</div>
 						
 						<!-- Widget-Teil (Rechts) -->
-						<div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 10px;">
+						<!-- ÄNDERUNG: flex-shrink: 0 hinzugefügt, damit die Buttons nicht gequetscht werden, aber auch nicht schieben-->
+						<div style="display: flex; flex-direction: column; align-items: flex-end; width: 110px; gap: 10px; flex-shrink: 0;">
 							
 							<!-- 1. GOOGLE MAPS WIDGET MIT ORTHOFOTO -->
 							<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
