@@ -459,25 +459,9 @@ footer {
 
 /* RECHTS: League */
 /* League auf HANDY: Langgezogen, hellgrau, ohne Rahmenlinie */
-.event-league {
-	background-color: #f5f5f5 !important; /* Sehr helles Grau */
-	border: none !important;              /* Keine sichtbare Rahmenlinie */
-	border-radius: 4px !important;
-	
-	/* Oben/Unten wenig (4px), Links/Rechts viel (0px weil width regelt) */
-	padding: 4px 0 !important;           
-	
-	color: #555 !important;
-	text-align: center !important;
-	
-	/* Langgezogen mit kleinem Abstand zum Außenrahmen */
-	display: block !important;            /* Block sorgt für volle Breite */
-	width: 92% !important;                /* Fast volle Breite */
-	margin: 5px auto !important;          /* Zentriert mit kleinem Abstand oben/unten */
-	
-	font-size: 0.9rem !important;
-	font-style: normal !important;
-}
+/* ==========================================================================
+   FINALE TV-SPORT LISTE: PC & HANDY OPTIMIERT
+   ========================================================================== */
 
 .event-card {
     background-color: #ffffff !important;
@@ -489,22 +473,61 @@ footer {
     flex-direction: column !important;
 }
 
+.event-date {
+    color: #8B4513 !important;
+    text-align: center !important;
+    font-size: 1.4rem !important; 
+    font-weight: bold !important;    
+    margin-bottom: 15px !important;
+    display: block !important;
+}
 
+.event-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
 
+.event-time {
+    color: #8B4513 !important; 
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    min-width: 80px !important;
+    text-align: left !important;
+}
 
-/* ==========================================================================
-   HANDY: UNTEREINANDER & GRAUER RAHMEN FÜR LEAGUE
-   ========================================================================== */
+.event-teams {
+    color: #333 !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    text-align: left !important;
+    flex-grow: 1 !important;
+    margin-left: 20px !important;
+}
 
+.event-league {
+    color: #666 !important;
+    font-style: italic;
+    font-size: 0.9rem !important;
+    text-align: right !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* HANDY ANPASSUNGEN */
 @media (max-width: 768px) {
     .event-grid {
-        flex-direction: column !important; /* Stapeln */
-        align-items: center !important;    /* Zentrieren */
-        gap: 12px !important;              /* Abstand zwischen den Zeilen */
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 12px !important;
     }
 
     .event-date {
-        margin-bottom: 30px !important;    /* Die gewünschte "Leerzeile" nach Datum */
+        margin-bottom: 30px !important;
     }
 
     .event-time, .event-teams {
@@ -513,18 +536,75 @@ footer {
         min-width: 0 !important;
     }
 
-    /* League auf HANDY: Mit grauem Kasten & Einrückung */
     .event-league {
-        background-color: #f0f0f0 !important; /* Leichtes Grau */
-        border: 1px solid #ccc !important;    /* Dezenter Rand */
-        border-radius: 6px !important;
-        padding: 6px 15px !important;        /* Innenabstand */
-        color: #444 !important;
+        background-color: #f2f2f2 !important;
+        border: none !important;
+        border-radius: 0 !important; /* Eckig */
+        padding: 2px 0 !important; /* Flach */
+        color: #555 !important;
         text-align: center !important;
-        display: inline-block !important;
-        /* Einrückung vom Hauptrahmen */
-        margin: 0 20px !important; 
-        font-size: 0.95rem !important;
+        display: block !important;
+        width: 96% !important; /* Langgezogen */
+        margin: 8px auto 0 auto !important;
+        font-style: normal !important;
     }
 }
+
+
+
+/* ==========================================================================
+   DER "ALLES-PASST-JETZT" FIX FÜR MOBILE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    /* 1. Den gesamten Wrapper zähmen */
+    html, body, .main-content-wrapper {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+    }
+
+    /* 2. Alle Container auf maximale Bildschirmbreite zwingen */
+    div, section, .start-container, .info-card-responsive {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        min-width: 0 !important; /* Hebt feste min-widths auf */
+    }
+
+    /* 3. Bilder-Fix (lokal.webp und pizza.webp) */
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    /* 4. Telefonnummer-Fix (Kein Rausdrücken mehr) */
+    a[href^="tel"] {
+        font-size: 1.1rem !important;
+        word-break: break-all !important;
+        display: block !important;
+    }
+
+    /* 5. Flex-Layouts untereinander stapeln */
+    .about-section, 
+    div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 15px !important;
+    }
+    
+    /* 6. Widget-Buttons (Insta, Google) zentrieren */
+    div[style*="width: 110px"] {
+        margin: 10px auto !important;
+        align-items: center !important;
+    }
+}
+
+
+
 
