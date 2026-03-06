@@ -1350,20 +1350,27 @@ function getStartPageFullLayout(data, lang, editMode) {
     
 				<img src="pizza.webp" alt="Pizza" class="about-image" 
 					 style="max-width: 100%; width: 400px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; flex-shrink: 1; display: block; margin: 0 auto;">
-				
-				<div class="about-text" style="flex: 1; min-width: 250px; font-size: 1.1rem; line-height: 1.7; word-wrap: break-word; text-align: center;">
-					${lang === 'DE' ? 
-						`<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
-						 <p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend</p>
-						 <p>mit Sky Live-Sport, Billiard oder Darts – bei uns sind Sie richtig.</p>
-						 <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>` 
-						: 
-						`<p>Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
-						 <p>Godetevi le nostre pizze in un'atmosfera accogliente</p>
-						 <p>con Sky live-sport, billiardo o darts</p>
-						 <p><strong>Non vediamo l'ora di darvi il benvenuto!</p>`
-					}
+				<div style="display: flex; flex-direction: column; align-items: center; width: 450px; max-width: 100%;">
+					<img src="cdb.jpg" alt="Cocktail Darts Billiard" class="about-image" 
+						style="max-width: 100%; width: 450px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; flex-shrink: 1; display: block; margin: 0 auto;">
+					
+					
+					
+					<div class="about-text" style="flex: 1; min-width: 250px; font-size: 0.9rem; line-height: 1.7; word-wrap: break-word; text-align: center;">
+						${lang === 'DE' ? 
+							`<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
+							 <p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend</p>
+							 <p>mit Sky Live-Sport, Billiard oder Darts – bei uns sind Sie richtig.</p>
+							 <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>` 
+							: 
+							`<p>Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
+							 <p>Godetevi le nostre pizze in un'atmosfera accogliente</p>
+							 <p>con Sky live-sport, billiardo o darts</p>
+							 <p><strong>Non vediamo l'ora di darvi il benvenuto!</p>`
+						}
+					</div>
 				</div>
+			
 			</div>
 			<!--Kontakt  (incl. google,instagram, facebook)
 	        ---------------------------------------------->
@@ -1600,5 +1607,4 @@ function getCategoryHeaderHtml(txt) {
 </script>
 </body>
 </html>
-
 
