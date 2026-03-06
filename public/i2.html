@@ -1376,11 +1376,36 @@ function getStartPageFullLayout(data, lang, editMode) {
 	        ---------------------------------------------->
 			<!-- INFO WRAPPER: KONTAKT & ZEITEN -->
 			<div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0; width: 100%; box-sizing: border-box;">
-					
+				
+				<!-- RECHTER RAHMEN: ÖFFNUNGSZEITEN & EDITOR 
+				-------------------------------------------->
+                <div class="info-card-responsive opening-hours-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.4; min-width: 310px; max-width: 100%;">			
+                    <h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 1px; margin-bottom: 5px;">
+                        ${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}
+                    </h3>
+                    
+                    <div style="display: block; width: 100%;">
+                        ${zeitenListe}
+                    </div>
+
+                    <!-- ADMIN BEREICH (Innerhalb der Box) -->
+                    ${editMode ? `
+                        <div style="margin-top: 25px; border-top: 2px dashed #ffc107; padding-top: 20px;">
+                            ${addTimeBtn}
+                            <div style="width: 100%; overflow-x: auto;">
+                                ${adminBox}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+
+
+
+				
 			   <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
 				<!--// ÄNDERUNG: min-width auf 280px senken und box-sizing hinzufügen-->
 				<div class="info-card-responsive contact-card-large" 
-                        style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1; min-width: 250px; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+                        style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.2; min-width: 250px; max-width: 100%; box-sizing: border-box; overflow: hidden;">
 					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
 					
 						<!-- Text-Teil (Links) -->
@@ -1401,69 +1426,44 @@ function getStartPageFullLayout(data, lang, editMode) {
 						
 						<!-- Widget-Teil (Rechts) -->
 						<!-- ÄNDERUNG: flex-shrink: 0 hinzugefügt, damit die Buttons nicht gequetscht werden, aber auch nicht schieben-->
-						<div style="display: flex; flex-direction: column; align-items: center; width: 110px; gap: 8px; flex-shrink: 0; margin: 0 auto;">	
-							<!-- 1. GOOGLE MAPS WIDGET MIT ORTHOFOTO -->
-							<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu"
-							   target="_blank" 
-							   style="text-decoration: none; display: block; cursor: pointer; width: 110px;">
-								<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
-									<div style="position: relative; width: 110px; height: 90px;">
-										<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-										<!-- Der 📍 Marker -->
-										<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
+						<!-- Container jetzt auf row (nebeneinander) gestellt und Breite erhöht -->
+						<div style="display: flex; flex-direction: row; align-items: flex-start; width: 230px; gap: 10px; flex-shrink: 0; margin: 0 auto;">	
+							
+							<!-- LINKER TEIL: GOOGLE MAPS + QUELLENNACHWEIS -->
+							<div style="display: flex; flex-direction: column; width: 110px;">
+								<a href="https://www.google.com..." target="_blank" style="text-decoration: none; display: block; width: 110px;">
+									<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
+										<div style="position: relative; width: 110px; height: 90px;">
+											<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+											<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
+										</div>
+										<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
+											${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
+										</div>
 									</div>
-									<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
-										${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
-									</div>
-								</div>
-							</a>
+								</a>
+								<p style="font-size: 8px; color: #999; margin: 5px 0; text-align: right; line-height: 1.1;">
+									© Prov. BZ - CC BY 4.0<br><span style="font-size: 7px;">Geoportal Südtirol</span>
+								</p>
+							</div>
 
-							<!-- 2. QUELLENNACHWEIS SÜDTIROL -->
-							<p style="font-size: 8px; color: #999; margin: -5px 0 5px 0; text-align: right; line-height: 1.1; width: 110px; padding-right: 2px;">
-								© Prov. BZ - CC BY 4.0<br>
-								<span style="font-size: 7px;">Geoportal Südtirol</span>
-							</p>
+							<!-- RECHTER TEIL: INSTAGRAM & FACEBOOK -->
+							<div style="display: flex; flex-direction: column; gap: 8px; width: 110px;">
+								<!-- INSTAGRAM BUTTON -->
+								<a href="https://www.instagram.com/stsisinius" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 10px 0; font-size: 9px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+									<span style="font-size: 12px; margin-right: 4px;">📸</span> INSTAGRAM
+								</a>
 
-							<!-- 3. INSTAGRAM BUTTON -->
-							<a href="https://www.instagram.com/stsisinius"
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-								<span style="font-size: 12px; margin-right: 5px;">📸</span> 
-								INSTAGRAM
-							</a>
-
-							<!-- 4. FACEBOOK BUTTON -->
-							<a href="https://www.facebook.com/61585930843655/"
-							   target="_blank" 
-							   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-								<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
-								FACEBOOK
-							</a>
+								<!-- FACEBOOK BUTTON -->
+								<a href="https://www.facebook.com/61585930843655/" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 10px 0; font-size: 9px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+									<span style="font-size: 14px; margin-right: 4px;">f</span> FACEBOOK
+								</a>
+							</div>
 						</div>
 					</div>
 				</div>
 
-                <!-- RECHTER RAHMEN: ÖFFNUNGSZEITEN & EDITOR 
-				-------------------------------------------->
-                <div class="info-card-responsive opening-hours-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.6; min-width: 310px; max-width: 100%;">			
-                    <h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 1px; margin-bottom: 5px;">
-                        ${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}
-                    </h3>
-                    
-                    <div style="display: block; width: 100%;">
-                        ${zeitenListe}
-                    </div>
-
-                    <!-- ADMIN BEREICH (Innerhalb der Box) -->
-                    ${editMode ? `
-                        <div style="margin-top: 25px; border-top: 2px dashed #ffc107; padding-top: 20px;">
-                            ${addTimeBtn}
-                            <div style="width: 100%; overflow-x: auto;">
-                                ${adminBox}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
+                
             </div> <!-- Ende Info Wrapper -->
 			 
 			<!-- ADMIN-BEREICH: POPUP / NOTICE 
