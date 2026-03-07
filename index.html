@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+	
+	
+	
+    <!-- SEO Google Tags -->
+    <title>Pizzeria Pub St. Sisinius Laas - Authentische Pizza & Sportbar im Vinschgau</title>
+    <meta name="description" content="Pizzeria Pub St. Sisinius in Laas - Genießen Sie Pizza mit frischen Zutaten. Cocktails, Darts, Billiard, Sportbar mit Sky-TV Live-Übertragungen. Pizza zum Mitnehmen. Reservierung: +39 389 833 4004">
+    <meta name="keywords" content="Pizzeria Laas, Pizza Vinschgau, Restaurant Laas, Sportbar Südtirol, Pizza zum Abholen, St. Sisinius, Pizza, Cocktails, Darts, Billiard">
+    <meta name="author" content="Pizzeria Pub St. Sisinius">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="restaurant">
+    <meta property="og:url" content="https://pizzeria-st-sisinius.com/">
+    <meta property="og:title" content="Pizzeria Pub St. Sisinius in Laas">
+    <meta property="og:description" content="Pizza mit frischen Zutaten in gemütlicher Atmosphäre. Cocktails, Darts, Billiard, Sportbar mit Sky-TV Live-Übertragungen in Laas, Südtirol.">
+    <meta property="og:image" content="https://pizzeria-st-sisinius.com/lokal.webp">
+    <meta property="og:locale" content="de_DE">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pizzeria Pub St. Sisinius Laas">
+    <meta name="twitter:description" content="Pizza im Vinschgau. Cocktails, Darts, Billiard, Sportbar mit Live-Übertragungen.">
+    <meta name="twitter:image" content="https://pizzeria-st-sisinius.com/lokal.webp">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pizzeria-st-sisinius.com/">
+	
+	<title>Pizzeria Pub St. Sisinius</title>
+    
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<!--==============================================
+ STATISCHES HTML LAYOUT
+==================================================-->
+<body>
+
+<style>
+* Standard für PC */
+.main-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+
+/* Nur für Handy */
+@media (max-width: 768px) {
+    .main-header {
+        /* Bleibt nebeneinander */
+        flex-direction: row; 
+        justify-content: flex-start;
+        padding: 10px;
+    }
+
+    .main-header .logo {
+        width: 50px; /* Kleineres Logo für mehr Platz daneben */
+        height: auto;
+    }
+
+    .main-header h1 {
+        /* Etwas größer als 0.8rem, damit es lesbar bleibt */
+        font-size: 0.8rem; 
+        line-height: 0.6;
+    }
+
+    #ort {
+        font-size: 0.6rem;
+        margin: 0;
+    }
+}
+</style>
+
+
+
+
+<!-- HEADER 
+------------------->    
+<header class="main-header">
+    <img src="logo.webp" class="logo" alt="Logo">
+    <div class="header-text">
+        <h1>Pizzeria Pub St. Sisinius</h1>
+		<p id="ort">Laas - Vinschgau</p>	
+    </div>
+</header>
+
+<!-- NAV CONTAINER
+------------------->    
+<div class="nav-container">
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-start" onclick="setTab('start')">Home</button>
+        <button class="tab-btn" id="tab-pizzas" onclick="setTab('pizzas')">Pizzakarte</button>
+        <button class="tab-btn" id="tab-events" onclick="setTab('events')">Events</button>
+        <button class="tab-btn" id="tab-tv" onclick="setTab('tv')">TV-Sport</button>
+    </div>
+    <div class="lang-switch">
+        <button class="lang-btn active" id="btn-de" onclick="setLang('DE')">DE</button>
+        <button class="lang-btn" id="btn-it" onclick="setLang('IT')">IT</button>
+    </div>
+</div>
+
+<div class="container">
+    <div id="content-area"></div>
+</div>
+  
+
+<!-- FOOTER
+------------------->   
+<footer>
+	<div class="footer-container">
+		<div class="footer-section">
+			<strong>Pizzeria Pub St. Sisinius</strong>
+			<span id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</span>
+			<span id="footer-region">Südtirol, Italien</span>
+		</div>
+		
+		<div class="footer-section">
+			<strong id="footer-contact">Kontakt</strong>
+			<a href="tel:+393898334004">Tel: +39 389 833 4004</a>
+			<span id="footer-mwst" style="opacity: 0.8; font-size: 0.8rem;">MwSt.-Nr.: 03317990210</span>
+		</div>
+
+		<div class="footer-section">
+			<strong id="footer-rechtliches">Rechtliches</strong>
+			<a href="impressumDe.html" id="footer-impressum-link">Impressum / Note Legali</a>
+			<a href="datenschutzDe.html" id="footer-datenschutz-link">Datenschutz / Privacy</a>
+		</div>		
+	</div>
+    <!-- Trennlinie und Copyright -->
+	<!-- Diese Box erzwingt eine neue Zeile -->
+	</div> <div class="footer-bottom">
+        <p class="copyright-text">
+            &copy; 2026 Pizzeria Pub St. Sisinius. Alle Rechte vorbehalten.
+        </p>
+    </div>
+</footer>
+
+
+<!--==============================================
+               SCRIPT
+==================================================-->
+<script>
+ 
+ 
+ 
+// Liest das Passwort einmalig aus der URL
+const urlParams = new URLSearchParams(window.location.search);
+const currentPw = urlParams.get('pw') || ''; 
+
+// Basis-URL für deine API-Aufrufe
+const apiUrl = `/api/data?pw=${currentPw}`;
+ 
+ 
+ 
+ 
+// 1. STYLE-BLOCK ALS VARIABLE (Ganz oben im Script)
+// Wir brechen die Tags auf: '<' + 'style>'
+const styleOpen = '<' + 'style>';
+const styleClose = '<' + '/' + 'style>';
+// Hilfsvariablen für "gefährliche" Zeichen
+const q = "'";  // Ein einfaches Anführungszeichen
+const dq = '"'; // Ein doppeltes Anführungszeichen
+
+const bt = '`'; // Das Backtick-Zeichen als String
+
+let editIndex = null; // Speichert, welche Position gerade bearbeitet wird
+let data = { start: {}, pizzas: [], events: [], tv: [] }; //mit Funktion load() werden data geladen und dazu noch render() aufgerufen
+let currentTab = 'start';
+let lang = 'DE';
+
+const editMode = btoa(new URLSearchParams(window.location.search).get('pw')) === 'bGVvbjIyMDg=';  //Base64-Code
+if(editMode) document.body.classList.add('admin-mode');
+
+// Tab start, pizza,events,tv einstellen
+//----------------------------------------
+function setTab(t) { 
+	currentTab = t; 
+	document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.id === 'tab-'+t));
+	render(); 
+}
+
+
+// Sprache bei start DE IT einstellen
+//----------------------------------------
+function setLang(l) { 
+	lang = l; 
+	
+	// 2. WICHTIG: Das 'Gesehen'-Flag für das Popup löschen!
+	// Dadurch wird das Popup beim nächsten render() wieder angezeigt.
+	sessionStorage.removeItem('noticeSeen');
+	
+	
+	 // Tab-Buttons übersetzen
+	const btnStart = document.getElementById('tab-start');
+	const btnPizzas = document.getElementById('tab-pizzas');
+	const btnEvents = document.getElementById('tab-events');
+	const btnTV = document.getElementById('tab-tv');
+
+    if (lang === 'DE') {
+        if(btnStart) btnStart.innerText = "Start";
+        if(btnPizzas) btnPizzas.innerText = "Pizzakarte";
+        if(btnEvents) btnEvents.innerText = "Events";
+        if(btnTV) btnTV.innerText = "TV-Sport";
+    } else {
+        if(btnStart) btnStart.innerText = "Home";
+        if(btnPizzas) btnPizzas.innerText = "Menu Pizza";
+        if(btnEvents) btnEvents.innerText = "Eventi";
+        if(btnTV) btnTV.innerText = "Sport TV";
+    }
+     
+    const ort=document.getElementById('ort');
+    if (lang === 'DE') {
+        if (ort) {
+            ort.innerHTML = "Laas - Vinschagau";
+        }
+	}
+	else{
+	    if (ort) {
+		    ort.innerHTML = "Lasa - Venosta";
+		}
+	}
+	
+	
+    // Footer-Elemente übersetzen
+    const footerHours = document.getElementById('footer-hours');
+    const footerAddress = document.getElementById('footer-address');
+    
+    if (lang === 'DE') {
+        if (footerHours) {
+            footerHours.innerHTML = "Montag Ruhetag<br>Di-Do: 16:00-00:00<br>Fr-So: 16:00-01:00";
+        }
+        // Adresse (optional, falls "Vinschgaustraße" übersetzt werden soll)
+        if (footerAddress) footerAddress.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+    } else {
+        if (footerHours) {
+            footerHours.innerHTML = "Lunedì giorno di riposo<br>Mar-Gio: 16:00-00:00<br>Ven-Dom: 16:00-01:00";
+        }
+        if (footerAddress) footerAddress.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+    }
+       
+	document.getElementById('btn-de').classList.toggle('active', l==='DE');
+	document.getElementById('btn-it').classList.toggle('active', l==='IT');
+	render(); 
+}
+
+//Datum Sprache übersetzen
+//----------------------------------
+function translateDate(str) {
+    if (!str || lang === 'DE') return str;
+
+    // Lange Wörter und kurze Abkürzungen in einem Objekt mapping
+    const mapping = {
+        "Montag": "Lunedì", "Dienstag": "Martedì", "Mittwoch": "Mercoledì", 
+        "Donnerstag": "Giovedì", "Freitag": "Venerdì", "Samstag": "Sabato", "Sonntag": "Domenica",
+        "Mo": "Lun", "Di": "Mar", "Mi": "Mer", "Do": "Gio", "Fr": "Ven", "Sa": "Sab", "So": "Dom"
+    };
+
+    let res = str;
+    // Wir sortieren die Keys nach Länge (längste zuerst), um Teil-Fehler zu vermeiden
+    Object.keys(mapping).sort((a, b) => b.length - a.length).forEach(deTag => {
+        // \b stellt sicher, dass nur das GANZE Wort/Kürzel ersetzt wird
+        // Damit wird aus "Sa" in "Sabato" kein "Sabbato"!
+        const regex = new RegExp("\\b" + deTag + "\\b", "gi");
+        res = res.replace(regex, mapping[deTag]);
+    });
+    
+    return res;
+}
+
+// LOAD (von DB in data) und zeichnen durch render()
+//=========================================================    
+async function load() {
+	try {
+		const res = await fetch(apiUrl);
+		const fetchedData = await res.json();
+		
+		// Sicherstellen, dass 'data' immer die richtige Struktur hat
+		data = fetchedData || {};
+		if (!data.pizzas) data.pizzas = [];
+		if (!data.events) data.events = [];
+		if (!data.start) data.start = { img: 'lokal.webp', textDE: 'Willkommen', textIT: 'Benvenuti' };
+
+		render(); // Jetzt wird die Seite garantiert gezeichnet
+	} catch (e) {
+		console.error("Fehler beim Laden der Daten:", e);
+		// Notfall-Plan: Leere Struktur, damit die Seite nicht hängen bleibt
+		data = { start: { img: 'lokal.webp', textDE: 'Willkommen' }, pizzas: [], events: [] };
+		render();
+	}
+}
+
+
+
+// POPUP
+//=========================================================
+function renderNoticePopup(data, lang, container) {
+    if (!data.notice || !data.notice.active || sessionStorage.getItem('noticeSeen')) return;
+
+    const title = lang === 'DE' ? data.notice.titleDE : data.notice.titleIT;
+    const scrollHint = lang === 'DE' ? 'Mehr lesen' : 'Leggi di più';
+    
+    // Bild-Logik (Notepad++ sicher in einer Zeile)
+    //const imageHtml = data.notice.img ? `<img src="${data.notice.img}" style="max-width:100%; border-radius:8px;">` : '📢';
+    
+
+	
+	
+	const isMobile = window.innerWidth <= 768;//ist Handy
+    const pcH = data.notice.imgHeightPC || '200';
+    const mobH = data.notice.imgHeightMobile || '100';
+    const currentHeight = isMobile ? mobH : pcH;
+
+    const imageHtml = data.notice.img 
+        ? `<img src="${data.notice.img}" 
+             style="width: 100% !important; 
+                    height: ${currentHeight}px !important; 
+                    max-height: none !important; 
+                    object-fit: cover; 
+                    display: block; 
+                    margin: 0 auto 15px; 
+                    border-radius: 8px;">` 
+        : '📢';
+	
+	
+	
+	
+    // TEXT-LOGIK: Hier muss die Linie wieder rein!
+    let rawText = (lang === 'DE' ? data.notice.textDE : data.notice.textIT) || "";
+    const formattedText = rawText
+        .replace(/\n/g, '<br>') 
+        .replace(/%25|%/g, '<div style="display:block; width:80%; height:2px; background-color:var(--red); margin:15px auto; border-radius:2px;"></div>');
+
+    // Wir rufen die externe "Fabrik" auf
+    container.innerHTML += getPopupTemplate(title, scrollHint, imageHtml, formattedText);
+	
+/*	
+		// Warte 1,5 Sekunden, dann scrolle sanft 100 Pixel nach unten
+	setTimeout(() => {
+		const scrollContent = document.getElementById('popup-scroll-content');
+		if (scrollContent) {
+			scrollContent.scrollBy({
+				top: 120, // Pixel-Anzahl
+				behavior: 'smooth'
+			});
+		}
+	}, 3000);
+*/	
+	
+}
+  
+// EDITITEM (für pizza, event, tv
+//=========================================================
+function editItem(idx) {
+    const item = data[currentTab][idx];	
+
+	const heightInput = document.getElementById('inImgHeight'); // Prüfe, ob die ID in deinem HTML so heißt
+	if (heightInput) {
+		// Falls in der DB nichts steht, nimm 200 als Standard-Anzeige im Edit-Modus
+		heightInput.value = item.imgHeight || 200; 
+	}
+    const heightHandyInput = document.getElementById('inImgHeightHandy'); // Prüfe, ob die ID in deinem HTML so heißt
+	if (heightHandyInput) {
+		// Falls in der DB nichts steht, nimm 100 als Standard-Anzeige im Edit-Modus
+		heightHandyInput.value = item.imgHeightHandy || 100; 
+	}
+    // ... deine anderen Felder (Name, Desc) ...
+    let catInput
+    // NEU: Lädt die Liga/Kategorie in das entsprechende Input-Feld
+    if (currentTab==="tv"){
+	  catInput = document.getElementById('inCat2'); 
+	}
+	else{
+	  catInput = document.getElementById('inCat'); 
+	}
+    if (catInput) {
+        catInput.value = item.cat || ""; 
+    }
+  
+  
+    document.getElementById('inNameDE').value = item.nameDE || "";
+    document.getElementById('inNameIT').value = item.nameIT || "";
+    document.getElementById('inDescDE').value = item.descDE || "";
+    document.getElementById('inDescIT').value = item.descIT || "";
+    document.getElementById('inRight').value = item.right || "";
+    
+	// 2. BILD-VORSCHAU AKTUALISIEREN (Der entscheidende Teil!)
+    const preview = document.getElementById('img-preview');
+    const hiddenInput = document.getElementById('inImgBase64');
+    const noImgText = document.getElementById('no-img-text');
+
+    if (item.img && item.img.length > 10) {
+        // Falls ein Bild-Code in der MongoDB ist
+        if (preview) {
+            preview.src = item.img;
+            preview.style.display = 'block';
+        }
+        if (hiddenInput) hiddenInput.value = item.img; // Code für späteres Speichern vorhalten
+        if (noImgText) noImgText.style.display = 'none';
+    } else {
+        // Falls kein Bild vorhanden ist
+        if (preview) {
+            preview.src = "";
+            preview.style.display = 'none';
+        }
+        if (hiddenInput) hiddenInput.value = "";
+        if (noImgText) noImgText.style.display = 'block';
+    }
+
+	// Falls du die Vorschau im Admin-Bereich auch direkt in der Höhe anpassen willst:
+	if (preview && item.imgHeight) {
+		preview.style.height = item.imgHeight + "px";
+		preview.style.objectFit = "cover"; // Sorgt für eine saubere Vorschau
+	}
+    // Falls du die Vorschau im Admin-Bereich auch direkt in der Höhe anpassen willst:
+	if (preview && item.imgHeightHandy) {
+		preview.style.height = item.imgHeightHandy + "px";
+		preview.style.objectFit = "cover"; // Sorgt für eine saubere Vorschau
+	}
+
+
+    editIndex = idx; // Position speichern!
+    // 3. Titel und Scroll-Effekt
+    const title = document.getElementById('admin-title');
+    if (title) title.innerText = "Eintrag bearbeiten (Position: " + (idx + 1) + ")";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}   
+    
+
+// Hilfsfunktion zum Speichern der gesamten Daten
+//------------------------------------------------------
+async function saveAllData() {
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (response.ok) { location.reload(); } 
+        else { alert("Fehler beim Speichern!"); }
+    } catch (err) { console.error(err); }
+}
+
+
+
+//Öffnungszeiten löschen, verschieben, edit, add
+//=========================================
+
+// Zeile löschen
+function deleteTimeRow(index) {
+    if(confirm(lang === 'DE' ? "Zeile wirklich löschen?" : "Eliminare riga?")) {
+        data.start.zeiten.splice(index, 1);
+        saveAllData();
+    }
+}
+
+//------------------------------------
+//Verschieben, editieren, hinzufügen
+//------------------------------------
+// Zeile verschieben (hoch/runter)
+function moveTimeRow(index, direction) {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= data.start.zeiten.length) return;
+    
+    const element = data.start.zeiten.splice(index, 1)[0];
+    data.start.zeiten.splice(targetIndex, 0, element);
+    saveAllData();
+}
+
+// Zeile editieren
+function editTimeRow(index) {
+    const z = data.start.zeiten[index];
+    const newTagDE = prompt("Tag (DE):", z.tagDE || z.tag);
+    const newTagIT = prompt("Giorno (IT):", z.tagIT || z.tag);
+    const newZeit = prompt("Zeit / Orario:", z.zeit);
+    
+    if (newTagDE !== null && newTagIT !== null && newZeit !== null) {
+        data.start.zeiten[index] = {
+            tagDE: newTagDE,
+            tagIT: newTagIT,
+            zeit: newZeit
+        };
+        saveAllData();
+    }
+}
+
+// Neue Zeile hinzufügen (Erweiterung deiner bestehenden Funktion)
+function addTimeRow() {
+    if (!data.start.zeiten) data.start.zeiten = [];
+    data.start.zeiten.push({ tagDE: "Neu", tagIT: "Nuovo", zeit: "00:00 - 00:00" });
+    saveAllData();
+}
+
+
+// ITEM HINZUFÜGEN
+//===================================================
+async function addItem() {
+    // 1. Werte aus den Feldern holen
+    const newItem = {
+        nameDE: document.getElementById('inNameDE').value,
+        nameIT: document.getElementById('inNameIT').value,
+        descDE: document.getElementById('inDescDE').value,
+        descIT: document.getElementById('inDescIT').value,
+        right: document.getElementById('inRight').value,
+        img: document.getElementById('inImgBase64').value || "",
+		//img: document.getElementById('inImg') ? document.getElementById('inImg').value : ""
+		imgHeight:document.getElementById('inImgHeight').value || "200", 
+		imgHeightHandy:document.getElementById('inImgHeightHandy').value || "100" 
+    };
+
+    //pizzas und tv besitzen Kategorie
+	//---------------------------------
+    // WICHTIG: Hier wird die Kategorie ausgelesen
+    if (currentTab === 'pizzas' || currentTab === 'tv') {
+        const catDropdown = document.getElementById('inCat');
+        if (currentTab === 'pizzas'){
+		    const catDropdown = document.getElementById('inCat');
+			if (catDropdown) {
+				newItem.cat = catDropdown.value; // Nimmt 'pizza', 'bianche' oder 'kinder'
+			} else {
+				 newItem.cat = 'pizza'; // Sicherheits-Fallback				
+			}
+		}
+		if (currentTab === 'tv'){
+		     const catTv = document.getElementById('inCatTv');
+		     newItem.cat=catTv.value;
+			 if (newItem.cat ===""){
+               newItem.cat = 'LIVE'; // Sicherheits-Fallback
+			 }
+		}
+    }
+
+
+    // Sicherheitscheck: Falls Name leer ist
+	//----------------------------------------
+    if (!newItem.nameDE && currentTab !== 'start') {
+        alert("Bitte Namen eingeben!");
+        return;
+    }
+
+
+    // 2. ENTSCHEIDUNG: Bearbeiten oder Neu?
+	//--------------------------------------------
+    if (editIndex !== null) {
+        // BEARBEITEN: Bestehenden Index überschreiben
+        data[currentTab][editIndex] = newItem;
+        console.log("Eintrag an Position " + editIndex + " bearbeitet.");
+        editIndex = null; // WICHTIG: Index nach Erfolg zurücksetzen!
+    } else {
+        // NEU: Nur wenn kein editIndex gesetzt ist, wird gepusht
+        if (currentTab === 'start') {
+            data.start = newItem; // [newItem]; // Bei Start meist nur ein Eintrag
+        } else {
+            data[currentTab].push(newItem);
+            console.log("Neuer Eintrag am Ende hinzugefügt.");
+        }
+    }
+	
+	
+    //alert("Sende Wert: " + newItem.imgHeightHandy);
+    
+	// 3. SYNCHRONISATION MIT SERVER
+    try {
+        const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            // Felder leeren für nächsten Eintrag
+            clearFields();
+            alert("Erfolgreich gespeichert!");
+            render();
+        }
+    } catch (e) {
+        alert("Fehler beim Speichern!");
+    }
+}
+
+
+
+
+// Hilfsfunktion zum Leeren der Felder im Browser (bei addItem verwendet)
+//-----------------------------------------------
+function clearFields() {
+	document.getElementById('inNameDE').value = "";
+	document.getElementById('inNameIT').value = "";
+	document.getElementById('inDescDE').value = "";
+	document.getElementById('inDescIT').value = "";
+	document.getElementById('inRight').value = "";
+	if(document.getElementById('inImg')) document.getElementById('inImg').value = "";
+	const title = document.getElementById('admin-title');
+	if(title) title.innerText = "Neuen Eintrag hinzufügen";
+}
+
+// nach oben und unten verschieben (bei getAdminButtonsHtml verwendet)
+//-------------------------------------	
+async function move(index, direction) {
+    const items = data[currentTab];
+    const targetIndex = index + direction;
+
+    // 1. Abbruch, wenn man über den Anfang oder das Ende hinaus will
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    // 2. KATEGORIE-CHECK (NUR für Pizzen!)
+    if (currentTab === 'pizzas') {
+        const currentCat = items[index].cat || 'pizza';
+        const targetCat = items[targetIndex].cat || 'pizza';
+        
+        // Wenn die Kategorien unterschiedlich sind (z.B. Pizza -> Bianche), Tausch stoppen
+        if (currentCat !== targetCat) {
+            console.log("Verschieben nur innerhalb der Pizza-Kategorie erlaubt.");
+            return; 
+        }
+    } 
+    // HINWEIS: Für 'tv' und 'events' gibt es hier kein 'if', 
+    // daher wird dort IMMER getauscht, egal was in 'cat' steht.
+
+    // 3. Tausch im Array (Destructuring-Methode)
+    [items[index], items[targetIndex]] = [items[targetIndex], items[index]];
+
+    // 4. In die MongoDB Atlas Cloud speichern & Ansicht erneuern
+    await saveAllData();
+    render(); 
+}
+  
+	
+// remove für closeNoticePopup (bei getAdminButtonsHtml verwendet)
+//-------------------------------------			
+function remove(idx) {
+	if(confirm('Löschen / Eliminare?')) { data[currentTab].splice(idx, 1); render();saveAllData(); }
+}
+
+
+
+// Bild jpg in base64 umwandeln
+//-------------------------------------	
+
+function encodeImageFileAsURL(element) {
+	const file = element.files[0];
+	if (!file) return;
+
+	const reader = new FileReader();
+	reader.onload = function(e) {
+		const img = new Image();
+		img.onload = function() {
+			// 1. Leinwand erstellen
+			const canvas = document.createElement('canvas');
+			const MAX_WIDTH = 800; // Maximale Breite für die Pizzeria-Webseite
+			
+			let width = img.width;
+			let height = img.height;
+
+			// 2. Proportionen berechnen
+			if (width > MAX_WIDTH) {
+				height *= MAX_WIDTH / width;
+				width = MAX_WIDTH;
+			}
+
+			canvas.width = width;
+			canvas.height = height;
+
+			// 3. Bild auf Leinwand zeichnen (verkleinern)
+			const ctx = canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0, width, height);
+
+			// 4. Als komprimiertes JPG exportieren (Qualität 0.7 = 70%)
+			const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+			// 5. In das versteckte Feld und die Vorschau schreiben
+			document.getElementById('inImgBase64').value = compressedBase64;
+			
+			const preview = document.getElementById('img-preview');
+			if (preview) {
+				preview.src = compressedBase64;
+				preview.style.display = 'block';
+			}
+			if (document.getElementById('no-img-text')) document.getElementById('no-img-text').style.display = 'none';
+			
+			console.log("Bild für St. Sisinius optimiert: " + Math.round(compressedBase64.length / 1024) + " KB");
+		};
+		img.src = e.target.result;
+	};
+	reader.readAsDataURL(file);
+}
+	
+
+// load: data von DB laden
+//-------------------------------------	
+load();
+	
+// Funktion um die Pizzas in die leere Datenbank einzufügen
+//---------------------------------------------------------		
+async function importPizzeriaDataComplete() {
+    const fullList = [
+        { n: "Margherita", p: "7.50", dDE: "Tomaten, Fior di Latte, Basilikum", dIT: "Pomodoro, fior di latte, basilico", c: "pizza" },
+        { n: "Marinara", p: "6.50", dDE: "Tomaten, Knoblauch, Olivenöl", dIT: "Pomodoro, aglio, olio d´oliva", c: "pizza" },
+        { n: "Prosciutto", p: "9.00", dDE: "Tomaten, Fior di Latte, Schinken", dIT: "Pomodoro, fior di latte, prosciutto cotto", c: "pizza" },
+        { n: "Prosciutto e funghi", p: "9.50", dDE: "Tomaten, Fior di Latte, Schinken, Champignon", dIT: "Pomodoro, fior di latte, prosciutto cotto, champignon", c: "pizza" },
+        { n: "Capricciosa", p: "10.00", dDE: "Tomaten, Fior di Latte, Schinken, Champignon, Artischocken", dIT: "Pomodoro, fior di latte, prosciutto, champignon, carciofi", c: "pizza" },
+        { n: "Quattro stagioni", p: "10.50", dDE: "Tomaten, Fior di Latte, Schinken, Champignon, Artischocken, Oliven", dIT: "Pomodoro, fior di latte, prosciutto, champignon, carciofi, olive", c: "pizza" },
+        { n: "Diavola", p: "10.00", dDE: "Tomaten, Fior di Latte, scharfe Salami, Lombardi", dIT: "Pomodoro, fior di latte, salame piccante, lombardi", c: "pizza" },
+        { n: "Siciliana", p: "10.00", dDE: "Tomaten, Fior di latte, Oliven, Kapern, Sardellen", dIT: "Pomodoro, fior di latte, olive, capperi, acciughe", c: "pizza" },
+        { n: "Quattro formaggi", p: "11.50", dDE: "Tomaten, Fior di latte, Bufala, Gorgonzola, Parmesan", dIT: "Pomodoro, fior di latte, bufala, gorgonzola, parmigiano", c: "pizza" },
+        { n: "Meeresfrüchte", p: "12.50", dDE: "Tomaten, Fior di latte, Meeresfrüchte, Knoblauch, Petersilie", dIT: "Pomodoro, fior di latte, frutti di mare, aglio, prezzemolo", c: "pizza" },
+        { n: "Tonno", p: "9.50", dDE: "Tomaten, Fior di latte, Thunfisch, Zwiebel", dIT: "Pomodoro, fior di latte, tonno, cipolla", c: "pizza" },
+        { n: "Garnelen", p: "13.00", dDE: "Tomaten, Fior di latte, Garnelen, Cocktailtomaten, Knoblauch", dIT: "Pomodoro, fior di latte, gamberi, pomodorini, aglio", c: "pizza" },
+        { n: "Lachs", p: "12.50", dDE: "Tomaten, Fior di latte, Lachs, Zucchini", dIT: "Pomodoro, fior di latte, salmone, zucchine", c: "pizza" },
+        { n: "Calzone", p: "10.50", dDE: "Tomaten, Fior di latte, Schinken, Champignon", dIT: "Pomodoro, fior di latte, prosciutto, champignon", c: "pizza" },
+        { n: "Bauern", p: "10.00", dDE: "Tomaten, Fior di latte, Speck, Zwiebel, Knoblauch", dIT: "Pomodoro, fior di latte, speck, cipolla, aglio", c: "pizza" },
+        { n: "Bufalina", p: "11.50", dDE: "Tomaten, Bufala, Rucola, Cocktailtomaten, Parmesan", dIT: "Pomodoro, bufala, rucola, pomodorini, parmigiano", c: "pizza" },
+        { n: "Parma", p: "12.50", dDE: "Tomaten, Fior di latte, Rucola, Cocktailtomaten, Rohschinken, Parmesan", dIT: "Pomodoro, fior di latte, rucola, pomodorini, crudo, parmigiano", c: "pizza" },
+        { n: "Gemüse", p: "11.00", dDE: "Tomaten, Fior di latte, Gemüse, Parmesan, Knoblauch", dIT: "Pomodoro, fior di latte, verdure, parmigiano, aglio", c: "pizza" },
+        { n: "Vegana", p: "9.50", dDE: "Tomaten, Gemüse, Knoblauch, Olivenöl", dIT: "Pomodoro, verdura, aglio, olio d’oliva", c: "pizza" },
+        { n: "Parmigiana", p: "10.50", dDE: "Tomaten, Fior di latte, Melanzane, Parmesan", dIT: "Pomodoro, fior di latte, melanzane, parmigiano", c: "pizza" },
+        { n: "Autunno", p: "11.50", dDE: "Tomaten, Fior di latte, Gorgonzola, Speck, Walnüsse", dIT: "Pomodoro, fior di latte, gorgonzola, speck, noci", c: "pizza" },
+        { n: "Parnetz", p: "11.50", dDE: "Tomaten, Fior di latte, Speck, Pfifferlinge, Spinat, Knoblauch", dIT: "Pomodoro, fior di latte, speck, finferli, spinaci, aglio", c: "pizza" },
+        { n: "Primavera", p: "12.00", dDE: "Tomaten, Bufala, Cocktailtomaten, Basilikumpesto, Ricotta", dIT: "Pomodoro, bufala, pomodorini, pesto alla Genovese, ricotta", c: "pizza" },
+        { n: "Rustica", p: "12.00", dDE: "Tomaten, Fior di latte, scharfe Salami, Gorgonzola, Zwiebel, Lombardi", dIT: "Pomodoro, fior di latte, salame piccante, gorgonzola, cipolla, lombardi", c: "pizza" },
+        { n: "Sisinius", p: "12.50", dDE: "Tomaten, Fior di latte, scharfe Salami, Zwiebel, Paprika, Pfifferlinge, Ei", dIT: "Pomodoro, fior di latte, salame piccante, cipolla, peperoni, finferli, uova", c: "pizza" },
+        { n: "Mediterranea", p: "12.00", dDE: "Tomaten, Fior di latte, Artischocken, Cocktailtomaten, Oliven, Ricotta, Parmesan", dIT: "Pomodoro, fior di latte, carciofi, pomodorini, olive, ricotta, parmigiano", c: "pizza" },
+        { n: "Vinschger", p: "13.00", dDE: "Tomaten, Fior di latte, Speck, Zwiebel, Gorgonzola, Pfifferlinge, Parmesan, Knoblauch", dIT: "Pomodoro, fior di latte, speck, cipolla, gorgonzola, finferli, parmigiano, aglio", c: "pizza" },
+        { n: "Italia", p: "13.50", dDE: "Tomaten, Fior di latte, Cocktailtomaten, Rohschinken, Burrata, Basilikum", dIT: "Pomodoro, fior di latte, pomodorini, crudo, burrata, basilico", c: "pizza" },
+
+        // --- PIZZA BIANCHE ---
+        { n: "Genovese", p: "13.00", dDE: "Basilikumpesto, Fior di latte, Cocktailomaten, Rohschinken, Parmesan", dIT: "Pesto alla genovese, fior di latte, pomodorini, crudo, parmigiano", c: "bianche" },
+        { n: "Carbonara", p: "12.00", dDE: "Fior di latte, Speck, Ei, Parmesan, Pfeffer", dIT: "Fior di latte, speck, uova, parmigiano, pepe", c: "bianche" },
+        { n: "Superba", p: "12.00", dDE: "Pesto, Fior di latte, Cocktailtomaten, Burrata, Basilikum", dIT: "Pesto, fior di latte, pomodorini, burrata, basilico", c: "bianche" },
+
+        // --- KINDERPIZZA ---
+        { n: "Micky Maus", p: "5.50", dDE: "Tomaten, Fior di latte", dIT: "Pomodoro, fior di latte", c: "kinder" },
+        { n: "Scooby Doo", p: "6.50", dDE: "Tomaten, Fior di latte, milde Salami, Mais", dIT: "Pomodoro, fior di latte, salame, mais", c: "kinder" },
+        { n: "Nemo", p: "7.00", dDE: "Tomate, Fior di latte, 2 Zutaten nach Wahl", dIT: "Pomodoro, fior di latte, 2 condimenti a scelta", c: "kinder" },
+
+        // --- EXTRAS ---
+        { n: "Kleine Pizza / pizze piccole", p: "1.50", dDE: "Abzug von:", dIT: "meno:", c: "extras" },
+        { n: "Extra Zutaten / aggiunte", p: "4.50", dDE: "max +", dIT: "max +", c: "extras" },
+        { n: "Glutenfreier Teig / impasto senza glutine", p: "3.00", dDE: "+", dIT: "+", c: "extras" },
+        { n: "Laktosefreie Mozarella / mozzarella senza lattosio", p: "2.00", dDE: "+", dIT: "+", c: "extras" }
+    ];
+
+    // Wir nehmen die bestehende Liste (Teil 1) und fügen den Rest hinzu
+    const formatted = fullList.map(p => ({
+        nameDE: p.n, nameIT: p.n, descDE: p.dDE, descIT: p.dIT, right: p.p, cat: p.c, img: ""
+    }));
+
+    data.pizzas = [...data.pizzas, ...formatted]; 
+
+    await saveAllData(); 
+    alert("Komplette Speisekarte inklusive Extras erfolgreich importiert!");
+    location.reload();
+}
+
+
+// Datum erkennen (bei render verwendet)
+//-------------------------------------	
+function parseSisiniusDate(dateStr, timeStr) {
+    if (!dateStr) return new Date(2099, 0, 1); 
+
+    try {
+        // Sucht nach TT.MM. (2 oder 4 Stellen beim Jahr)
+        // Erkennt: 14.02.26, 14.02.2026, Samstag 14.02.26 etc.
+        const match = dateStr.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+        
+        if (match) {
+            let day = parseInt(match[1]);
+            let month = parseInt(match[2]) - 1; // Monate 0-11
+            let year = parseInt(match[3]);
+
+            // Wenn das Jahr nur 2 Stellen hat (z.B. 26), machen wir 2026 daraus
+            if (year < 100) year += 2000;
+
+            // Uhrzeit "18:00" oder "18.00" oder "18" finden
+            const tMatch = (timeStr || "").match(/(\d{1,2})[:.]?(\d{2})?/);
+            const hours = tMatch ? parseInt(tMatch[1]) : 0;
+            const minutes = tMatch ? parseInt(tMatch[2] || 0) : 0;
+
+            return new Date(year, month, day, hours, minutes);
+        }
+    } catch (e) {
+        console.error("Format-Fehler in Laas:", e);
+    }
+    // Falls gar kein Datum gefunden wird, ab nach hinten in der Liste
+    return new Date(2099, 0, 1);
+}	
+
+
+
+
+
+// Bild für POPUP hochladen
+//-------------------------
+function handleNoticeImageUpload(event) {
+    const file = event.target.files[0]; // Das ausgewählte Bild
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Image = e.target.result; // Das Bild als Text-String
+
+        // 1. Die Bild-Vorschau im Admin-Bereich sofort aktualisieren
+        const previewImg = document.getElementById('noticePreviewImg');
+        if (previewImg) {
+            previewImg.src = base64Image;
+        } else {
+            // Falls vorher "Kein Bild" stand, neuen Img-Tag erzeugen
+            document.getElementById('noticePreviewContainer').innerHTML = 
+                `<img id="noticePreviewImg" src="${base64Image}" style="max-width:100%; max-height:150px; object-fit:contain; border-radius:8px;">`;
+        }
+
+        // 2. Den Base64-String in das versteckte Input-Feld schreiben
+        // Nur was hier drin steht, wird von saveNoticeSettings() an die DB geschickt!
+        const hiddenInput = document.getElementById('inImgBase64Notice');
+        if (hiddenInput) {
+            hiddenInput.value = base64Image;
+            console.log("Bild geladen und im Hidden-Feld bereitgestellt.");
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+
+//saveNoticeSettings: Daten popup speichern
+//--------------------------------------------
+async function saveNoticeSettings() {
+    // 1. Alle Felder präzise auslesen (inklusive der neuen Titel)
+    const noticeData = {
+        active: document.getElementById('edit-notice-active').checked,
+        img: document.getElementById('inImgBase64Notice').value || "",
+		imgHeightPC: document.getElementById('edit-notice-img-height-pc').value || "200", // NEU
+        imgHeightMobile: document.getElementById('edit-notice-img-height-mobile').value || "100", // NEU
+        titleDE: document.getElementById('edit-notice-title-de').value, // NEU
+        titleIT: document.getElementById('edit-notice-title-it').value, // NEU
+        textDE: document.getElementById('edit-notice-de').value,
+        textIT: document.getElementById('edit-notice-it').value
+    };
+
+    // 2. Das globale Daten-Objekt aktualisieren
+    // Wir kopieren das bestehende 'data' und fügen 'notice' hinzu
+    data.notice = noticeData;
+
+    try {
+        // 3. Deine zentrale save() Funktion aufrufen
+        // Diese schickt 'data' an /api/data?pw=xxxxxx
+        await saveAllData(); 
+
+        // 4. Erfolgsmeldung erzwingen
+        alert(lang === 'DE' ? 'Popup erfolgreich gespeichert!' : 'Popup salvato con successo!');
+        
+        // 5. Seite neu laden, um die Änderungen in der MongoDB zu aktivieren
+        location.reload();
+    } catch (err) {
+        console.error("Fehler beim Speichern:", err);
+        alert("Serverfehler: Daten konnten nicht in MongoDB gespeichert werden.");
+    }
+}
+
+
+//Popup schließen
+//-----------------------------------------
+window.closeNoticePopup = function() {
+    const popup = document.getElementById('notice-popup');
+    const scrollContent = document.getElementById('popup-scroll-content');
+
+    if (popup) {
+        // 1. SCHRITT: Nach UNTEN scrollen (z.B. 300 Pixel weiter)
+        if (scrollContent) {
+            scrollContent.scrollBy({
+                top: 300, // Positiver Wert = scrollt nach unten
+                behavior: 'smooth'
+            });
+        }
+
+        // 2. SCHRITT: Warten (0,5 Sek), damit man die Abwärtsbewegung sieht
+        setTimeout(() => {
+            // 3. SCHRITT: Ausfaden
+            popup.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            popup.style.opacity = '0';
+            popup.style.transform = 'translateY(20px)'; // Karte sinkt leicht ab
+
+            // 4. SCHRITT: Endgültig löschen
+            setTimeout(() => {
+                popup.remove();
+                sessionStorage.setItem('noticeSeen', 'true');
+            }, 400);
+            
+        }, 500); 
+    }
+};
+
+
+//Bild von Popup entfernen
+//-----------------------------
+function removeNoticeImage() {
+    // 1. Hidden Input leeren
+    document.getElementById('inImgBase64Notice').value = "";
+    
+    // 2. File Input leeren
+    document.getElementById('file-input-notice').value = "";
+    
+    // 3. Vorschau-Elemente anpassen
+    document.getElementById('img-preview-notice').style.display = "none";
+    document.getElementById('img-preview-notice').src = "";
+    document.getElementById('no-img-text-notice').style.display = "block";
+    
+    // 4. Lösch-Button verstecken
+    document.getElementById('btn-remove-notice').style.display = "none";
+}
+
+// RENDERN
+//----------------------------------------
+function render() {    
+	// --- AUTOMATISCHE SORTIERUNG NACH DATUM BEI TV UND EVENTS---
+	if (currentTab === 'tv' || currentTab === 'events') {
+		data[currentTab].sort((a, b) => {
+			let dateStrA, timeStrA, dateStrB, timeStrB;
+
+			if (currentTab === 'tv') {
+				// TV: Datum in descDE, Zeit in right
+				dateStrA = a.descDE; timeStrA = a.right;
+				dateStrB = b.descDE; timeStrB = b.right;
+			} else {
+				// EVENTS: Datum in right (z.B. "Fr 13.02.26"), Zeit meist in descDE oder gar nicht
+				dateStrA = a.right; timeStrA = "00:00"; 
+				dateStrB = b.right; timeStrB = "00:00";
+			}
+
+			const dA = parseSisiniusDate(dateStrA, timeStrA);
+			const dB = parseSisiniusDate(dateStrB, timeStrB);
+			return dA - dB;
+		});
+	}
+	
+	// --- FOOTER SPRACHUMSTELLUNG ---
+
+	// 1. Elemente abgreifen
+	const footerAddr = document.getElementById('footer-address');
+	const footerRegion = document.getElementById('footer-region');
+	const footerContact = document.getElementById('footer-contact');
+	const footerMwst = document.getElementById('footer-mwst');
+	const footerRecht = document.getElementById('footer-rechtliches');
+	const footerImpLink = document.getElementById('footer-impressum-link');
+	const footerDataLink = document.getElementById('footer-datenschutz-link');
+
+	// 2. Texte und Links je nach Sprache setzen
+	if (lang === 'DE') {
+		if (footerAddr) footerAddr.innerText = "Vinschgaustraße 74, 39023 Laas (BZ)";
+		if (footerRegion) footerRegion.innerText = "Südtirol, Italien";
+		if (footerContact) footerContact.innerText = "Kontakt";
+		if (footerMwst) footerMwst.innerText = "Mwst.-Nr.: 03317990210";
+		if (footerRecht) footerRecht.innerText = "Rechtliches";
+		
+		if (footerImpLink) {
+			footerImpLink.innerText = "Impressum";
+			footerImpLink.href = "impressumDe.html";
+		}
+		if (footerDataLink) {
+			footerDataLink.innerText = "Datenschutz & Cookies";
+			footerDataLink.href = "datenschutzDe.html";
+		}
+	} else {
+		// ITALIENISCH (IT)
+		if (footerAddr) footerAddr.innerText = "Via Venosta 74, 39023 Lasa (BZ)";
+		if (footerRegion) footerRegion.innerText = "Alto Adige, Italia";
+		if (footerContact) footerContact.innerText = "Contatto";
+		if (footerMwst) footerMwst.innerText = "P.IVA: 03317990210";
+		if (footerRecht) footerRecht.innerText = "Informazioni legali";
+		
+		if (footerImpLink) {
+			footerImpLink.innerText = "Note Legali"; // In Italien heißt Impressum oft Note Legali
+			footerImpLink.href = "impressumIt.html";
+		}
+		if (footerDataLink) {
+			footerDataLink.innerText = "Informativa sulla privacy & Cookie";
+			footerDataLink.href = "datenschutzIt.html";
+		}
+	}
+	
+
+	const area = document.getElementById('content-area');
+    if (!area) return;
+    area.innerHTML = '';
+
+    // Admin-Modus Klasse am Body umschalten
+    if (editMode) {
+        document.body.classList.add('admin-mode');
+    } else {
+        document.body.classList.remove('admin-mode');
+    }
+
+	//ADMIN
+	// =========================================================
+	// 2. ADMIN-KONSOLE (Logik & Anzeige)
+	// =========================================================
+	if (editMode && currentTab !== 'start') {
+		const label = currentTab === 'pizzas' ? 'Preis' : (currentTab === 'tv' ? 'Uhrzeit' : 'Datum');
+		const labelDesc = currentTab === 'tv' ? 'Datum (z.B. Samstag 14.02.26)' : (currentTab === 'events' ? 'Uhrzeit (z.B. ab 20:00 Uhr)' : 'Beschreibung');
+		
+		const descITField = (currentTab === 'pizzas') 
+			? '<input type="text" id="inDescIT" placeholder="Descrizione (IT)">' 
+			: '<input type="hidden" id="inDescIT" value="">';
+
+		// Aufruf der externen Admin-Fabrik (siehe unten)
+		area.innerHTML += getAdminConsoleHtml(currentTab, label, labelDesc, descITField);
+	}
+
+	// =========================================================
+	// 1. STARTSEITE (Sonderlayout GAST & ADMIN)
+	// =========================================================
+	if (currentTab === 'start') {
+		area.className = 'list-mode';
+		
+		// Aufruf der externen Startseiten-Fabrik (siehe unten)
+		// Diese enthält Hero, About, Kontakt, Orthofoto, Social-Buttons & Admin-Popup-Box
+		area.innerHTML += getStartPageFullLayout(data, lang, editMode);
+
+		// Ruft das Popup auf und übergibt die Daten
+		renderNoticePopup(data, lang, area);
+		
+		return; // Bricht render() hier sauber ab
+	}
+	
+	//---------------------------------------------------------------
+	
+    // 2. ANDERE SEITEN ALS STARTSEITE 
+	//=====================================
+    
+	
+	// a. Prüfen, ob es ein Handy ist (Standard-Breakpoint 768px)
+    const isMobile = window.innerWidth <= 768;
+	
+	// b. Die richtige Höhe auswählen
+	// Logik: Wenn Handy UND imgHeightHandy da -> nimm imgHeightHandy. 
+	// Sonst nimm imgHeight (PC) oder den Standard 200px.
+	//const currentHeight=item.imgHeight;
+	/*const hPc=data[currentTab].item.imgHeight;
+	const hHandy=data[currentTab].item.imgHeightHandy;
+	const currentHeight = isMobile && hHandy 
+		? hHandy 
+		: (hPc || '200');*/
+
+    if (!data[currentTab]) {
+        area.innerHTML = '<p>Lade Daten...</p>';
+        return;
+    }
+
+    // 2.2 LISTEN RENDERING
+    //------------------------------- 
+	//--- FALL 1: PIZZAS ---
+	//-------------------------------
+    if (currentTab === 'pizzas') {
+        // Aufruf der kleinen Hilfsfunktion (Notepad++ bleibt bunt!)
+        area.innerHTML += getSectionTitleHtml(lang === 'DE' ? 'Unsere Pizzakarte' : 'Il Nostro Menu Pizza');
+        
+        const kats = [
+            { id: 'pizza', de: 'Pizza', it: 'Pizza' },
+            { id: 'bianche', de: 'Pizza Bianca', it: 'Pizze Bianche' },
+            { id: 'kinder', de: 'Kinderpizza', it: 'Pizze per bambini' },
+            { id: 'extras', de: 'Extras', it: 'Extra' }
+        ];
+
+        kats.forEach(kat => {
+            const filtered = data.pizzas.filter(p => (p.cat || 'pizza') === kat.id);
+            if (filtered.length > 0) {
+                // Auch hier: HTML-String durch Funktion ersetzen
+                area.innerHTML += getCategoryHeaderHtml(lang === 'DE' ? kat.de : kat.it);
+                
+                 // --- NEU: GRID-CONTAINER START ---
+                // Am Handy 1 Spalte, ab 768px 2 Spalten, ab 1024px 3 Spalten
+                let gridHtml = '<div class=' + dq + 'pizza-grid' + dq + '>';
+   
+			
+                  
+               
+
+                filtered.forEach(item => {
+                    const realIdx = data.pizzas.findIndex(p => p === item);
+                    gridHtml += renderPizzaOrEvent(item, realIdx, true);
+                });
+
+                gridHtml += '</div>'; // Grid-Container schließen
+                area.innerHTML += gridHtml;
+                // --- GRID-CONTAINER ENDE ---
+            }
+        });
+        renderNoticePopup(data, lang, area);
+    }
+	//-----------------------------------------
+    // --- FALL 2: TV & EVENTS ---
+    //-----------------------------------------
+	else {
+        const title = currentTab === 'tv' ? 'TV-Sport' : (lang === 'DE' ? 'Events' : 'Eventi');
+        
+        // Titelbalken für TV/Events
+        area.innerHTML += getSectionTitleHtml(title);
+        area.innerHTML += '<div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 2px solid var(--red); margin-bottom: 20px;"></div>';
+
+        data[currentTab].forEach((item, idx) => {
+            const hPc = item.imgHeight;
+            const hHandy = item.imgHeightHandy;
+            const isMobile = window.innerWidth <= 768;
+            const currentHeight = (isMobile && hHandy) ? hHandy : (hPc || '200');
+
+            if (currentTab === 'tv') {
+                area.innerHTML += getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml);
+            } else {
+                area.innerHTML += renderPizzaOrEvent(item, idx, false);
+            }
+        });
+
+        renderNoticePopup(data, lang, area);
+    }
+} // Ende render()
+
+//***************************************
+//    PIZZA ODER EVENT 
+//***************************************
+
+
+//Pizza und Event anzeigen
+//-----------------------------------------
+// Hilfsfunktion mit automatischer Wochentags-Übersetzung für Laas
+function renderPizzaOrEvent(item, idx, isPizza) {    
+    const isMobile = window.innerWidth <= 768;
+    const hPc = item.imgHeight;
+    const hHandy = item.imgHeightHandy;
+    const currentHeight = isMobile && hHandy 
+        ? hHandy 
+        : (hPc || '200');
+    
+    let displayRight = item.right || '';
+    if (!isPizza){
+      if (lang ==='DE'){} else { displayRight = translateDate(displayRight); }
+    }
+   
+   // 1. Bild-HTML vorab berechnen (mit normalen Anführungszeichen)
+    let imgHtml = '';
+    if (item.img) {
+        imgHtml = '<img src="' + item.img + '" class="item-img" ' +
+                  'style="width: 100%; height: ' + currentHeight + 'px !important; object-fit: cover; display: block;" ' +
+                  'alt="Bild">';
+    }
+   
+    return `
+    <div class="entry" style="width: 100%; box-sizing: border-box; overflow: hidden; margin-bottom: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-direction: column;">
+		${imgHtml}                                               
+		<div class="entry-content" style="padding: 15px; display: flex; flex-direction: column; width: 100%; box-sizing: border-box; gap: 5px;">
+			
+			<div class="entry-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 10px;">
+				<span class="pizza-name" style="font-weight: bold; font-size: 1.1rem; word-break: break-word; flex: 1;">
+					${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}
+				</span>
+				
+				<span class="price pc-price" style="color: var(--red); font-weight: bold; font-size: 1.1rem; white-space: nowrap; text-align: right;">
+					${displayRight}${isPizza ? ' €' : ''}
+				</span>
+			</div>
+
+			<div class="desc" style="font-size: 0.9rem; color: #555; font-style: italic; word-wrap: break-word; overflow-wrap: break-word; width: 100%;">
+				${lang === 'DE' ? (item.descDE || '') : (item.descIT || '')}
+			</div>
+
+			<div class="mobile-price" style="color: var(--red); font-weight: bold; font-size: 1.1rem; display: none;">
+				 ${displayRight}${isPizza ? ' €' : ''}
+			</div>
+
+			<div style="width: 100%; display: flex; justify-content: flex-end; margin-top: 10px;">
+				${typeof getAdminButtonsHtml === 'function' ? getAdminButtonsHtml(idx) : ''}
+			</div>
+		</div>
+	</div>
+    `; 
+}
+
+//***************************************
+//    BUTTONS EDIT 
+//***************************************
+//Buttons für edit
+//--------------------------------------
+// HILFSFUNKTION (Benannt!)  EDIT LÖSCHEN, VERSCHIEBEN
+function getAdminButtonsHtml(idx) {
+    if (!editMode) return '';
+    return `
+        <div class="btn-row admin-only" style="display: flex !important; margin-top:10px;">           
+			 <!-- Pfeile NUR im Pizza-Tab anzeigen -->
+            ${currentTab === 'pizzas' ? `
+			  <button class="btn-ctrl" onclick="move(${idx}, -1)">▲</button>
+              <button class="btn-ctrl" onclick="move(${idx}, 1)">▼</button>
+            ` : ''}			
+			<button class="btn-ctrl" style="background:#ffa000" onclick="editItem(${idx})">✎</button>
+            <button class="btn-ctrl" style="background:#d32f2f" onclick="remove(${idx})">✖</button>
+        </div>`;
+}
+
+//***************************************
+//    POPUP 
+//***************************************
+//Template für popup
+//--------------------------------
+// GANZ UNTEN IN DER DATEI
+function getPopupTemplate(title, scrollHint, imageHtml, formattedText) {
+    const q = "'"; 
+    scrollHint=null;// <--- Scroll Pfeil Weiter lesen Das hier einfügen. Der Block unten wird dann automatisch ignoriert
+	return `
+        <div id="notice-popup" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:10000; padding:20px; animation: fadeIn 0.3s ease-out; opacity: 1;">
+            
+            <div style="position: relative; background:white; border-radius:15px; max-width:450px; width:100%; max-height:85vh; text-align:center; border:4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow:hidden; display:flex; flex-direction:column;">
+                
+                <!-- Scroll Hint Pfeil -->
+                ${scrollHint ? `
+                <div id="popup-scroll-hint" 
+                     class="scroll-hint" 
+                     onclick="document.getElementById(${q}popup-scroll-content${q}).scrollBy({top: 150, behavior: ${q}smooth${q}});"
+                     style="transition: opacity 0.3s ease; z-index: 100;">
+                    ${scrollHint} <span style="font-size: 16px;">↓</span>
+                </div>` : ''}
+
+                <!-- Header: Titel (Fest oben) -->
+                <div style="padding:20px; flex-shrink:0; background: white; border-bottom: 1px solid #eee;">
+                    <h2 style="color:var(--red); margin:0;">${title}</h2>
+                </div>
+
+                <!-- WICHTIG: Der Scroll-Bereich mit fester Begrenzung -->
+                <div id="popup-scroll-content" 
+                     style="overflow-y:auto; flex-grow:1; padding:20px 25px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+                    
+                    ${imageHtml}       
+                    <div style="font-size:1.1rem; color:#333; font-weight:bold; line-height:1.5; text-align:center; padding-bottom:20px;">
+                        ${formattedText}
+                    </div>
+                </div>
+
+                <!-- Footer: OK Button (Fest unten) -->
+                <div style="padding:15px 20px 20px 20px; flex-shrink:0; border-top:1px solid #eee; background: white;">
+                    <button onclick="closeNoticePopup()" style="background:var(--red); color:white; border:none; padding:12px; border-radius:5px; font-weight:bold; cursor:pointer; text-transform:uppercase; width:100%;">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>`;
+}
+//***************************************
+//    ADMIN CONSOLE (EDIT) 
+//***************************************
+//Edit Konsole (Eingabefelder oben für pizza, events u. tv
+//----------------------------------------------------------
+// --- ADMIN KONSOLE FABRIK ---
+// GANZ UNTEN IN DER DATEI - Die komplette Admin-Fabrik
+function getAdminConsoleHtml(tab, label, labelDesc, descITField) {
+    const q = "'"; 
+    return `
+    <div class="admin-panel" style="display: block; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+        <strong style="color: var(--red);">Admin-Konsole (${tab.toUpperCase()})</strong>
+        
+        <div class="input-grid" style="margin-top: 10px;">
+            <input type="text" id="inNameDE" placeholder="Name/Titel (DE)">
+            <input type="text" id="inNameIT" placeholder="Nome/Titolo (IT)">
+            <input type="text" id="inDescDE" placeholder="${labelDesc}">
+            ${descITField}
+            <input type="text" id="inRight" placeholder="${label}">
+        </div>
+
+        <!-- BILD & HÖHEN BEREICH -->
+        <div style="margin-top: 15px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: white;">
+            <label style="font-weight:bold; font-size: 0.9rem;">Bild & Anzeigehöhen:</label>
+            <input type="file" id="inImgFile" onchange="encodeImageFileAsURL(this)" style="width:100%; margin-bottom:10px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span>PC:</span> <input type="text" id="inImgHeight" placeholder="200" style="width:60px;">
+                <span>Handy:</span> <input type="text" id="inImgHeightHandy" placeholder="100" style="width:60px;">
+            </div>
+            <input type="hidden" id="inImgBase64">
+        </div>
+
+        <!-- KATEGORIE-WAHL (WICHTIG: Hier fehlte inCatTv) -->
+        ${(tab === 'pizzas' || tab === 'tv') ? `
+            <div style="margin-top: 15px; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
+                <label style="font-weight: bold; font-size: 0.9rem;">
+                    ${tab === 'pizzas' ? 'Pizza-Kategorie:' : 'Liga / Wettbewerb:'}
+                </label>
+                ${tab === 'pizzas' ? `
+                    <select id="inCat" style="width:100%; padding:8px; margin-top:5px;">
+                        <option value="pizza">Standard Pizza</option>
+                        <option value="bianche">Pizza Bianche</option>
+                        <option value="kinder">Kinderpizza</option>
+                        <option value="extras">Extras</option>
+                    </select>
+                ` : `
+                    <!-- DAS FEHLENDE FELD -->
+                    <input type="text" id="inCatTv" placeholder="z.B. Champions League oder Serie A" style="width:100%; padding:8px; margin-top:5px;">
+                `}
+            </div>
+        ` : ''}
+
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="addItem()" style="flex:1; background:#2e7d32; color:white; padding:12px; border-radius:4px; font-weight:bold; cursor:pointer;">Eintrag speichern</button>
+            <button onclick="location.reload()" style="flex:1; background:#757575; color:white; padding:12px; border-radius:4px; cursor:pointer;">Abbrechen</button>
+        </div>
+    </div>`;
+}
+//***************************************
+//    STARTSEITE 
+//***************************************
+//Startseite LAYOUT
+//--------------------
+// --- STARTSEITE VOLL-LAYOUT FABRIK ---
+function getStartPageFullLayout(data, lang, editMode) {
+    const q = "'"; 
+
+     // 1. ÖFFNUNGS-ZEITEN-SCHLEIFE GENERIEREN (Flexibel: Einzeilig wenn möglich, Umbruch wenn nötig)
+    const zeitenListe = (data.start && data.start.zeiten && data.start.zeiten.length > 0) ? 
+    data.start.zeiten.map((z, idx) => `
+        <div style="display: block; width: 100%; margin-bottom: 5px; border-bottom: ${editMode ? '1px dashed #ccc' : 'none'}; padding-bottom: 1px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; flex-wrap: wrap; gap: 0px;">
+                
+                <!-- TAG (Bleibt links) -->
+                <span style="font-weight: bold; font-size: 0.9rem; flex: 1; min-width: 100px;line-height: 1.1">
+                    ${lang === 'DE' ? (z.tagDE || z.tag || '') : (z.tagIT || z.tag || '')}
+                </span>               
+                <!-- ZEIT (Bricht nur um, wenn der Platz rechts nicht reicht) -->
+                <span style="font-size: 0.9rem; text-align: right; min-width: fit-content; white-space: normal; word-break: keep-all; line-height: 1.1;margin-top: -5px">
+                    ${(z.zeit || '').replace('-', ' - ')}
+                </span>
+            </div>
+
+            <!-- ADMIN CONTROLS -->
+            ${editMode ? `
+            <div style="display: flex; gap: 5px; margin-top: 8px; justify-content: flex-end;">
+                <button onclick="editTimeRow(${idx})" style="background:#ffc107; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">✏️</button>
+                <button onclick="moveTimeRow(${idx}, -1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === 0 ? 'disabled' : ''}>↑</button>
+                <button onclick="moveTimeRow(${idx}, 1)" style="background:#6c757d; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;" ${idx === data.start.zeiten.length - 1 ? 'disabled' : ''}>↓</button>
+                <button onclick="deleteTimeRow(${idx})" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:4px 8px; cursor:pointer; font-size:11px;">🗑️</button>
+            </div>
+            ` : ''}
+        </div>
+    `).join('') : `<p>${lang === 'DE' ? 'Keine Zeiten hinterlegt.' : 'Nessun orario inserito.'}</p>`;
+
+    // 2. ADMIN-KOMPONENTEN VORBEREITEN
+    const adminBox = editMode ? (typeof getAdminPopupBoxHtml === 'function' ? getAdminPopupBoxHtml(data) : '') : '';
+    const addTimeBtn = editMode ? `
+        <div style="text-align:center; margin: 15px 0;">
+            <button onclick="addTimeRow()" style="background-color: #dc3545; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold;">
+                + Neue Zeit hinzufügen
+            </button>
+        </div>` : '';
+    //-------------------------
+	// Ende Öffnungszeiten
+    
+	
+	// 3. DAS GESAMTE HTML ZURÜCKGEBEN
+    return `	
+	<div class="main-content-wrapper" style="width: 100%; overflow-x: hidden;">
+		<!--Willkommen + lokal.webp
+	    -------------------------------->
+		<!-- HERO SECTION (Fix: 100% Breite) -->
+		<div class="hero" style="height: 450px; position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; color: white; background: #000;">
+			<img src="lokal.webp" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+			<div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.3); z-index: 1.5;"></div>
+			<div style="position: relative; z-index: 2; text-align: center; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); padding: 0 20px;">
+				<h2 style="font-size: 2.2rem; margin-bottom: 10px;">${lang === 'DE' ? 'Willkommen bei Pizzeria Pub St. Sisinius' : 'Benvenuti nella Pizzeria Pub St. Sisinius'}</h2>
+				<p style="font-size: 1.2rem;">${lang === 'DE' ? 'Pizza, Cocktails' : 'Pizza, Cocktail'}</p>
+				<p style="font-size: 1.2rem;">${lang === 'DE' ? 'Billiard, Darts' : 'Billiardo, Darts'}</p>
+				<p style="font-size: 1.2rem;">${lang === 'DE' ? 'TV Sky Live-Sport' : 'TV Sky - Sport dal vivo'}</p>
+			</div>
+		</div>
+
+		<div class="start-container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+			<!--pizza.webp + Genießen sie....
+	        -------------------------------->
+			<!-- ABOUT SECTION (FIX: flex-wrap + min-width 0 verhindert Overflow) -->
+			<div class="about-section" style="padding: 40px 0; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: flex-start; width: 100%; box-sizing: border-box;">
+    
+    <!-- Linke Spalte (Pizza) -->
+    <div class="image-container-left" style="display: flex; flex-direction: column; align-items: center; width: 400px; max-width: 100%;">
+        <img src="pizza.webp" alt="Pizza" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; display: block; margin-bottom: 15px;">
+        
+        <!-- TEXT 1: Nur am Desktop sichtbar -->
+        <div class="about-text-desktop" style="font-size: 0.9rem; line-height: 1.2; text-align: center; width: 100%;">
+            ${lang === 'DE' ? `
+				<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
+				<p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend</p>
+				<p>mit Sky Live-Sport, Billiard oder Darts – bei uns sind Sie richtig.</p>
+				<p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>`
+			:
+				`<p>Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
+				<p>Godetevi le nostre pizze in un'atmosfera accogliente</p>
+				<p>con Sky live-sport, billiardo o darts</p>
+				<p><strong>Non vediamo l'ora di darvi il benvenuto!</p>`			
+			}
+        </div>
+    </div>
+
+
+    <!-- Rechte Spalte (Billard/Darts) -->
+    <div class="image-container-right" style="display: flex; flex-direction: column; align-items: center; width: 450px; max-width: 100%;">
+		<img src="scdb.jpg" alt="Billiard Darts Sky" class="scdb-img" 
+			 style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; display: block; margin-bottom: 15px;">
+        
+        <!-- TEXT 2: Nur am Handy sichtbar -->
+        <div class="about-text-mobile" style="font-size: 0.9rem; line-height: 1.2; text-align: center; width: 100%; display: none;">
+            ${lang === 'DE' ? `
+				<p style="margin: 5px 0;">Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
+				<p style="margin: 5px 0;">Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend</p>
+				<p style="margin: 5px 0;">mit Sky Live-Sport, Billiard oder Darts – bei uns sind Sie richtig.</p>
+				<p style="margin: 5px 0;"><strong>Wir freuen uns auf Ihren Besuch!</strong></p>`
+			:
+				`<p style="margin: 5px 0;">Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
+				<p style="margin: 5px 0;">Godetevi le nostre pizze in un'atmosfera accogliente</p>
+				<p style="margin: 5px 0;">con Sky live-sport, billiardo o darts</p>
+				<p style="margin: 5px 0;"><strong>Non vediamo l'ora di darvi il benvenuto!</p>`				
+			}
+        </div>
+    </div>
+</div>
+			<!--Kontakt  (incl. google,instagram, facebook)
+	        ---------------------------------------------->
+			<!-- INFO WRAPPER: KONTAKT & ZEITEN -->
+			<div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0; width: 100%; box-sizing: border-box;">
+				
+				<!-- RECHTER RAHMEN: ÖFFNUNGSZEITEN & EDITOR 
+				-------------------------------------------->
+                <div class="info-card-responsive opening-hours-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.4; min-width: 310px; max-width: 100%;">			
+                    <h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 1px; margin-bottom: 5px;">
+                        ${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}
+                    </h3>
+                    
+                    <div style="display: block; width: 100%;">
+                        ${zeitenListe}
+                    </div>
+
+                    <!-- ADMIN BEREICH (Innerhalb der Box) -->
+                    ${editMode ? `
+                        <div style="margin-top: 25px; border-top: 2px dashed #ffc107; padding-top: 20px;">
+                            ${addTimeBtn}
+                            <div style="width: 100%; overflow-x: auto;">
+                                ${adminBox}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+
+
+
+				
+			   <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
+				<!--// ÄNDERUNG: min-width auf 280px senken und box-sizing hinzufügen-->
+				<div class="info-card-responsive contact-card-large" 
+                        style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.2; min-width: 250px; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+					
+						<!-- Text-Teil (Links) -->
+						<div style="flex: 1; min-width: 140px; margin-bottom: 0px;">
+							<h3 style="color:#dc3545; margin-top: 0; font-size: 1.2rem; overflow-wrap: break-word;">
+								${lang === 'DE' ? 'Kontakt' : 'Contatto'}
+							</h3>
+							
+							<a href="tel:+393898334004" 
+							   style="font-weight: bold; text-decoration: none; font-size: 1.1rem; color: #333; display: block; margin-bottom: 5px; word-break: break-all; white-space: normal;">
+								+39 389 833 4004
+							</a>
+							
+							<p style="font-size: 0.85rem; font-weight: bold; color: #666; margin-top: 10px; margin-bottom: 0px; line-height: 1.3;">
+								${lang === 'DE' ? 'Reservierung & Abholung' : 'Prenotazioni & Asporto'}
+							</p>
+						</div>
+						
+						<!-- Widget-Teil (Rechts) -->
+						<!-- ÄNDERUNG: flex-shrink: 0 hinzugefügt, damit die Buttons nicht gequetscht werden, aber auch nicht schieben-->
+						<!-- Container jetzt auf row (nebeneinander) gestellt und Breite erhöht -->
+						<div style="display: flex; flex-direction: row; align-items: flex-start; width: 230px; gap: 10px; flex-shrink: 0; margin: 0 auto;">	
+							
+							<!-- LINKER TEIL: GOOGLE MAPS + QUELLENNACHWEIS -->
+							<div style="display: flex; flex-direction: column; width: 110px;">
+								<a href="https://www.google.com/maps/place/Pizzeria+Pub+St.+Sisinius/@46.6224613,10.693687,18.58z/data=!4m6!3m5!1s0x4782e0627ab612c3:0xca96466506f0d033!8m2!3d46.6224479!4d10.6940889!16s%2Fg%2F11bbsz_x5t?entry=ttu" target="_blank" style="text-decoration: none; display: block; width: 110px;">
+									<div style="width: 110px; background: white; border: 2px solid white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; flex-direction: column;">
+										<div class="image-container-right" style="position: relative; width: 110px; height: 90px;">
+											<img src="orthofoto.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+											<div style="position: absolute; top: 65%; left: 40%; transform: translate(-50%, -100%); font-size: 20px;">📍</div>
+										</div>
+										<div style="background: #4285F4; color: white; text-align: center; padding: 5px 2px; font-size: 10px; font-weight: bold; text-transform: uppercase; line-height: 1.2;">
+											${lang === 'DE' ? 'KARTE<br>ÖFFNEN' : 'APRI<br>MAPPA'}
+										</div>
+									</div>
+								</a>
+								<p style="font-size: 8px; color: #999; margin: 5px 0; text-align: right; line-height: 1.1;">
+									© Prov. BZ - CC BY 4.0<br><span style="font-size: 7px;">Geoportal Südtirol</span>
+								</p>
+							</div>
+
+							<!-- RECHTER TEIL: INSTAGRAM & FACEBOOK -->
+							<div style="display: flex; flex-direction: column; gap: 8px; width: 110px;">
+								<!-- INSTAGRAM BUTTON -->
+								<a href="https://www.instagram.com/stsisinius" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 6px; padding: 10px 0; font-size: 9px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+									<span style="font-size: 12px; margin-right: 4px;">📸</span> INSTAGRAM
+								</a>
+
+								<!-- FACEBOOK BUTTON -->
+								<!--<a href="https://www.facebook.com/61585930843655/" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 10px 0; font-size: 9px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+									<span style="font-size: 14px; margin-right: 4px;">f</span> FACEBOOK
+								</a>-->
+								
+								
+								<!-- 4. FACEBOOK BUTTON -->
+								<a href="https://www.facebook.com/61585930843655/"
+								   target="_blank" rel="noopener noreferrer"
+								   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+									<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
+									FACEBOOK
+								</a>
+								<!--<a href="javascript:void(0);" 
+								   onclick="openFacebook('https://www.facebook.com/61585930843655/')" 
+								    style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+									<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
+									FACEBOOK
+								</a>-->							
+							</div>
+						</div>
+					</div>
+				</div>
+                
+            </div> <!-- Ende Info Wrapper -->
+			 
+			<!-- ADMIN-BEREICH: POPUP / NOTICE 
+			-------------------------------------->
+            ${editMode ? `
+            <div class="admin-notice-settings" style="margin-top: 30px; background: #fff9e6; border: 2px dashed #ffc107; padding: 25px; border-radius: 15px; width: 100%; box-sizing: border-box;">
+                <h3 style="margin-top: 0; color: #856404; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    📢 Popup / Notice bearbeiten
+                    <label style="font-size: 0.9rem; cursor: pointer; background: #eee; padding: 5px 10px; border-radius: 5px; color: #333; display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="edit-notice-active" ${data.notice && data.notice.active ? 'checked' : ''}> Aktivieren
+                    </label>
+                </h3>
+                
+                <!-- BILD-UPLOAD BEREICH IM ADMIN-FENSTER FÜR POPUP-->
+				<div style="text-align: center; margin-bottom: 20px; background: #eee; padding: 15px; border-radius: 10px;">
+					<div id="noticePreviewContainer">
+						<!-- Vorschau-Bild -->
+						<img id="img-preview-notice" 
+							 src="${data.notice && data.notice.img ? data.notice.img : ''}" 
+							 style="max-width:100%; max-height:150px; object-fit:contain; border-radius:8px; display: ${data.notice && data.notice.img ? 'block' : 'none'}; margin: 0 auto;">
+						
+						<!-- Platzhalter-Text -->
+						<span id="no-img-text-notice" style="display: ${data.notice && data.notice.img ? 'none' : 'block'}; color: #666;">
+							Kein Bild vorhanden
+						</span>
+					</div>
+
+					<input type="file" id="file-input-notice" accept="image/*" onchange="handleNoticeImageUpload(event)" style="margin-top: 10px; font-size: 0.8rem; width: 100%;">
+					<input type="hidden" id="inImgBase64Notice" value="${data.notice && data.notice.img ? data.notice.img : ''}">
+
+					<!-- Der Lösch-Button -->
+					<button id="btn-remove-notice" 
+							onclick="removeNoticeImage()" 
+							style="display: ${data.notice && data.notice.img ? 'inline-block' : 'none'}; margin-top: 10px; background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px;">
+						🗑️ Bild entfernen
+					</button>
+				</div>
+
+				<!-- Im Admin-Bereich für Popup unter dem Bild-Upload -->
+				<div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
+					<div style="flex: 1;">
+						<label style="font-size: 0.75rem; display: block; font-weight: bold;">Bildhöhe PC (px):</label>
+						<input type="number" id="edit-notice-img-height-pc" 
+							   style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" 
+							   value="${data.notice.imgHeightPC || '250'}">
+					</div>
+					<div style="flex: 1;">
+						<label style="font-size: 0.75rem; display: block; font-weight: bold;">Bildhöhe Handy (px):</label>
+						<input type="number" id="edit-notice-img-height-mobile" 
+							   style="width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px;" 
+							   value="${data.notice.imgHeightMobile || '180'}">
+					</div>
+				</div>
+
+
+				<!-- Im Admin-Bereich für Popup Text -->
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="font-weight:bold; font-size:0.8rem; display: block;">Titel (DE):</label>
+                            <input type="text" id="edit-notice-title-de" style="width:100%; padding:8px; border: 1px solid #ccc; border-radius: 4px;" value="${data.notice && data.notice.titleDE ? data.notice.titleDE : ''}">
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <label style="font-weight:bold; font-size:0.8rem; display: block;">Titolo (IT):</label>
+                            <input type="text" id="edit-notice-title-it" style="width:100%; padding:8px; border: 1px solid #ccc; border-radius: 4px;" value="${data.notice && data.notice.titleIT ? data.notice.titleIT : ''}">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-weight:bold; font-size:0.8rem; display: block;">Nachricht (DE):</label>
+                        <textarea id="edit-notice-de" style="width:100%; padding:8px; min-height:60px; border: 1px solid #ccc; border-radius: 4px;">${data.notice && data.notice.textDE ? data.notice.textDE : ''}</textarea>
+                    </div>
+                    <div>
+                        <label style="font-weight:bold; font-size:0.8rem; display: block;">Messaggio (IT):</label>
+                        <textarea id="edit-notice-it" style="width:100%; padding:8px; min-height:60px; border: 1px solid #ccc; border-radius: 4px;">${data.notice && data.notice.textIT ? data.notice.textIT : ''}</textarea>
+                    </div>
+
+                    <button onclick="saveNoticeSettings()" style="background: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        💾 Popup erfolgreich speichern (MongoDB)
+                    </button>
+                </div>
+            </div>
+            ` : ''}
+
+        </div> <!-- Ende start-container -->
+    </div> <!-- Ende main-content-wrapper -->
+    `;
+}
+
+//***************************************
+//    TV 
+//***************************************
+//praktisch renderTv
+//--------------------------------
+function getTvCardHtml(item, idx, lang, currentHeight, getAdminButtonsHtml) {
+    // Falls translateDate existiert, nutzen wir es, sonst Fallback
+    const textDE = item.descDE || '';
+    const textIT = (typeof translateDate === 'function') ? translateDate(textDE) : textDE;
+    
+    return `
+        <div class="event-card">
+            <div class="event-date">
+                ${lang === 'DE' ? textDE : textIT}
+            </div> 					
+            <hr class="event-line">
+            ${item.img ? `
+                <img src="${item.img}" 
+                     class="item-img" 
+                     style="height: ${currentHeight}px !important; object-fit: fill;" 
+                     alt="Bild">
+            ` : ''}		
+            <div class="event-grid">
+                <div class="event-time">${item.right || ''}</div>
+                <div class="event-teams">${lang === 'DE' ? (item.nameDE || '') : (item.nameIT || '')}</div>
+                <div class="event-league">${item.cat || 'LIVE'}</div>
+            </div>
+            ${getAdminButtonsHtml(idx)}
+        </div>`;
+}
+
+//***************************************
+//    Haupt-Unterüberschriften und Kategorie Trenner
+//***************************************
+// Hilfsfunktion für Haupt-Überschriften (Pizzakarte / TV-Sport)
+//----------------------------------------------------------------
+function getSectionTitleHtml(txt) {
+    // Wir nutzen hier klassische Anführungszeichen statt Backticks, das ist 100% Notepad++ sicher
+    return '<div style="grid-column: 1 / -1; width: 100%; text-align: left; margin-bottom: 0px;">' +
+           '<h1 style="color: black; margin: 0; padding: 0; font-size: 1.5rem;">' + txt + '</h1>' +
+           '</div>';
+}
+
+// Hilfsfunktion für Kategorie-Trenner (Pizza, Bianche etc.)
+//---------------------------------------------------------------
+function getCategoryHeaderHtml(txt) {
+    return '<div style="grid-column: 1 / -1; width: 100%; margin-top: 5px; border-bottom: 3px solid var(--red);">' +
+           '<h2 style="margin: 0px 0; padding: 10px 0; color: var(--red);">' + txt + '</h2>' +
+           '</div>';
+}
+	
+</script>
+</body>
+</html>
+
