@@ -1379,17 +1379,19 @@ function getStartPageFullLayout(data, lang, editMode) {
 				<img src="pizza.webp" alt="Pizza" class="about-image" 
 					 style="max-width: 100%; width: 400px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; flex-shrink: 1; display: block; margin: 0 auto;">
 				<div style="display: flex; flex-direction: column; align-items: center; width: 450px; max-width: 100%;">
-					<img src="cdb.jpg" alt="Cocktail Darts Billiard" class="about-image" 
+					<img src="cocktail.jpg" alt="Cocktail" class="about-image" 
+						style="max-width: 100%; width: 450px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: 80px; flex-shrink: 1; display: block; margin: 0 auto;">
+					<img src="bds.jpg" alt="Billiard Darts Sky" class="about-image" 
 						style="max-width: 100%; width: 450px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: auto; flex-shrink: 1; display: block; margin: 0 auto;">
 					
 					
 					
-					<div class="about-text" style="flex: 1; min-width: 250px; font-size: 0.9rem; line-height: 1.7; word-wrap: break-word; text-align: center;">
+					<div class="about-text" style="flex: 1; min-width: 250px; font-size: 0.9rem; line-height: 1.0; word-wrap: break-word; text-align: center;">
 						${lang === 'DE' ? 
-							`<p>Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
-							 <p>Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend</p>
-							 <p>mit Sky Live-Sport, Billiard oder Darts – bei uns sind Sie richtig.</p>
-							 <p><strong>Wir freuen uns auf Ihren Besuch!</strong></p>` 
+							`<p style="margin: 5px 0;">Genießen Sie unsere frische Pizza aus dem Holzofen in vielen Varianten sowie Cocktails und erfrischende Getränke.</p>
+							 <p style="margin: 5px 0;">Ob entspanntes Essen, ein Treffen mit Freunden oder ein Abend</p>
+							 <p style="margin: 5px 0;">mit Sky Live-Sport, Billiard oder Darts – bei uns sind Sie richtig.</p>
+							 <p style="margin: 5px 0;"><strong>Wir freuen uns auf Ihren Besuch!</strong></p>` 
 							: 
 							`<p>Benvenuti alla Pizzeria Pub St. Sisinius! Serviamo pizze cotte nel forno a legna con ingredienti freschi.</p>
 							 <p>Godetevi le nostre pizze in un'atmosfera accogliente</p>
@@ -1483,14 +1485,14 @@ function getStartPageFullLayout(data, lang, editMode) {
 								</a>
 
 								<!-- FACEBOOK BUTTON -->
-								<!--<a href="https://www.facebook.com/61585930843655/" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 10px 0; font-size: 9px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+								<!--<a href="https://www.facebook.com/61585930843655/" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 10px 0; font-size: 9px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
 									<span style="font-size: 14px; margin-right: 4px;">f</span> FACEBOOK
 								</a>-->
 								
 								
 									<!-- 4. FACEBOOK BUTTON -->
 								<a href="https://www.facebook.com/61585930843655/"
-								   target="_blank" 
+								   target="_blank" rel="noopener noreferrer"
 								   style="text-decoration: none; display: flex; align-items: center; justify-content: center; width: 110px; background: #1877F2; color: white; border-radius: 6px; padding: 6px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
 									<span style="font-size: 14px; margin-right: 5px; font-family: 'Arial Black', sans-serif;">f</span> 
 									FACEBOOK
@@ -1645,5 +1647,4 @@ function getCategoryHeaderHtml(txt) {
 </script>
 </body>
 </html>
-
 
