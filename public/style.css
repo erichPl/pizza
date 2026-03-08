@@ -427,17 +427,23 @@ footer {
     .footer-container {
         grid-template-columns: 1fr; /* Nur 1 Spalte am Handy */
         text-align: center; /* Am Handy sieht zentriert meist besser aus */
+		margin-bottom: -25px !important;
+		padding-bottom: 0px;
     }
     
     .footer-section {
-        margin-bottom: 25px;
-        padding-bottom: 20px;
+		margin-top: -30px !important;
+        padding-top: 0px;
+       
+        margin-bottom: 5px;
+        padding-bottom: 0px;
         border-bottom: 1px solid #333;
     }
     
     .footer-section:last-child {
         border-bottom: none;
     }
+	
 }
 
 
