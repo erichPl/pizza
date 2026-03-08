@@ -1420,13 +1420,17 @@ function getStartPageFullLayout(data, lang, editMode) {
 			<!--Kontakt  (incl. google,instagram, facebook)
 	        ---------------------------------------------->
 			<!-- INFO WRAPPER: KONTAKT & ZEITEN -->
-			<div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0; width: 100%; box-sizing: border-box;">
+			<div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; padding: 20px 0 0 0; width: 100%; box-sizing: border-box;">
 				
 				<!-- RECHTER RAHMEN: ÖFFNUNGSZEITEN & EDITOR 
 				-------------------------------------------->
-                <div class="info-card-responsive opening-hours-card" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.4; min-width: 310px; max-width: 100%;">			
-                    <h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 1px; margin-bottom: 5px;">
-                        ${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}
+                
+			    <div class="info-card-responsive opening-hours-card" 
+					 style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+							flex: 1 1 300px; min-width: 0; width: 100%; box-sizing: border-box;">       
+
+					<h3 style="color:#dc3545; margin-top: 0; border-bottom: 2px solid #f8f9fa; padding-bottom: 1px; margin-bottom: 5px;">
+							${lang === 'DE' ? 'Öffnungszeiten' : 'Orari di apertura'}
                     </h3>
                     
                     <div style="display: block; width: 100%;">
@@ -1450,7 +1454,8 @@ function getStartPageFullLayout(data, lang, editMode) {
 			   <!-- LINKER RAHMEN: KONTAKT & SOCIAL -->
 				<!--// ÄNDERUNG: min-width auf 280px senken und box-sizing hinzufügen-->
 				<div class="info-card-responsive contact-card-large" 
-                        style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); flex: 1.2; min-width: 250px; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+					 style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+							flex: 1 1 300px; min-width: 0; width: 100%; box-sizing: border-box; overflow: hidden;">	
 					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
 					
 						<!-- Text-Teil (Links) -->
