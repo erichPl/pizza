@@ -1,5 +1,6 @@
 <?php
 header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *"); // Erlaubt den Zugriff von außen
 header("Cache-Control: no-cache, must-revalidate");
 header("Connection: close");
 date_default_timezone_set('Europe/Berlin');
