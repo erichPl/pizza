@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+     <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Bestellung</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; padding: 15px; margin: 0; }
+        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        h2 { color: #ffcc00; border-bottom: 1px solid #333; padding-bottom: 5px; margin-top: 25px; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #222; }
+        .info { flex-grow: 1; }
+        .desc { font-size: 0.8rem; color: #888; display: block; }
+        .preis { color: #00ca4e; font-weight: bold; font-size: 0.9rem; }
+        .controls { display: flex; align-items: center; gap: 15px; }
+        .btn { width: 40px; height: 40px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.2rem; }
+        .btn-plus { background: #007bff; color: white; }
+        .btn-minus { background: #444; color: white; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; padding: 20px; border-top: 3px solid #00ca4e; display: none; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
+        .btn-send { background: #00ca4e; color: white; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 10px; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div style="padding-bottom: 120px;">
+        <h1 id="tisch-view">Tisch ?</h1>
+        <div id="menu">Lade Speisekarte...</div>
+    </div>
+
+    <div class="cart-bar" id="cart-bar">
+        <div id="cart-text" style="margin-bottom: 15px; font-weight: bold;"></div>
+        <button class="btn-send" onclick="sendOrder()">JETZT BESTELLEN</button>
+    </div>
+
+    <script>
+        let cart = {}; 
+        let productNames  = {};
+		let productCategories = {}; // NEU: Damit wir uns die Kategorie merken		
+
+        // 1. Laden beim Start
+        /*async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const tischNr = params.get('tisch') || "Unbekannt";
+            document.getElementById('tisch-view').innerText = "Tisch " + tischNr;
+
+            try {
+                const res = await fetch('bestellen.php?get_products=1'); 
+                const items = await res.json();
+                renderMenu(items);
+            } catch (e) {
+                document.getElementById('menu').innerText = "Fehler: Bitte zuerst Produkte im Admin-Bereich speichern!";
+            }
+        }*/
+		
+		
+		let items = []; // Deine globale Variable für die Produkte
+
+async function init() {
+    // 1. Tischnummer wie bisher
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('tisch-view').innerText = "Tisch " + (params.get('tisch') || "Unbekannt");
+
+    // 2. Im Speicher des Browsers nachsehen
+    const cachedMenu = localStorage.getItem('bar_menu');
+    const cachedVersion = localStorage.getItem('bar_menu_version');
+
+    // 3. Sofort anzeigen, falls vorhanden (0ms Wartezeit!)
+    if (cachedMenu) {
+        items = JSON.parse(cachedMenu);
+        renderMenu(items);
+    }
+
+    // 4. Im Hintergrund (oder falls nichts da ist) Version prüfen
+    try {
+        const res = await fetch('bestellen.php?get_products=1');
+        const serverVersion = res.headers.get('X-Menu-Version');
+
+        // Nur neu laden, wenn der Server eine neuere Version hat
+        if (serverVersion !== cachedVersion) {
+            items = await res.json();
+            localStorage.setItem('bar_menu', JSON.stringify(items));
+            localStorage.setItem('bar_menu_version', serverVersion);
+            
+            // Nur neu zeichnen, wenn sich wirklich was geändert hat
+            renderMenu(items);
+            console.log("Speisekarte aktualisiert.");
+        }
+    } catch (e) {
+        if (!cachedMenu) document.getElementById('menu').innerText = "Offline/Fehler";
+    }
+}
+
+		// 2. Menü aufbauen
+		function renderMenu(items) {
+			const menuDiv = document.getElementById('menu');
+			
+			if(!items || items.length === 0) {
+				menuDiv.innerText = "Keine Produkte gefunden. Bitte Admin-Bereich prüfen.";
+				return;
+			}
+
+			// Wir starten mit einer Standard-Kategorie, falls das erste Item kein Header ist
+			let aktuelleKategorie = "Diverses"; 
+
+			menuDiv.innerHTML = items.map((item, index) => {
+				// FALL A: Es ist eine Überschrift (Kategorie)
+				if(item.type === 'header') {
+					// Wir merken uns den Namen dieser Überschrift für alle folgenden Produkte
+					aktuelleKategorie = item.name; 
+					return `<h2>${item.name}</h2>`;
+				}
+				
+				// FALL B: Es ist ein Produkt
+				productNames[index] = item.name;         // Name für Warenkorb merken
+				productCategories[index] = aktuelleKategorie; // Aktuelle Kategorie an Produkt heften
+
+				return `
+					<div class="item">
+						<div class="info">
+							<strong>${item.name}</strong>
+							<span class="desc">${item.desc}</span>
+							<span class="preis">${item.price} €</span>
+						</div>
+						<div class="controls">
+							<button class="btn btn-minus" onclick="changeQty(${index}, -1)">-</button>
+							<span id="qty-${index}" style="min-width:20px; text-align:center;">0</span>
+							<button class="btn btn-plus" onclick="changeQty(${index}, 1)">+</button>
+						</div>
+					</div>`;
+			}).join('');
+		}
+
+        // 3. Mengen ändern
+        function changeQty(id, delta) {
+            cart[id] = (cart[id] || 0) + delta;
+            if(cart[id] <= 0) delete cart[id];
+
+            // Anzeige im Menü updaten
+            const display = document.getElementById('qty-' + id);
+            if(display) display.innerText = cart[id] || 0;
+
+            updateCartUI();
+        }
+
+        // 4. Warenkorb-Leiste updaten
+        function updateCartUI() {
+            const bar = document.getElementById('cart-bar');
+            const txt = document.getElementById('cart-text');
+            const keys = Object.keys(cart);
+
+            if(keys.length > 0) {
+                bar.style.display = 'block';
+                txt.innerText = keys.map(id => `${cart[id]}x ${productNames[id]}`).join(", ");
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        // 5. Absenden
+       async function sendOrder() {
+			const tisch = new URLSearchParams(window.location.search).get('tisch') || "Unbekannt";
+			
+			// Wir bauen den String jetzt so: "(Kategorie) Menge x Name"
+			const artikelString = Object.keys(cart).map(id => {
+				return `(${productCategories[id]}) ${cart[id]}x ${productNames[id]}`;
+			}).join(", ");
+
+			const res = await fetch('bestellen.php', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ tisch: tisch, artikel: artikelString })
+			});
+
+			if(res.ok) {
+				alert("Bestellung ist abgeschickt! 🍻");
+				location.reload(); 
+			}
+		}
+
+        init(); // Starten
+    </script>
+</body>
+</html>

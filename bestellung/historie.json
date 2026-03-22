@@ -1,0 +1,50 @@
+[
+  {
+    "zeit": "19:15",
+    "tisch": "5",
+    "artikel": "(PIZZA) 1x Salame",
+    "datum": "21.03.2026",
+    "erledigt_um": "19:30",
+    "gesamtpreis": "10,00 €",
+    "artikel_liste": [
+      "[PIZZA] 1x Salame | 10,00 €"
+    ],
+    "kategorien_details": [
+      {"kategorie": "PIZZA", "summe": 10}
+    ]
+  },
+  {
+    "zeit": "08:44",
+    "tisch": "4",
+    "artikel": "(PIZZA) 1x Salame, (PIZZA) 1x Test, (PIZZA) 2x test1",
+    "datum": "22.03.2026",
+    "erledigt_um": "08:44",
+    "gesamtpreis": "23,00 €",
+    "artikel_liste": [
+      "[PIZZA] 1x Salame | 10,00 €",
+      "[PIZZA] 1x Test | 3,00 €",
+      "[PIZZA] 2x test1 | 10,00 €"
+    ],
+    "kategorien_details": [
+      {"kategorie": "PIZZA", "summe": 10},
+      {"kategorie": "PIZZA", "summe": 3},
+      {"kategorie": "PIZZA", "summe": 10}
+    ]
+  },
+  {
+    "zeit": "09:11",
+    "tisch": "Unbekannt",
+    "artikel": "(GETRÄNKE) 3x Pils, (GETRÄNKE) 1x Pils",
+    "datum": "22.03.2026",
+    "erledigt_um": "09:11",
+    "gesamtpreis": "9,20 €",
+    "artikel_liste": [
+      "[GETRÄNKE] 3x Pils | 6,90 €",
+      "[GETRÄNKE] 1x Pils | 2,30 €"
+    ],
+    "kategorien_details": [
+      {"kategorie": "GETRÄNKE", "summe": 6.90},
+      {"kategorie": "GETRÄNKE", "summe": 2.30}
+    ]
+  }
+]
