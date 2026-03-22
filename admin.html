@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <!-- QR-Code Bibliothek laden -->
+	<script src="https://
+cdn.jsdelivr.net/
+npm/
+qrcode@1.5.1/
+build/
+qrcode.min.js"></script>
+	
+	
+	<title>Bar Admin - Karte Editor</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #eee; }
+        .row { background: white; padding: 10px; margin-bottom: 5px; display: flex; gap: 10px; border-radius: 5px; }
+        input { padding: 5px; border: 1px solid #ccc; }
+        .header-row { border-left: 5px solid #ffcc00; font-weight: bold; }
+        .btn-save { background: #00ca4e; color: white; padding: 15px; width: 100%; border: none; font-weight: bold; cursor: pointer; }
+    </style>
+	
+	<style>
+		/* Diese Regeln gelten nur beim Ausdrucken */
+		@media print {
+			body * { visibility: hidden; } /* Alles verstecken */
+			#print-area, #print-area * { visibility: visible; } /* Nur QR-Codes zeigen */
+			#print-area { position: absolute; left: 0; top: 0; width: 100%; }
+			.qr-tile { page-break-inside: avoid; margin-bottom: 50px; } /* Keine halben Codes auf einer Seite */
+		}
+		.qr-tile { 
+			display: inline-block; padding: 20px; border: 1px solid #ccc; 
+			text-align: center; background: white; color: black; margin: 10px;
+		}
+	</style>
+	
+	
+</head>
+<body>
+    <h1>📋 Speisekarte Editor</h1>
+	
+	<div class="card">
+		<h3>🖨️ QR-Code Druck-Center</h3>
+		Basis-URL: <input type="text" id="base-url" value="Sisinius.it/" style="width:200px;">
+		Anzahl Tische: <input type="number" id="qr-count" value="10" style="width:60px;">
+		
+		<!-- NEU: Einzelner Tisch -->
+		oder nur Tisch Nr: <input type="number" id="single-tisch" placeholder="Nr" style="width:50px;">
+		
+		<button onclick="generateQRs()">QR-Codes generieren</button>
+		<button onclick="window.print()" style="background:#28a745; color:white;">📄 Jetzt Drucken</button>
+		
+		<div id="print-area" style="margin-top:20px; display:flex; flex-wrap:wrap; justify-content:center;"></div>
+	</div>
+    
+	<div id="editor"></div>
+    <button onclick="addItem('header')">+ Überschrift</button>
+    <button onclick="addItem('product')">+ Produkt</button>
+    <hr>
+    <button class="btn-save" onclick="save()">SPEICHERN</button>
+
+    <script>
+        let items = [];
+        async function load() {
+            const res = await fetch('bestellen.php?get_products=1');
+            items = await res.json();
+            render();
+        }
+        function addItem(type) {
+            items.push({ type, name: '', desc: '', price: '' });
+            render();
+        }
+        function render() {
+            const div = document.getElementById('editor');
+            div.innerHTML = items.map((item, i) => `
+                <div class="row ${item.type === 'header' ? 'header-row' : ''}">
+                    <b>${item.type === 'header' ? 'Überschrift' : 'Produkt'}</b>
+                    <input type="text" placeholder="Name" value="${item.name}" oninput="items[${i}].name=this.value">
+                    ${item.type === 'product' ? `
+                        <input type="text" placeholder="Beschreibung" value="${item.desc}" oninput="items[${i}].desc=this.value">
+                        <input type="text" placeholder="Preis" value="${item.price}" oninput="items[${i}].price=this.value">
+                    ` : ''}
+                    <button onclick="items.splice(${i},1);render()">X</button>
+                </div>
+            `).join('');
+        }
+        async function save() {
+            await fetch('bestellen.php', { method: 'POST', body: JSON.stringify({ save_products: true, products: items }) });
+            alert("Karte gespeichert!");
+        }
+        load();
+		
+		
+		async function generateQRs() {
+			const baseUrl = document.getElementById('base-url').value.trim();
+			const count = parseInt(document.getElementById('qr-count').value);
+			const singleTisch = document.getElementById('single-tisch').value; // NEU
+			const display = document.getElementById('print-area');
+			
+			display.innerHTML = "Generiere...";
+
+			// URL bereinigen
+			let cleanUrl = baseUrl.startsWith('http') ? baseUrl : 'http://' + baseUrl;
+			if(!cleanUrl.endsWith('/')) cleanUrl += '/';
+
+			display.innerHTML = ""; // Container leeren
+
+			// Bestimme Start und Ende der Schleife
+			let start = 1;
+			let ende = count;
+
+			// Falls ein einzelner Tisch eingegeben wurde, überschreiben wir die Werte
+			if (singleTisch && singleTisch > 0) {
+				start = parseInt(singleTisch);
+				ende = parseInt(singleTisch);
+			}
+
+			for(let i = start; i <= ende; i++) {
+				const finalUrl = `${cleanUrl}bestelle.html?tisch=${i}`;
+				
+				const tile = document.createElement('div');
+				tile.className = "qr-tile";
+				
+				const canvas = document.createElement('canvas');
+				tile.appendChild(canvas);
+				tile.insertAdjacentHTML('beforeend', `<br><b style="font-size:1.2rem;">Tisch ${i}</b><br><small style="font-size:0.7rem; color:#666;">${finalUrl}</small>`);
+				
+				display.appendChild(tile);
+
+				// QR Code zeichnen
+				await QRCode.toCanvas(canvas, finalUrl, { 
+					width: 180, 
+					margin: 2
+				});
+			}
+		}
+    </script>
+</body>
+</html>
