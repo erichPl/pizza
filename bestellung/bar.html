@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>   
+    <title>Bar Backend - Live</title>  
+	<style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #eee; padding: 20px; }
+        .order-card { 
+            background: #1e1e1e; border-left: 6px solid #00ca4e; 
+            margin-bottom: 15px; padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .tisch-nr { font-weight: bold; color: #ffcc00; font-size: 1.4rem; margin-right: 15px; }
+        .artikel-text { font-size: 1.2rem; flex-grow: 1; }
+        
+        /* Die kleine Bestellzeit */
+        .bestell-zeit { 
+            display: block; 
+            font-size: 0.85rem; 
+            color: #888; 
+            margin-top: 4px; 
+        }
+
+        .btn-done { 
+            background: #00ca4e; color: white; border: none; 
+            padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        .btn-done:hover { background: #00a841; }
+    </style>
+</head>
+<body>
+
+	<div class="card" style="border-left: 6px solid #007bff;">
+		<h3>📊 Auswertung</h3>
+		von: <input type="text" id="date-from" placeholder="TT.MM.JJJJ" style="width:100px;"> 
+		bis: <input type="text" id="date-to" placeholder="TT.MM.JJJJ" style="width:100px;">
+		
+		<div id="category-filter" style="margin-top: 10px; padding: 10px; background: #222; border-radius: 5px;">
+			<span style="color: #888;">Kategorien filtern:</span> 
+			<div id="category-checkboxes" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;">
+				<!-- Wird per JS gefüllt -->
+			</div>
+		</div>
+		
+		Ansicht: 
+		<select id="report-mode">
+			<option value="daily">Täglich</option>
+			<option value="weekly">Wöchentlich (Mo-So)</option>
+		</select>
+		
+		<button onclick="runReport()" style="background:#007bff; margin-left:10px;">Bericht erstellen</button>
+	</div>
+
+	<!-- Modal für den Bericht -->
+	<div id="report-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); overflow-y:auto; padding:20px; z-index:2000;">
+		<button onclick="document.getElementById('report-modal').style.display='none'" style="float:right; background:red;">Schließen X</button>
+		<h2>📊 Verkaufsbericht</h2>
+		<div id="report-content"></div>
+		
+		<!-- Container, der das Scrollen erlaubt -->
+		<div style="width: 100%; overflow-x: auto; background: #1a1a1a; padding: 10px; border-radius: 8px;">
+			<!-- Das eigentliche Diagramm bekommt eine dynamische Breite per JS -->
+			<div id="chart-wrapper" style="width: 100%; height: 300px;">
+				<canvas id="revenueChart"></canvas>
+			</div>
+		</div>
+		
+		
+	</div>
+
+
+	<button onclick="showHistory()" style="background:#555; margin-bottom:20px;">📜 Verlauf anzeigen</button>
+
+	<!-- Der versteckte Bereich für den Verlauf -->
+	<div id="history-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); overflow-y:auto; padding:20px; z-index:1000;">
+		<button onclick="document.getElementById('history-modal').style.display='none'" style="float:right;">Close X</button>
+		<h2>📜 Erledigte Bestellungen</h2>
+		<div id="history-liste"></div>
+	</div>
+
+    <h1>📥 Offene Bestellungen</h1>
+    <div id="liste">Lade...</div>
+
+    <script>
+        async function fetchOrders() {
+            try {
+                const res = await fetch('./bestellen.php') ;
+                const orders = await res.json();
+                const liste = document.getElementById('liste');
+                
+                if (orders.length === 0) {
+                    liste.innerHTML = "<h3>Keine offenen Bestellungen 🙌</h3>";
+                    return;
+                }
+
+                liste.innerHTML = orders.map((o, index) => `
+                    <div class="order-card">
+                        <div class="artikel-text">
+                            <span class="tisch-nr">Tisch ${o.tisch}</span>
+                            <span>${o.artikel}</span>
+                            <span class="bestell-zeit">Bestellt um ${o.zeit} Uhr</span>
+                        </div>
+                        <button class="btn-done" onclick="markDone(${index})">ERLEDIGT ✓</button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Fehler beim Laden:", e);
+            }
+        }
+
+        async function markDone(id) {
+            await fetch('bestellen.php', {
+                method: 'POST',
+                body: JSON.stringify({ delete_id: id })
+            });
+            fetchOrders(); 
+        }
+
+        setInterval(fetchOrders, 3000); // Alle 3 Sek. aktualisieren
+        fetchOrders();
+		
+	async function showHistory() {
+		document.getElementById('history-modal').style.display = 'block';
+		const container = document.getElementById('history-liste');
+		container.innerHTML = "Lade Verlauf...";
+
+		try {
+			const res = await fetch('./bestellen.php?get_history=1&t=' + Date.now());
+			const history = await res.json();
+			
+			console.log("Historie Daten:", history);
+
+			if (!history || history.length === 0) {
+				container.innerHTML = "<p>Noch keine Daten vorhanden.</p>";
+				return;
+			}
+
+			const displayData = [...history].reverse();
+
+			container.innerHTML = displayData.map(h => `
+			<div style="border-bottom:1px solid #444; padding:15px 10px; color:#aaa;">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+					<strong style="color:white; font-size: 1.1rem;">Tisch ${h.tisch || '?'}</strong>
+					<span style="color:#00ca4e; font-weight:bold; font-size: 1.2rem;">${h.gesamtpreis || '0,00 €'}</span>
+				</div>
+				<div style="color:#eee; font-size: 0.95rem; margin-bottom: 8px;">
+					${(h.artikel_liste || [h.artikel]).map(zeile => `<div>${zeile}</div>`).join('')}
+				</div>
+				<small>
+					Datum: ${h.datum || '---'} | Bestellt: ${h.zeit} | Erledigt: ${h.erledigt_um || '---'}
+				</small>
+			</div>
+		`).join('');
+		} catch (e) {
+			console.error("Historie Fehler:", e);
+			container.innerHTML = "Fehler beim Laden: " + e.message;
+		}
+	}
+		
+		
+let myChart = null; // Globale Variable, um das Diagramm bei Neuberechnung zu resetten
+
+async function runReport() {
+    const fromStr = document.getElementById('date-from').value;
+    const toStr = document.getElementById('date-to').value;
+    const mode = document.getElementById('report-mode').value;
+    const modal = document.getElementById('report-modal');
+    const content = document.getElementById('report-content');
+
+    // 1. Welche Kategorien sind aktuell angehakt?
+    const activeCats = Array.from(document.querySelectorAll('.cat-check:checked')).map(cb => cb.value);
+
+    if (!fromStr) { alert("Bitte Startdatum (TT.MM.JJJJ) eingeben!"); return; }
+    
+    modal.style.display = 'block';
+    content.innerHTML = "Berechne Bericht... Bitte warten.";
+
+    const parseDate = (str) => {
+        if (!str || typeof str !== 'string') return null;
+        const p = str.split('.');
+        if (p.length !== 3) return null;
+        return new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
+    };
+
+    const dFrom = parseDate(fromStr);
+    const dTo = toStr ? parseDate(toStr) : dFrom;
+
+    try {
+        const res = await fetch('./bestellen.php?get_history=1&t=' + Date.now());
+        const rawData = await res.json();
+        const history = Array.isArray(rawData) ? rawData : [];
+
+        let stats = {}; 
+        let chartData = {}; 
+        let totalUmsatz = 0;
+
+history.forEach(h => {
+            const hDate = parseDate(h.datum);
+            
+            if (hDate && hDate >= dFrom && hDate <= dTo) {
+                let orderTotalForFilteredCats = 0;
+
+                if (h.artikel_liste && Array.isArray(h.artikel_liste)) {
+                    h.artikel_liste.forEach(zeile => {
+                        // REGEX: Sucht nach [Kat] ODER startet direkt mit Menge
+                        const matchNew = zeile.match(/^\[(.+?)\]\s+(\d+)x\s+(.+?)\s\|\s(.+?)\s€/);
+                        const matchOld = zeile.match(/^(\d+)x\s+(.+?)\s\|\s(.+?)\s€/);
+                        
+                        let kat, menge, name, preisStr;
+
+                        if (matchNew) {
+                            kat = matchNew[1];
+                            menge = parseInt(matchNew[2]);
+                            name = matchNew[3];
+                            preisStr = matchNew[4];
+                        } else if (matchOld) {
+                            kat = "Unbekannt"; // Für alte Testdaten
+                            menge = parseInt(matchOld[1]);
+                            name = matchOld[2];
+                            preisStr = matchOld[3];
+                        }
+
+                        if (menge) {
+                            const preis = parseFloat(preisStr.replace(/\./g, '').replace(',', '.'));
+
+                            // FILTER: Nur berechnen, wenn Kategorie gewählt ist (oder "Unbekannt" im Filter existiert)
+                            if (activeCats.length === 0 || activeCats.includes(kat)) {
+                                orderTotalForFilteredCats += preis;
+
+                                if (!stats[name]) stats[name] = { menge: 0, summe: 0, kat: kat };
+                                stats[name].menge += menge;
+                                stats[name].summe += preis;
+                            }
+                        }
+                    });
+                }
+                
+                if (orderTotalForFilteredCats > 0) {
+                    totalUmsatz += orderTotalForFilteredCats;
+                    let groupLabel = h.datum;
+                    if (mode === 'weekly') {
+                        const day = hDate.getDay();
+                        const diff = hDate.getDate() - day + (day === 0 ? -6 : 1);
+                        const monday = new Date(hDate.getFullYear(), hDate.getMonth(), diff);
+                        groupLabel = "Woche ab " + monday.toLocaleDateString('de-DE');
+                    }
+                    if (!chartData[groupLabel]) chartData[groupLabel] = {};
+                    chartData[groupLabel][h.datum] = (chartData[groupLabel][h.datum] || 0) + orderTotalForFilteredCats;
+                }
+            }
+        });
+
+        if (totalUmsatz === 0) {
+            content.innerHTML = `<h3>Keine Daten für die gewählten Kategorien im Zeitraum gefunden.</h3>`;
+            if (myChart) myChart.destroy();
+            return;
+        }
+
+        // Diagramm zeichnen
+        renderStackedChart(chartData, mode);
+
+        // Tabelle bauen
+        let html = `<h3>Zeitraum: ${fromStr} ${toStr ? '- ' + toStr : ''}</h3>`;
+        html += `<h1 style="color:#00ca4e;">Gefilterter Umsatz: ${totalUmsatz.toFixed(2).replace('.', ',')} €</h1><hr>`;
+        html += `<table style="width:100%; text-align:left; border-collapse:collapse; margin-top:20px;">
+                    <tr style="border-bottom:2px solid #555; color:#888;">
+                        <th style="padding:10px;">Menge</th>
+                        <th style="padding:10px;">Kategorie</th>
+                        <th style="padding:10px;">Artikel</th>
+                        <th style="padding:10px;">Umsatz</th>
+                    </tr>`;
+        
+        for (let n in stats) {
+            html += `<tr style="border-bottom:1px solid #333;">
+                        <td style="padding:10px;">${stats[n].menge}x</td>
+                        <td style="padding:10px; font-size:0.8rem; color:#888;">${stats[n].kat}</td>
+                        <td style="padding:10px;">${n}</td>
+                        <td style="padding:10px; color:#00ca4e;">${stats[n].summe.toFixed(2).replace('.', ',')} €</td>
+                    </tr>`;
+        }
+        html += `</table>`;
+        content.innerHTML = html;
+
+    } catch (e) {
+        content.innerHTML = "<b style='color:red;'>Fehler:</b> " + e.message;
+        console.error(e);
+    }
+}
+
+
+
+
+
+const wochentagFarben = [
+    '#ff4444', // 0: Sonntag (Rot)
+    '#33b5e5', // 1: Montag (Blau)
+    '#aa66cc', // 2: Dienstag (Lila)
+    '#ffbb33', // 3: Mittwoch (Orange)
+    '#ff8800', // 4: Donnerstag (Dunkelorange)
+    '#0099cc', // 5: Freitag (Hellblau)
+    '#00ca4e'  // 6: Samstag (Grün)
+];
+
+function renderChart(data) {
+    const canvas = document.getElementById('revenueChart');
+    const wrapper = document.getElementById('chart-wrapper');
+    if (!canvas || !wrapper) return;
+
+    const ctx = canvas.getContext('2d');
+    if (myChart) myChart.destroy();
+
+    const labels = Object.keys(data); // Die Daten (z.B. "22.03.2026")
+    const values = Object.values(data);
+
+    // NEU: Farben pro Balken berechnen
+    const hintergründe = labels.map(datumStr => {
+        const parts = datumStr.split('.');
+        // Achtung: JS Monate sind 0-11
+        const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        const wochentag = d.getDay(); // 0 (So) bis 6 (Sa)
+        return wochentagFarben[wochentag];
+    });
+
+    const minWidth = Math.max(wrapper.parentElement.clientWidth, labels.length * 50);
+    wrapper.style.width = minWidth + "px";
+
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Umsatz pro Tag (€)',
+                data: values,
+                backgroundColor: hintergründe, // Hier die berechneten Farben nutzen
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: '#333' } },
+                x: { ticks: { color: '#fff', maxRotation: 45, minRotation: 45 }, grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false },
+                // Optional: Tooltip zeigt Wochentag an
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            const datumStr = context[0].label;
+                            const parts = datumStr.split('.');
+                            const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                            const tage = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+                            return tage[d.getDay()] + ", " + datumStr;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    wrapper.parentElement.scrollLeft = wrapper.parentElement.scrollWidth;
+}
+	
+	
+
+
+function renderStackedChart(groupedData, mode) {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    if (myChart) myChart.destroy();
+
+    const labels = Object.keys(groupedData); // X-Achse: Tage oder Wochen
+    const allDays = [...new Set(Object.values(groupedData).flatMap(obj => Object.keys(obj)))].sort();
+
+    // Wir erstellen für jeden physischen Tag einen eigenen Datensatz (Segment)
+    const datasets = allDays.map(dayStr => {
+        const parts = dayStr.split('.');
+        const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        const color = wochentagFarben[d.getDay()];
+
+        return {
+            label: dayStr,
+            data: labels.map(label => groupedData[label][dayStr] || 0),
+            backgroundColor: color,
+            stack: 'Stack 0', // Alle Daten in denselben Stapel
+            borderWidth: 1
+        };
+    });
+
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { stacked: true, ticks: { color: '#fff' } },
+                y: { stacked: true, beginAtZero: true, ticks: { color: '#fff' } }
+            },
+            plugins: {
+                legend: { display: mode === 'weekly' }, // Legende nur bei Woche zeigen
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.dataset.label}: ${context.raw.toFixed(2)} €`
+                    }
+                }
+            }
+        }
+    });
+}	
+
+
+
+async function loadCategories() {
+    const res = await fetch('./bestellen.php?get_history=1');
+    const history = await res.json();
+    const cats = new Set();
+    
+    history.forEach(h => {
+        if(h.artikel_liste) {
+            h.artikel_liste.forEach(zeile => {
+                const match = zeile.match(/^\[(.+?)\]/);
+                if(match) cats.add(match[1]);
+            });
+        }
+    });
+
+    const container = document.getElementById('category-checkboxes');
+    container.innerHTML = Array.from(cats).map(cat => `
+        <label style="cursor:pointer;">
+            <input type="checkbox" class="cat-check" value="${cat}" checked> ${cat}
+        </label>
+    `).join('');
+}
+
+async function refreshCategoryFilters() {
+    const container = document.getElementById('category-checkboxes');
+    if (!container) return;
+
+    try {
+        const res = await fetch('./bestellen.php?get_history=1&t=' + Date.now());
+        const history = await res.json();
+        const cats = new Set();
+        
+        if (!Array.isArray(history) || history.length === 0) {
+            container.innerHTML = "<small style='color:orange;'>Historie leer - bitte erste Bestellung erledigen.</small>";
+            return;
+        }
+
+        history.forEach(h => {
+            if (h.artikel_liste && Array.isArray(h.artikel_liste)) {
+                h.artikel_liste.forEach(zeile => {
+                    // Sucht nach [...] am Anfang der Zeile
+                    const match = zeile.match(/^\[(.+?)\]/);
+                    if (match) {
+                        cats.add(match[1]);
+                    } else {
+                        // Falls keine Klammern da sind (alte Testdaten)
+                        cats.add("Unbekannt");
+                    }
+                });
+            }
+        });
+
+        // Checkboxen nur bauen, wenn wir Kategorien gefunden haben
+        if (cats.size > 0) {
+            container.innerHTML = Array.from(cats).sort().map(cat => `
+                <label style="background:#444; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.9rem; margin-right:5px; margin-bottom:5px; display:inline-block;">
+                    <input type="checkbox" class="cat-check" value="${cat}" checked onchange="runReport()"> ${cat}
+                </label>
+            `).join('');
+        } else {
+            container.innerHTML = "<small style='color:red;'>Keine Datenformate erkannt.</small>";
+        }
+    } catch (e) {
+        container.innerHTML = "<small style='color:red;'>Fehler beim Laden der Filter.</small>";
+    }
+}
+
+
+
+
+
+async function refreshCategoryFiltersAdmin() {
+    const container = document.getElementById('category-checkboxes');
+    try {
+        // Wir laden die PRODUKTE (Speisekarte), nicht die Historie!
+        const res = await fetch('./bestellen.php?get_products=1');
+        const products = await res.json();
+        const cats = new Set();
+        
+        // Suche alle Einträge vom Typ 'header'
+        products.forEach(p => {
+            if(p.type === 'header') cats.add(p.name);
+        });
+
+        if (cats.size === 0) {
+            container.innerHTML = "<small>Keine Kategorien in der Speisekarte definiert.</small>";
+            return;
+        }
+
+        container.innerHTML = Array.from(cats).sort().map(cat => `
+            <label style="background:#444; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:0.9rem; margin-right:5px; margin-bottom:5px; display:inline-block;">
+                <input type="checkbox" class="cat-check" value="${cat}" checked onchange="runReport()"> ${cat}
+            </label>
+        `).join('');
+    } catch (e) {
+        container.innerHTML = "<small>Fehler beim Laden der Kategorien.</small>";
+    }
+}
+
+
+
+
+
+
+
+
+	
+    // 2. WICHTIG: Die Filter-Checkboxen JETZT beim Start einmal laden
+	//refreshCategoryFilters(); 	
+    refreshCategoryFiltersAdmin(); 	
+		
+    </script>
+</body>
+</html>
