@@ -1,6 +1,9 @@
 <?php
-header("Content-Type: application/json");
+// 1. Pufferung starten, um Header-Fehler zu vermeiden
+ob_start();
+
 header("Access-Control-Allow-Origin: *"); // Erlaubt den Zugriff von außen
+header("Content-Type: application/json");
 header("Cache-Control: no-cache, must-revalidate");
 header("Connection: close");
 date_default_timezone_set('Europe/Berlin');
