@@ -42,7 +42,7 @@ const Order = mongoose.model('Order', orderSchema);
 
 app.get('/admin-editor', (req, res) => {
     if (req.query.pw !== 'leon2208') return res.status(403).send("Zugriff verweigert");
-    res.sendFile(path.join(__dirname, 'adminNode.html'));
+    res.sendFile(path.join(__dirname,'public','bestelle1', 'adminNode.html'));
 });
 
 app.get('/api/order-menu', async (req, res) => {
