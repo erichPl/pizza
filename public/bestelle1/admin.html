@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <!-- QR-Code Bibliothek laden -->
+	<script src="https://
+cdn.jsdelivr.net/
+npm/
+qrcode@1.5.1/
+build/
+qrcode.min.js"></script>
+	
+	
+	<title>Bar Admin - Karte Editor</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #eee; }
+        .row { background: white; padding: 10px; margin-bottom: 5px; display: flex; gap: 10px; border-radius: 5px; }
+        input { padding: 5px; border: 1px solid #ccc; }
+        .header-row { border-left: 5px solid #ffcc00; font-weight: bold; }
+        .btn-save { background: #00ca4e; color: white; padding: 15px; width: 100%; border: none; font-weight: bold; cursor: pointer; }
+    </style>
+	
+	<style>
+		/* Diese Regeln gelten nur beim Ausdrucken */
+		@media print {
+			body * { visibility: hidden; } /* Alles verstecken */
+			#print-area, #print-area * { visibility: visible; } /* Nur QR-Codes zeigen */
+			#print-area { position: absolute; left: 0; top: 0; width: 100%; }
+			.qr-tile { page-break-inside: avoid; margin-bottom: 50px; } /* Keine halben Codes auf einer Seite */
+		}
+		.qr-tile { 
+			display: inline-block; padding: 20px; border: 1px solid #ccc; 
+			text-align: center; background: white; color: black; margin: 10px;
+		}
+	</style>
+	
+	
+</head>
+<body>
+    <h1>📋 Speisekarte Editor</h1>
+	
+	<div class="card">
+		<h3>🖨️ QR-Code Druck-Center</h3>
+		Basis-URL: <input type="text" id="base-url" value="Sisinius.it/" style="width:200px;">
+		Anzahl Tische: <input type="number" id="qr-count" value="10" style="width:60px;">
+		
+		<!-- NEU: Einzelner Tisch -->
+		oder nur Tisch Nr: <input type="number" id="single-tisch" placeholder="Nr" style="width:50px;">
+		
+		<button onclick="generateQRs()">QR-Codes generieren</button>
+		<button onclick="window.print()" style="background:#28a745; color:white;">📄 Jetzt Drucken</button>
+		
+		<div id="print-area" style="margin-top:20px; display:flex; flex-wrap:wrap; justify-content:center;"></div>
+	</div>
+    
+	<div id="editor"></div>
+    <button onclick="addHeader()">+ Überschrift</button>
+    <button onclick="addProduct()">+ Produkt</button>
+    <hr>
+    <button class="btn-save" onclick="save()">SPEICHERN</button>
+
+<script>
+    // --- KONFIGURATION ---
+    // Nur bei diesen Kategorien wird das Feld "Basiszutaten" im Editor angezeigt
+    const BASIS_KATEGORIEN = ["PIZZA", "KINDERPIZZA"]; 
+    
+    let lastFocusedIndex = -1; // Merkt sich die Zeile, in der du zuletzt getippt hast
+    let items = [];
+
+    // --- 1. LADEN & SPEICHERN ---
+    async function load() {
+        try {
+            const res = await fetch('bestellen.php?get_products=1');
+            items = await res.json();
+            render();
+        } catch (e) {
+            console.error("Ladefehler:", e);
+        }
+    }
+
+    async function save() {
+        await fetch('bestellen.php', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ save_products: true, products: items }) 
+        });
+        alert("Speisekarte erfolgreich gespeichert! 🍕");
+    }
+
+    // --- 2. ZEILEN HINZUFÜGEN (Intelligent unter Cursor) ---
+    function addHeader() {
+        const newHeader = { type: 'header', name: 'NEUE ÜBERSCHRIFT' };
+        if (lastFocusedIndex !== -1) {
+            items.splice(lastFocusedIndex + 1, 0, newHeader);
+        } else {
+            items.push(newHeader);
+        }
+        render();
+    }
+
+    function addProduct() {
+        const newProduct = { type: 'product', name: '', desc: '', basis: '', price: '' };
+        if (lastFocusedIndex !== -1) {
+            items.splice(lastFocusedIndex + 1, 0, newProduct);
+        } else {
+            items.push(newProduct);
+        }
+        render();
+    }
+
+    // --- 3. SORTIER-LOGIK (Verschieben) ---
+    function move(index, step) {
+        const targetIndex = index + step;
+        if (targetIndex < 0 || targetIndex >= items.length) return;
+
+        if (items[index].type === 'header') {
+            moveHeaderGroup(index, step);
+        } else {
+            // Normales Produkt verschieben
+            const temp = items[index];
+            items[index] = items[targetIndex];
+            items[targetIndex] = temp;
+        }
+        render();
+    }
+
+    function moveHeaderGroup(index, step) {
+        let groupSize = 1;
+        for (let i = index + 1; i < items.length; i++) {
+            if (items[i].type === 'header') break;
+            groupSize++;
+        }
+
+        if (step > 0) { // NACH UNTEN
+            let nextHeaderIndex = -1;
+            for (let i = index + groupSize; i < items.length; i++) {
+                if (items[i].type === 'header') { nextHeaderIndex = i; break; }
+            }
+            if (nextHeaderIndex === -1) return;
+            let nextGroupSize = 0;
+            for (let i = nextHeaderIndex; i < items.length; i++) {
+                if (i > nextHeaderIndex && items[i].type === 'header') break;
+                nextGroupSize++;
+            }
+            const group = items.splice(index, groupSize);
+            items.splice(index + nextGroupSize, 0, ...group);
+        } else { // NACH OBEN
+            if (index === 0) return;
+            let prevHeaderIndex = -1;
+            for (let i = index - 1; i >= 0; i--) {
+                if (items[i].type === 'header') { prevHeaderIndex = i; break; }
+            }
+            if (prevHeaderIndex === -1) return;
+            const group = items.splice(index, groupSize);
+            items.splice(prevHeaderIndex, 0, ...group);
+        }
+    }
+
+    // --- 4. RENDER-FUNKTION ---
+function render() {
+    const div = document.getElementById('editor');
+    let aktuelleKategorie = "";
+
+    div.innerHTML = items.map((item, i) => {
+        if (item.type === 'header') aktuelleKategorie = item.name.toUpperCase();
+        const isHeader = item.type === 'header';
+        
+        // Prüfen, ob für diese Kategorie Basiszutaten angezeigt werden sollen
+        const zeigeBasis = BASIS_KATEGORIEN.some(kat => aktuelleKategorie.includes(kat));
+
+        return `
+        <div class="row" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px; align-items:center; padding:10px; border-bottom:2px solid #444; ${isHeader ? 'background:#333;' : ''}">
+            
+            <!-- 1. SORTIEREN -->
+            <div style="display:flex; flex-direction:column; gap:2px;">
+                <button onclick="move(${i}, -1)" style="padding:0 5px; cursor:pointer;">▲</button>
+                <button onclick="move(${i}, 1)" style="padding:0 5px; cursor:pointer;">▼</button>
+            </div>
+
+            <b style="min-width:50px; font-size:0.7rem; color:#aaa;">${isHeader ? 'HEADER' : 'PROD'}</b>
+            
+            <!-- 2. SICHTBARKEIT & PREIS-CHECKBOX -->
+            <div style="display:flex; flex-direction:column; gap:5px; width:130px; background:rgba(255,255,255,0.05); padding:5px; border-radius:5px;">
+                <input type="text" placeholder="b, w..." value="${item.view || ''}" 
+                       onfocus="lastFocusedIndex=${i}"
+                       oninput="items[${i}].view=this.value" 
+                       style="width:100%; background:#fcf3cf; border:1px solid #f39c12; font-size:0.8rem;"
+                       title="Kürzel für Sichtbarkeit (z.B. b für Bestellen)">
+                
+                <label style="font-size:0.65rem; color:#eee; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                    <input type="checkbox" ${item.hidePrice ? 'checked' : ''} 
+                           onchange="items[${i}].hidePrice = this.checked; render();"> 
+                    Preis verstecken
+                </label>
+            </div>
+
+            <!-- 3. DEUTSCHE EINGABE -->
+            <div style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:5px;">
+                <input type="text" placeholder="Name (DE)" value="${item.name || ''}" onfocus="lastFocusedIndex=${i}" oninput="items[${i}].name=this.value" style="border-left:3px solid #de2110;">
+                ${!isHeader ? `
+                    <input type="text" placeholder="Beschreibung (DE)" value="${item.desc || ''}" onfocus="lastFocusedIndex=${i}" oninput="items[${i}].desc=this.value" style="border-left:3px solid #de2110;">
+                    ${zeigeBasis ? `<input type="text" placeholder="Basiszutaten (DE)" value="${item.basis || ''}" onfocus="lastFocusedIndex=${i}" oninput="items[${i}].basis=this.value" style="background:#e8f0fe; border-left:3px solid #de2110;">` : ''}
+                ` : ''}
+            </div>
+
+            <!-- 4. ITALIENISCHE EINGABE -->
+            <div style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:5px;">
+                <input type="text" placeholder="Nome (IT)" value="${item.name_it || ''}" onfocus="lastFocusedIndex=${i}" oninput="items[${i}].name_it=this.value" style="border-left:3px solid #008d46;">
+                ${!isHeader ? `
+                    <input type="text" placeholder="Descrizione (IT)" value="${item.desc_it || ''}" onfocus="lastFocusedIndex=${i}" oninput="items[${i}].desc_it=this.value" style="border-left:3px solid #008d46;">
+                    ${zeigeBasis ? `<input type="text" placeholder="Ingredienti Base (IT)" value="${item.basis_it || ''}" onfocus="lastFocusedIndex=${i}" oninput="items[${i}].basis_it=this.value" style="background:#e8f0fe; border-left:3px solid #008d46;">` : ''}
+                ` : ''}
+            </div>
+            
+            <!-- 5. PREIS-FELD (Farbe ändert sich, wenn versteckt) -->
+            <div style="width:80px;">
+                <input type="text" placeholder="0,00" value="${item.price || ''}" 
+                       oninput="items[${i}].price=this.value" 
+                       style="width:100%; text-align:right; font-weight:bold; border-radius:4px; 
+                       background:${item.hidePrice ? '#222' : '#fff'}; 
+                       color:${item.hidePrice ? '#00ca4e' : '#000'}; 
+                       border: 1px solid ${isHeader ? '#fff9c4' : '#ccc'};">
+            </div>
+
+            <!-- 6. LÖSCHEN -->
+            <button onclick="if(confirm('Löschen?')) { items.splice(${i},1); render(); }" style="color:#ff4444; border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.2rem; margin-left:5px;">X</button>
+        </div>`;
+    }).join('');
+}
+
+
+
+
+    // --- 5. QR CODE GENERATOR ---
+    async function generateQRs() {
+        const baseUrl = document.getElementById('base-url').value.trim();
+        const count = parseInt(document.getElementById('qr-count').value);
+        const singleTisch = document.getElementById('single-tisch').value;
+        const display = document.getElementById('print-area');
+        
+        display.innerHTML = "Generiere...";
+
+        let cleanUrl = baseUrl.startsWith('http') ? baseUrl : 'http://' + baseUrl;
+        if(!cleanUrl.endsWith('/')) cleanUrl += '/';
+
+        display.innerHTML = "";
+
+        let start = 1;
+        let ende = count;
+
+        if (singleTisch && singleTisch > 0) {
+            start = parseInt(singleTisch);
+            ende = parseInt(singleTisch);
+        }
+
+        for(let i = start; i <= ende; i++) {
+            const finalUrl = `${cleanUrl}bestelle.html?tisch=${i}`;
+            const tile = document.createElement('div');
+            tile.className = "qr-tile";
+            const canvas = document.createElement('canvas');
+            tile.appendChild(canvas);
+            tile.insertAdjacentHTML('beforeend', `<br><b style="font-size:1.2rem;">Tisch ${i}</b><br><small style="font-size:0.7rem; color:#666;">${finalUrl}</small>`);
+            display.appendChild(tile);
+
+            await QRCode.toCanvas(canvas, finalUrl, { width: 180, margin: 2 });
+        }
+    }
+
+    // Start
+    load();
+</script>
+
+</body>
+</html>
