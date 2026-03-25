@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.json());
 //app.use(express.static(__dirname));
-app.use(express.static('public'));
+app.use(express.static('public','bestelle1'));
 // --- BITTE NUR HIER DEINE URL EINTRAGEN ---
 const mongoURI =  process.env.MONGO_URI;
 
