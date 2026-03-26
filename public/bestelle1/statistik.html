@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza-Statistik Professional</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; margin: 20px; }
+        .filter-panel { background: #1e1e1e; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        .filter-group { border: 1px solid #333; padding: 10px; border-radius: 5px; }
+        .filter-group h3 { margin-top: 0; font-size: 0.9rem; color: #aaa; text-transform: uppercase; }
+        
+        .status-checks label, .weekday-checks label { display: block; margin: 5px 0; cursor: pointer; }
+        
+        /* Balken-Container */
+        #chart-container { 
+            background: #1e1e1e; 
+            height: 400px; 
+            display: flex; 
+            align-items: flex-end; 
+            gap: 15px; 
+            padding: 40px 20px; 
+            overflow-x: auto; 
+            border-bottom: 2px solid #444;
+        }
+        
+        /* Ein einzelner Balken (Stacked) */
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; min-width: 60px; height: 100%; justify-content: flex-end; }
+        .bar { width: 40px; display: flex; flex-direction: column-reverse; border-radius: 3px 3px 0 0; overflow: hidden; background: #333; }
+        .bar-segment { width: 100%; transition: height 0.5s ease; }
+        .bar-label { font-size: 0.7rem; margin-top: 8px; transform: rotate(-45deg); white-space: nowrap; }
+
+        .summary-box { display: flex; justify-content: space-around; background: #28a745; padding: 15px; border-radius: 10px; margin-top: 20px; font-weight: bold; }
+        
+        /* Farben für die Wochentage im Stacked Bar */
+        .day-1 { background: #ff4b2b; } /* Mo */
+        .day-2 { background: #ffbd44; } /* Di */
+        .day-3 { background: #00ca4e; } /* Mi */
+        .day-4 { background: #007bff; } /* Do */
+        .day-5 { background: #6610f2; } /* Fr */
+        .day-6 { background: #e83e8c; } /* Sa */
+        .day-0 { background: #fd7e14; } /* So */
+		
+		
+@media print {
+    /* 1. Alles Unnötige weg */
+    .stats-controls, .filter-section, button, .menu-group, #menu-filter-container {
+        display: none !important;
+    }
+
+    /* 2. Seite und Fenster radikal WEISS */
+    html, body, div, section, .chart-container, #table-stats-container {
+        background: white !important;
+        background-color: white !important;
+        color: black !important;
+        box-shadow: none !important;
+    }
+
+    /* 3. DIE BALKEN-RETTUNG (Der Trick mit dem Box-Shadow) */
+    /* Wir nutzen einen riesigen inneren Schatten, um die Farbe zu simulieren */
+    .bar-segment {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        display: inline-block !important;
+        min-height: 10px; /* Sicherstellen, dass sie Höhe haben */
+        border: 1px solid #000; /* Optional: Ein dünner Rahmen hilft dem Drucker */
+    }
+
+    /* Wir "füllen" die Balken mit einem Schatten, den der Drucker nicht ignorieren kann */
+    .day-1 { box-shadow: inset 0 0 0 1000px #ff5722 !important; background-color: #ff5722 !important; }
+    .day-2 { box-shadow: inset 0 0 0 1000px #4caf50 !important; background-color: #4caf50 !important; }
+    .day-3 { box-shadow: inset 0 0 0 1000px #2196f3 !important; background-color: #2196f3 !important; }
+    .day-4 { box-shadow: inset 0 0 0 1000px #ffeb3b !important; background-color: #ffeb3b !important; }
+    .day-5 { box-shadow: inset 0 0 0 1000px #9c27b0 !important; background-color: #9c27b0 !important; }
+    .day-6 { box-shadow: inset 0 0 0 1000px #ff9800 !important; background-color: #ff9800 !important; }
+    .day-7 { box-shadow: inset 0 0 0 1000px #795548 !important; background-color: #795548 !important; }
+
+    /* 4. Texte schwarz */
+    h1, h2, h3, h4, p, span:not(.bar-segment), td, th, #total-amount {
+        color: black !important;
+    }
+	
+	.print-only {
+        display: block !important;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #666 !important;
+    }
+	
+}
+		
+    </style>
+</head>
+<body>
+
+    <h1>Umsatz-Statistik</h1>
+	
+	<p class="print-only" style="display: none;">
+		Bericht erstellt am: <span id="print-date"></span>
+	</p>
+
+    <div class="filter-panel">
+        <div class="filter-group">
+            <h3>Zeitraum</h3>
+            <input type="date" id="dateFrom"> bis <input type="date" id="dateTo">
+        </div>
+
+        <div class="filter-group status-checks">
+            <h3>Bestell-Status</h3>
+            <label><input type="checkbox" id="status-neu"> Neu</label>
+            <label><input type="checkbox" id="status-erledigt" checked> Erledigt</label>
+            <label><input type="checkbox" id="status-storno"> Storno</label>
+        </div>
+
+        <div class="filter-group weekday-checks">
+            <h3>Wochentage berücksichtigen</h3>
+            <label><input type="checkbox" class="wd-check" value="1" checked> Mo</label>
+            <label><input type="checkbox" class="wd-check" value="2" checked> Di</label>
+            <label><input type="checkbox" class="wd-check" value="3" checked> Mi</label>
+            <label><input type="checkbox" class="wd-check" value="4" checked> Do</label>
+            <label><input type="checkbox" class="wd-check" value="5" checked> Fr</label>
+            <label><input type="checkbox" class="wd-check" value="6" checked> Sa</label>
+            <label><input type="checkbox" class="wd-check" value="0" checked> So</label>
+        </div>
+
+        <div class="filter-group">
+            <h3>Gruppierung</h3>
+            <select id="groupBy">
+                <option value="day">Tag einzeln</option>
+                <option value="week">Woche (gestapelt)</option>
+                <option value="month">Monat (gestapelt)</option>
+            </select>
+            <button onclick="loadStats()" style="margin-top:15px; width:100%; padding:10px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">Anzeigen</button>
+			
+			
+			<button onclick="exportToCSV()" style="padding: 8px 20px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+				📥 Excel Export
+			</button>
+
+			<button onclick="window.print()" style="padding: 8px 20px; background: #607D8B; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 10px;">
+				📄 PDF / Drucken
+			</button>
+			
+        </div>
+    </div>
+
+    <div id="category-filter" class="filter-panel" style="margin-top:-10px;">
+        <div class="filter-group" style="grid-column: 1 / -1;">
+            <h3>Menü-Filter</h3>
+            <div class="filter-section" style="margin-bottom: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px;">
+				<h3 style="color: #eee; margin-top: 0;">Produkte filtern</h3>			
+				<div id="menu-filter-container" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+			</div>
+        </div>
+    </div>
+
+    <div id="chart-container">
+        </div>
+
+    <div class="summary-box">
+        <div>Gesamtumsatz: <span id="total-sum">0,00</span> €</div>
+        <div>Ø pro Tag: <span id="avg-sum">0,00</span> €</div>
+    </div>
+	
+	
+	<div id="table-stats-container" style="margin-top: 30px; background: #1a1a1a; padding: 20px; border-radius: 10px;">
+		<h3 style="color: #00ca4e; border-bottom: 1px solid #444; padding-bottom: 10px;">Umsatz nach Tischen</h3>
+		<table style="width: 100%; color: white; border-collapse: collapse; text-align: left;">
+			<thead>
+				<tr style="color: #888; font-size: 0.9rem;">
+					<th style="padding: 10px;">Tisch</th>
+					<th>Bestellungen</th>
+					<th>Gesamtumsatz</th>
+					<th>Ø pro Bestellung</th>
+				</tr>
+			</thead>
+			<tbody id="table-stats-body">
+				</tbody>
+		</table>
+	</div>
+
+    <script src="bestelle1/stats-logic.js"></script>
+</body>
+</html>
