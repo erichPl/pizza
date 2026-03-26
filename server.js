@@ -273,7 +273,7 @@ app.get('/bestelle', (req, res) => {
 });
 
 app.get('/orders', (req, res) => {
-    if (req.query.pw !== 'schaukel2') return res.status(403).send("Zugriff verweigert");
+    if (req.query.pw !== 'schaukell2') return res.status(403).send("Zugriff verweigert");
 	res.sendFile(path.join(__dirname, 'public','bestelle1','orders.html'));
 });
 app.get('/statistik', (req, res) => {
