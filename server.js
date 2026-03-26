@@ -273,10 +273,12 @@ app.get('/bestelle', (req, res) => {
 });
 
 app.get('/orders', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public','bestelle1','orders.html'));
+    if (req.query.pw !== 'schaukel2') return res.status(403).send("Zugriff verweigert");
+	res.sendFile(path.join(__dirname, 'public','bestelle1','orders.html'));
 });
 app.get('/statistik', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public','bestelle1','statistik.html'));
+    if (req.query.pw !== 'schaukel23!') return res.status(403).send("Zugriff verweigert");
+	res.sendFile(path.join(__dirname, 'public','bestelle1','statistik.html'));
 });
 
 
