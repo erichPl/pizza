@@ -1,0 +1,57 @@
+[
+  { 
+    "type": "header", 
+    "name": "EXTRAS", 
+    "name_it": "EXTRAS", 
+    "price": "",
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Glutenfreier Teig", 
+    "name_it": "Impasto senza glutine", 
+    "price": "+ 3,00", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Laktosefreie Mozzarella", 
+    "name_it": "Mozzarella senza lattosio", 
+    "price": "+ 2,00", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Extras", 
+    "name_it": "Extra", 
+    "price": "+0,50 - 4,50", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Kleine Pizza", 
+    "name_it": "Pizza piccola", 
+    "price": "-1,50", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }
+]

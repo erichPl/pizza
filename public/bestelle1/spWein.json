@@ -1,0 +1,101 @@
+[
+  { 
+    "type": "header", 
+    "name": "WEISS", 
+    "name_it": "WEISS", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sauvignon Tramin", 
+    "name_it": "Sauvignon Tramin", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lenz weiß Ritterhof", 
+    "name_it": "Lenz weiß Ritterhof", 
+    "price": "3,70 / 23,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lugana Ca dei frati", 
+    "name_it": "Lugana Ca dei frati", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "ROT", 
+    "name_it": "ROT", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Vernatsch Fass 9 Girlan", 
+    "name_it": "Vernatsch Fass 9 Girlan", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Merlot Tramin", 
+    "name_it": "Merlot Tramin", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Primitivo di Manduria Masseria Pietrosa", 
+    "name_it": "Primitivo di Manduria Masseria Pietrosa", 
+    "price": "4,00 / 23,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lagrein Rubeno Andrian", 
+    "name_it": "Lagrein Rubeno Andrian", 
+    "price": "25,00", 
+    "desc": "Flasche", 
+    "desc_it": "Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }
+]

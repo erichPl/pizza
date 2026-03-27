@@ -10,17 +10,11 @@
 		de: {tisch: "TISCH", aendern: "ÄNDERN", ohne: "OHNE", extra: "EXTRA", gesamt: "Gesamtbetrag", bestellen: "JETZT BESTELLEN", anpassen: "Anpassen", abbrechen: "ABBRECHEN", fertig: "SPEICHERN & FERTIG", weg: "weg", produkt: "Produkt", produkte: "Produkte",
         korrekturTitel: "Bestellung anpassen",
         korrekturFrage: "Welche Version möchtest du ändern?",
-        schliessen: "Schließen", impressum: "Impressum",
-        privacy: "Datenschutz",address: "Vinschgaustraße 74, 39023 Laas (BZ)",
-        region: "Südtirol, Italien",
-        vat: "MwSt.-Nr.: 12345678901"		},
+        schliessen: "Schließen"		},
 		it: {tisch: "TAVOLO", aendern: "MODIFICA", ohne: "SENZA", extra: "EXTRA", gesamt: "Totale", bestellen: "ORDINA ORA", anpassen: "Modifica", abbrechen: "ANNULLA", fertig: "SALVA & CHIUDI", weg: "togli", produkt: "prodotto", produkte: "prodotti",
 		korrekturTitel: "Modifica ordine",
         korrekturFrage: "Quale versione vuoi cambiare?",
-        schliessen: "Chiudi",impressum: "Note legali",
-        privacy: "Privacy", address: "Via Venosta 74, 39023 Lasa (BZ)",
-        region: "Alto Adige, Italia",
-        vat: "P.IVA: 12345678901"}
+        schliessen: "Chiudi"}
 	};
 
 
@@ -29,8 +23,7 @@
 	(currentLang === 'it') ? 
 	document.getElementById('tisch-view').innerText = "Tisch " + (params.get('tisch') || "/"):
 	document.getElementById('tisch-view').innerText = "Tisch " + (params.get('tisch') || "/");
-    // 2. Die Funktion einmal aufrufen, um alles zu initialisieren
-    setLanguage('de');
+    
     try {
         // Wir rufen jetzt die Daten von deinem Node-Server ab
         // Das 'v=' + Date.now() hilft gegen Browser-Caching
@@ -83,24 +76,6 @@
 			
 			if (btnSave) btnSave.innerText = txt.fertig;
 			if (btnCancel) btnCancel.innerText = txt.abbrechen;
-
-
-
-
-
-
-// Footer-Texte übersetzen
-    if (document.getElementById('link-impressum')) document.getElementById('link-impressum').innerText = txt.impressum;
-    if (document.getElementById('link-privacy')) document.getElementById('link-privacy').innerText = txt.privacy;
-    if (document.getElementById('footer-address')) document.getElementById('footer-address').innerText = txt.address;
-    if (document.getElementById('footer-region')) document.getElementById('footer-region').innerText = txt.region;
-    if (document.getElementById('footer-vat')) document.getElementById('footer-vat').innerText = txt.vat;
-
-
-
-
-
-
 
 			// 4. Den Rest der Seite neu zeichnen
 			renderMenu();
@@ -1615,7 +1590,7 @@ function addExtra(name, priceStr) {
 
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-async function sendOrder_() {
+async function sendOrder() {
 	//alert("in sendOrder");
     const urlParams = new URLSearchParams(window.location.search);
     const isTestMode = urlParams.get('test') === 'true';
@@ -1649,40 +1624,7 @@ async function sendOrder_() {
         { enableHighAccuracy: true, timeout: 8000 }
     );
 }
-
-
 let isGeolocation=false;
-async function sendOrder() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTestMode = urlParams.get('test') === 'true';
-    const tisch = urlParams.get('tisch') || "Unbekannt";
-
-    // NEU: Wenn Geolocation generell AUS ist ODER Testmodus AN ist
-    if (!isGeolocation || isTestMode) {
-        if (isTestMode) console.log("🛠 Testmodus aktiv");
-        else console.log("📡 Geolocation global deaktiviert");
-        
-        await executeOrder(tisch, 0, 0); 
-        return;
-    }
-
-    // Ab hier läuft der normale GPS-Prozess nur, wenn isGeolocationActive === true
-    const infoText = "📍 Standort-Bestätigung erforderlich...";
-    if (!confirm(infoText)) return;
-
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            await executeOrder(tisch, position.coords.latitude, position.coords.longitude);
-        },
-        async (error) => {
-            console.warn("GPS Fehler:", error.message);
-            alert("Standort konnte nicht ermittelt werden.");
-        },
-        { enableHighAccuracy: true, timeout: 8000 }
-    );
-}
-
-
 async function executeOrder(tisch, lat, lng) {
 	//alert("in executeOrder");
     // --- DEINE RESTAURANT DATEN ---
@@ -2016,22 +1958,19 @@ function checkDevice() {
 }
 function enforceMobileAndContext() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTestMode = urlParams.get('test') === 'true';
-
-    // SPERRE NUR WENN: 
-    // 1. Geolocation eingeschaltet ist (isGeolocation === true)
-    // 2. UND wir NICHT im Testmodus sind
-    // 3. UND es KEIN Handy ist
-    if (isGeolocation && !isTestMode && !isMobile) {
-        document.body.innerHTML = `
-            <div style="text-align:center; padding:50px; font-family:sans-serif;">
-                <h1>📱 Mobilgerät erforderlich</h1>
-                <p>Diese Funktion ist aus Sicherheitsgründen nur an Mobilgeräten verfügbar.</p>
-                <p><small>Nutzen Sie am PC den Testmodus (?test=true), falls erlaubt.</small></p>
-            </div>`;
-        return false; 
-    }
+    if (!isTestMode){
+		if (!isMobile) {
+			// Seite leeren und Sperre anzeigen
+			document.body.innerHTML = `
+				<div style="text-align:center; padding:50px; font-family:sans-serif;">
+					<h1>📱 Nur am Handy</h1>
+					<p>Bestellungen sind am PC nicht möglich.</p>
+				</div>`;
+			
+			// GANZ WICHTIG: Wir werfen einen "sanften" Fehler oder stoppen alles
+			return false; 
+		}
+	}
     return true;
 }
 
@@ -2075,29 +2014,6 @@ if (allowed) {
     init(); // Hier drin wird renderMenu() gerufen
 }
 		
-
-
-window.onload = async function() {
-    try {
-        // 1. Einstellungen vom Server laden
-        const res = await fetch('/api/get-settings');
-        const settings = await res.json();
-        isGeolocation = settings.isGeolocation; // Globalen Wert setzen
-        
-        console.log("Geolocation-Status vom Server:", isGeolocation);
-
-        // 2. Jetzt erst den Mobile-Check machen
-        if (!enforceMobileAndContext()) {
-            return; // Stoppt hier, wenn PC-Sperre aktiv ist
-        }
-
-        // 3. Normaler Start der App (Menü laden etc.)
-        // await loadMenu(); 
-        
-    } catch (err) {
-        console.error("Fehler beim Initialisieren:", err);
-    }
-};
 
 
 /*

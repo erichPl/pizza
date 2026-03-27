@@ -1,0 +1,139 @@
+[
+  { 
+    "type": "header", 
+    "name": "APERITIVO", 
+    "name_it": "APERITIVO", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Aperol Spritz", "name_it": "Aperol Spritz", "price": "5,00", 
+    "desc": "Aperol, Prosecco, Soda", "desc_it": "Aperol, Prosecco, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Campari Spritz", "name_it": "Campari Spritz", "price": "5,00", 
+    "desc": "Campari, Prosecco, Soda", "desc_it": "Campari, Prosecco, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Hugo", "name_it": "Hugo", "price": "5,00", 
+    "desc": "Prosecco, Holunder, Soda", "desc_it": "Prosecco, Holunder, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Maracuja Spritz", "name_it": "Maracuja Spritz", "price": "5,00", 
+    "desc": "Prosecco, Maracuja, Soda", "desc_it": "Prosecco, Maracuja, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Pompelmo Spritz", "name_it": "Pompelmo Spritz", "price": "5,00", 
+    "desc": "Prosecco, Grapefruit, Soda", "desc_it": "Prosecco, Grapefruit, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Himbeer Spritz", "name_it": "Himbeer Spritz", "price": "5,00", 
+    "desc": "Prosecco, Himbeer, Soda", "desc_it": "Prosecco, Himbeer, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sarti Spritz", "name_it": "Sarti Spritz", "price": "5,00", 
+    "desc": "Sarti, Prosecco, Soda", "desc_it": "Sarti, Prosecco, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Negroni", "name_it": "Negroni", "price": "", 
+    "desc": "Gin, Campari, Vermouth", "desc_it": "Gin, Campari, Vermouth", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Gin Tonic", "name_it": "Gin Tonic", "price": "8,00—12,00", 
+    "desc": "Bombay, Z44", "desc_it": "Bombay, Z44", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "COCKTAILS", 
+    "name_it": "COCKTAILS", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Whiskey/Amaretto/Aperol Sour", "name_it": "Whiskey/Amaretto/Aperol Sour", "price": "9,00", 
+    "desc": "Spirit, Lemon, Zucker, Eiweiß", "desc_it": "Spirit, Lemon, Zucker, Eiweiß", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Cuba libre", "name_it": "Cuba libre", "price": "9,00", 
+    "desc": "Havana 7, Lime, Cola", "desc_it": "Havana 7, Lime, Cola", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Pina Colada", "name_it": "Pina Colada", "price": "9,00", 
+    "desc": "Bacardi, Kokos, Ananas", "desc_it": "Bacardi, Kokos, Ananas", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Caipirinha", "name_it": "Caipirinha", "price": "9,00", 
+    "desc": "Cachaca, Lime, Zucker", "desc_it": "Cachaca, Lime, Zucker", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Dark ‘n‘ Stormy", "name_it": "Dark ‘n‘ Stormy", "price": "9,00", 
+    "desc": "Rum, Lime, Ginger Beer", "desc_it": "Rum, Lime, Ginger Beer", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Long Island", "name_it": "Long Island", "price": "10,00", 
+    "desc": "Vodka, Gin, Rum, Cointreau, Lemon, Cola", "desc_it": "Vodka, Gin, Rum, Cointreau, Lemon, Cola", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Espresso Martini", "name_it": "Espresso Martini", "price": "9,00", 
+    "desc": "Vodka, Kahlua, Espresso", "desc_it": "Vodka, Kahlua, Espresso", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Ma Coco", "name_it": "Ma Coco", "price": "11,00", 
+    "desc": "Havana 7, Bacardi, Kokos, Maracuja", "desc_it": "Havana 7, Bacardi, Kokos, Maracuja", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Margarita", "name_it": "Margarita", "price": "9,00", 
+    "desc": "Tequila, Cointreau, Lime", "desc_it": "Tequila, Cointreau, Lime", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "LONGDRINKS", 
+    "name_it": "LONGDRINKS", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Riegele, Gletschertee, Gin Lemon, Bacardi Cola", 
+    "name_it": "Riegele, Gletschertee, Gin Lemon, Bacardi Cola", 
+    "price": "5,50—6,50", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }
+]

@@ -80,7 +80,16 @@
 <div class="main-container">
     <header>
         <h1>🍴 Menü-Verwaltung <small style="font-size: 14px;">(Synchronized Full-Width)</small></h1>
-        <button onclick="addNewRow()" style="background:var(--primary); color:white; border:none; padding:12px 20px; border-radius:6px; cursor:pointer;">+ Neues Produkt</button>
+        
+		<div style="background: #eee; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+			<h3>System-Einstellungen</h3>
+			<label>
+				<input type="checkbox" id="geoCheckbox"> Geolocation-Pflicht (GPS) aktiv
+			</label>
+			<button onclick="saveSettings()">Einstellungen speichern</button>
+		</div>
+		
+		<button onclick="addNewRow()" style="background:var(--primary); color:white; border:none; padding:12px 20px; border-radius:6px; cursor:pointer;">+ Neues Produkt</button>
     </header>
 
     <div id="status" class="status-bar">Lade Daten...</div>
@@ -167,6 +176,28 @@
             if (res.ok) alert("Gespeichert!");
         } catch (err) { alert("Fehler!"); }
     }
+	
+	
+	// Beim Laden der Admin-Seite den aktuellen Status holen
+	async function loadSettings() {
+		const res = await fetch('/api/get-settings');
+		const data = await res.json();
+		document.getElementById('geoCheckbox').checked = data.isGeolocation;
+	}
+
+	async function saveSettings() {
+		const isActive = document.getElementById('geoCheckbox').checked;
+		const res = await fetch('/api/save-settings', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ isGeolocation: isActive })
+		});
+		if (res.ok) alert("Einstellungen gespeichert!");
+	}
+
+	// Initial aufrufen
+	loadSettings();		
+	
     loadData();
 </script>
 </body>

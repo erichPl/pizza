@@ -7,6 +7,103 @@
     <title>Bar Bestellung - Sisinius</title>
     <style>	
 
+
+.footer-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    
+    /* ÄNDERUNG: Hellgrauer Rahmen (gut sichtbar) */
+    border: 1px solid #888; 
+    
+    border-radius: 25px;
+    color: #ccc !important; /* Etwas dunklerer Text als der Rahmen */
+    text-decoration: none !important;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    background-color: transparent;
+}
+
+.footer-btn:active, .footer-btn:hover {
+    /* Rahmen wird gold, Text weiß */
+    border-color: #ffcc00; 
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.05); /* Ganz leichter weißer Schleier */
+    transform: scale(0.96);
+}
+
+/*LOGO*/
+
+header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px 15px; 
+    border-bottom: 1px solid #333;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alles wird von links nach rechts aufgefüllt */
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box; /* Wichtig, damit Padding die Breite nicht sprengt */
+}
+
+
+
+.header-logo {
+    width: 40px; /* Feste Breite fürs Logo */
+	height: 40px;
+    flex-shrink: 0; /* Logo darf nicht gequetscht werden */
+    margin-right: 5px;
+}
+
+.header-text {
+    flex-grow: 1; /* Dieser Bereich nimmt den restlichen Platz ein */
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Verhindert Layout-Sprünge bei langem Text */
+	padding: 0 5px; /* Ein kleiner Puffer nach links und rechts */
+}
+
+.brand-name {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #888;
+}
+
+#tisch-anzeige {
+   font-size: 0.9rem; /* Etwas kleiner, damit mehr auf eine Zeile passt */
+    font-weight: bold;
+    color: #888;
+    /* VERHINDERT DEN UMBRUCH: */
+    white-space: nowrap; 
+    /* FALLS es doch zu lang ist, wird es elegant mit "..." abgekürzt statt umgebrochen: */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.language-switch {
+    flex-shrink: 0; /* DE|IT bleibt starr an seiner Position */
+    width: 60px;    /* Geben wir dem Switch eine feste Breite! */
+    display: flex;
+    justify-content: flex-end; /* Text innerhalb der 60px rechts ausrichten */
+    font-size: 0.85rem;
+    margin-left: 0px;
+}
+
+
+
+
+
+
+
+
+
 body::after {
     content: "";
     position: fixed;
@@ -284,15 +381,22 @@ body::after {
 <body>
 <div id="custom-scroll-hint" style="position: fixed; right: 2px; top: 20%; bottom: 20%; width: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; z-index: 3000;"></div>
 <div id="scroll-wrapper" style="background: #1a1a1a;">
-    <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #333;">
-        
-        <h1 id="tisch-view" style="margin: 0; font-size: 1.1rem; color: #ffcc00; white-space: nowrap;">Tisch ?</h1>
+	<header style="display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #333; background: #1a1a1a;">
+    
+    <img src="logo.webp" alt="Logo" style="width: 40px; height: 40px; flex-shrink: 0; margin-right: 10px;">
 
-        <div id="language-switcher" style="display: flex; gap: 10px; align-items: center;">
-            <button onclick="setLanguage('de')" style="background:none; border:none; font-size:1.5rem; cursor:pointer; padding: 0; opacity: 1;" id="lang-de">🇩🇪</button>
-            <button onclick="setLanguage('it')" style="background:none; border:none; font-size:1.5rem; cursor:pointer; padding: 0; opacity: 0.4;" id="lang-it">🇮🇹</button>
-        </div>
-    </header>
+    <div style="flex-grow: 1; min-width: 0; line-height: 1.1;">
+        <div style="font-size: 0.85rem; font-weight: bold; color: #eee; white-space: nowrap;">Pizzeria - Pub</div>
+        <div style="font-size: 0.75rem; color: #888; white-space: nowrap;">St. Sisinius</div>
+        <div id="tisch-view" style="font-size: 1.0rem; color: #ffcc00; font-weight: bold; margin-top: 2px;">Tisch ?</div>
+    </div>
+
+    <div class="language-switch" style="flex-shrink: 0; font-size: 0.8rem; margin-left: 5px;">
+        <span onclick="setLanguage('de')" id="lang-de" style="padding: 2px;">DE</span>
+        <span style="color: #444;">|</span>
+        <span onclick="setLanguage('it')" id="lang-it" style="padding: 2px;">IT</span>
+    </div>
+</header>
 
     <input type="hidden" id="lat" name="latitude">
     <input type="hidden" id="lng" name="longitude">
@@ -335,5 +439,36 @@ body::after {
 	</div>
 
     <script src='bestelle1/bestelle.js' defer></script>
+	
+	
+<footer style="margin-top: 40px; padding: 20px 10px; border-top: 1px solid #333; text-align: center; background: #1a1a1a;">
+    
+    <div style="margin-bottom: 20px; display: flex; justify-content: center; gap: 10px;">
+        
+        <a href="impressum.html" id="link-impressum" 
+           style="display: inline-block; padding: 5px 10px; border: 1px solid #555; color: #bbb; text-decoration: none; font-size: 0.8rem;">
+           Impressum
+        </a>
+
+        <a href="datenschutz.html" id="link-privacy" 
+           style="display: inline-block; padding: 5px 10px; border: 1px solid #555; color: #bbb; text-decoration: none; font-size: 0.8rem;">
+           Datenschutz
+        </a>
+        
+    </div>
+
+    <div style="color: #777; font-size: 0.75rem; line-height: 1.4;">
+        <strong style="color: #999;">Pizzeria - Pub St. Sisinius</strong><br>
+        <span id="footer-address">Vinschgaustraße 74, 39023 Laas (BZ)</span><br>
+        <span id="footer-region">Südtirol, Italien</span><br>
+        <div style="margin-top: 5px;">
+            <span style="color: #888;">Tel: +39 389 833 4004</span><br>
+            <span id="footer-vat">MwSt.-Nr.: 12345678901</span>
+        </div>
+    </div>
+</footer>	
+	
+	
+	
 </body>
 </html>

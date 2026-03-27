@@ -1,0 +1,891 @@
+[
+ { 
+    "type": "header", 
+    "name": "GETRÄNKE", 
+    "name_it": "BIBITE", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "BIER VOM FASS", 
+    "name_it": "BIRRA ALLA SPINA", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Forst Pils", 
+    "name_it": "Forst Pils", 
+    "price": "2,30 / 4,60", 
+    "desc": "0,2 l / 0,4 l", 
+    "desc_it": "0,2 l / 0,4 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Felsenkeller", 
+    "name_it": "Felsenkeller", 
+    "price": "3,70", 
+    "desc": "0,3 l", 
+    "desc_it": "0,3 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Weihenstephaner Weizen", 
+    "name_it": "Weihenstephaner Weizen", 
+    "price": "3,50 / 5,50", 
+    "desc": "0,3 l / 0,5 l", 
+    "desc_it": "0,3 l / 0,5 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "FLASCHENBIER", 
+    "name_it": "FLASCHENBIER", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Forst Kronen, 1857", 
+    "name_it": "Forst Kronen, 1857", 
+    "price": "3,50", 
+    "desc": "0,33 l", 
+    "desc_it": "0,33 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Forst 0.0", 
+    "name_it": "Forst 0.0", 
+    "price": "3,50", 
+    "desc": "0,33 l", 
+    "desc_it": "0,33 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Tegernseer", 
+    "name_it": "Tegernseer", 
+    "price": "4,00", 
+    "desc": "0,33 l", 
+    "desc_it": "0,33 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "PROSECCO", 
+    "name_it": "PROSECCO", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Prosecco", 
+    "name_it": "Prosecco", 
+    "price": "3,70 / 23,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }, 
+  { 
+    "type": "header", 
+    "name": "WEIN", 
+    "name_it": "VINO", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Hauswein rot/weiß", 
+    "name_it": "Vino della casa rosso/bianco", 
+    "price": "2,00 / 4,00 / 8,00", 
+    "desc": "0,1 l / 0,25 l / 0,5 l", 
+    "desc_it": "0,1 l / 0,25 l / 0,5 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }, 
+  
+  
+  { 
+    "type": "header", 
+    "name": "WEISS", 
+    "name_it": "WEISS", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sauvignon Tramin", 
+    "name_it": "Sauvignon Tramin", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lenz weiß Ritterhof", 
+    "name_it": "Lenz weiß Ritterhof", 
+    "price": "3,70 / 23,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lugana Ca dei frati", 
+    "name_it": "Lugana Ca dei frati", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "ROT", 
+    "name_it": "ROT", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Vernatsch Fass 9 Girlan", 
+    "name_it": "Vernatsch Fass 9 Girlan", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Merlot Tramin", 
+    "name_it": "Merlot Tramin", 
+    "price": "4,00 / 25,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Primitivo di Manduria Masseria Pietrosa", 
+    "name_it": "Primitivo di Manduria Masseria Pietrosa", 
+    "price": "4,00 / 23,00", 
+    "desc": "0,1 l / Flasche", 
+    "desc_it": "0,1 l / Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lagrein Rubeno Andrian", 
+    "name_it": "Lagrein Rubeno Andrian", 
+    "price": "25,00", 
+    "desc": "Flasche", 
+    "desc_it": "Flasche", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "ALKOHOLFREIE GETRÄNKE", 
+    "name_it": "BEVANDE ANALCOLICHE", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Wasser mit/ohne", 
+    "name_it": "Acqua con/senza gas", 
+    "price": "1,00 / 2,00 / 4,50", 
+    "desc": "0,2 l / 0,4 l / 1 l", 
+    "desc_it": "0,2 l / 0,4 l / 1 l", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Cola, Limonade, Eistee, Aranciata, Spuma, Jambo, Apfelsaft, Orangensaft", 
+    "name_it": "Cola, Limonata, Tè freddo, Aranciata, Spuma, Jambo, Succo di mela, arancia", 
+    "price": "2,20 / 4,40", 
+    "desc": "0,2 l / 0,4 l", 
+    "desc_it": "0,2 l / 0,4 l", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sportwasser, Spumeral, Himbeer, Holunder", 
+    "name_it": "Acqua sport, Spumeral, Lampone, Sambuco", 
+    "price": "1,80 / 3,60", 
+    "desc": "0,2 l / 0,4 l", 
+    "desc_it": "0,2 l / 0,4 l", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "HEIẞE GETRÄNKE", 
+    "name_it": "BEVANDE CALDE", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Espresso", "name_it": "Espresso", "price": "1,70", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Macchiato", "name_it": "Macchiato", "price": "1,70", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Cappuccino", "name_it": "Cappuccino", "price": "2,70", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Latte Macchiato", "name_it": "Latte Macchiato", "price": "3,30", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Tee", "name_it": "Tè", "price": "2,50", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Heiße Schokolade", "name_it": "Cioccolata calda", "price": "3,00", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "DOSEN", 
+    "name_it": "LATTINE", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Coca Cola, Fanta, Lemon-/Oransoda", 
+    "name_it": "Coca Cola, Fanta, Lemon-/Oransoda", 
+    "price": "3,00", 
+    "desc": "0,33 l", "desc_it": "0,33 l", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sanbitter", "name_it": "Sanbitter", "price": "3,00", "desc": "0,1 l", "desc_it": "0,1 l", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "DIGESTIF", 
+    "name_it": "DIGESTIVI", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Cynar, Averna, Fernet, Montenegro, Jägermeister, Amaro del Capo", 
+    "name_it": "Cynar, Averna, Fernet, Montenegro, Jägermeister, Amaro del Capo", 
+    "price": "3,50", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "SCHNÄPSE", 
+    "name_it": "GRAPPA", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Berliner Luft", "name_it": "Berliner Luft", "price": "3,00", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Williams", "name_it": "Williams", "price": "3,50", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Marille", "name_it": "Albicocca", "price": "4,00", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Himbeergeist", "name_it": "Acquavite di lampone", "price": "4,00", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "La Morbida Ambra", "name_it": "La Morbida Ambra", "price": "6,00", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  
+  
+  { 
+    "type": "header", 
+    "name": "APERITIVO", 
+    "name_it": "APERITIVO", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Aperol Spritz", "name_it": "Aperol Spritz", "price": "5,00", 
+    "desc": "Aperol, Prosecco, Soda", "desc_it": "Aperol, Prosecco, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Campari Spritz", "name_it": "Campari Spritz", "price": "5,00", 
+    "desc": "Campari, Prosecco, Soda", "desc_it": "Campari, Prosecco, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Hugo", "name_it": "Hugo", "price": "5,00", 
+    "desc": "Prosecco, Holunder, Soda", "desc_it": "Prosecco, Holunder, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Maracuja Spritz", "name_it": "Maracuja Spritz", "price": "5,00", 
+    "desc": "Prosecco, Maracuja, Soda", "desc_it": "Prosecco, Maracuja, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Pompelmo Spritz", "name_it": "Pompelmo Spritz", "price": "5,00", 
+    "desc": "Prosecco, Grapefruit, Soda", "desc_it": "Prosecco, Grapefruit, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Himbeer Spritz", "name_it": "Himbeer Spritz", "price": "5,00", 
+    "desc": "Prosecco, Himbeer, Soda", "desc_it": "Prosecco, Himbeer, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sarti Spritz", "name_it": "Sarti Spritz", "price": "5,00", 
+    "desc": "Sarti, Prosecco, Soda", "desc_it": "Sarti, Prosecco, Soda", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Negroni", "name_it": "Negroni", "price": "", 
+    "desc": "Gin, Campari, Vermouth", "desc_it": "Gin, Campari, Vermouth", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Gin Tonic", "name_it": "Gin Tonic", "price": "8,00—12,00", 
+    "desc": "Bombay, Z44", "desc_it": "Bombay, Z44", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "COCKTAILS", 
+    "name_it": "COCKTAILS", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Whiskey/Amaretto/Aperol Sour", "name_it": "Whiskey/Amaretto/Aperol Sour", "price": "9,00", 
+    "desc": "Spirit, Lemon, Zucker, Eiweiß", "desc_it": "Spirit, Lemon, Zucker, Eiweiß", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Cuba libre", "name_it": "Cuba libre", "price": "9,00", 
+    "desc": "Havana 7, Lime, Cola", "desc_it": "Havana 7, Lime, Cola", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Pina Colada", "name_it": "Pina Colada", "price": "9,00", 
+    "desc": "Bacardi, Kokos, Ananas", "desc_it": "Bacardi, Kokos, Ananas", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Caipirinha", "name_it": "Caipirinha", "price": "9,00", 
+    "desc": "Cachaca, Lime, Zucker", "desc_it": "Cachaca, Lime, Zucker", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Dark ‘n‘ Stormy", "name_it": "Dark ‘n‘ Stormy", "price": "9,00", 
+    "desc": "Rum, Lime, Ginger Beer", "desc_it": "Rum, Lime, Ginger Beer", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Long Island", "name_it": "Long Island", "price": "10,00", 
+    "desc": "Vodka, Gin, Rum, Cointreau, Lemon, Cola", "desc_it": "Vodka, Gin, Rum, Cointreau, Lemon, Cola", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Espresso Martini", "name_it": "Espresso Martini", "price": "9,00", 
+    "desc": "Vodka, Kahlua, Espresso", "desc_it": "Vodka, Kahlua, Espresso", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Ma Coco", "name_it": "Ma Coco", "price": "11,00", 
+    "desc": "Havana 7, Bacardi, Kokos, Maracuja", "desc_it": "Havana 7, Bacardi, Kokos, Maracuja", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Margarita", "name_it": "Margarita", "price": "9,00", 
+    "desc": "Tequila, Cointreau, Lime", "desc_it": "Tequila, Cointreau, Lime", 
+    "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "LONGDRINKS", 
+    "name_it": "LONGDRINKS", 
+    "price": "", "desc": "", "desc_it": "", "ingredients": "", "ingredients_it": "", "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Riegele, Gletschertee, Gin Lemon, Bacardi Cola", 
+    "name_it": "Riegele, Gletschertee, Gin Lemon, Bacardi Cola", 
+    "price": "5,50—6,50", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { "type": "header", "name": "PIZZA", "view": "b" },
+  { 
+    "type": "product", 
+    "name": "Margherita", 
+    "name_it": "Margherita", 
+    "price": 9.50, 
+    "desc": "Tomaten, Fior di latte, Basilikum", 
+    "desc_it": "Pomodoro, fior di latte, basilico", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Marinara", 
+    "name_it": "Marinara", 
+    "price": 10.50, 
+    "desc": "Tomaten, Knoblauch, Olivenöl", 
+    "desc_it": "Pomodoro, aglio, olio d’oliva", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Prosciutto", 
+    "name_it": "Prosciutto", 
+    "price": 11.50, 
+    "desc": "Tomaten, Fior di latte, Schinken", 
+    "desc_it": "Pomodoro, fior di latte, prosciutto", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Prosciutto e funghi", 
+    "name_it": "Prosciutto e funghi", 
+    "price": 11.50, 
+    "desc": "Tomaten, Fior di latte, Schinken, Champignon", 
+    "desc_it": "Pomodoro, fior di latte, prosciutto, champignon", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Salame", 
+    "name_it": "Salame", 
+    "price": 12.00, 
+    "desc": "Tomaten, Fior di latte, scharfe Salami", 
+    "desc_it": "Pomodoro, fior di latte, salame piccante", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Capricciosa", 
+    "name_it": "Capricciosa", 
+    "price": 12.00, 
+    "desc": "Tomaten, Fior di latte, Schinken, Champignon, Artischocken", 
+    "desc_it": "Pomodoro, fior di latte, prosciutto, champignon, carciofi", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Quattro stagioni", 
+    "name_it": "Quattro stagioni", 
+    "price": 12.50, 
+    "desc": "Tomaten, Fior di latte, Schinken, Champignon, Artischocken, Oliven", 
+    "desc_it": "Pomodoro, fior di latte, prosciutto, champignon, carciofi, olive", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Diavola", 
+    "name_it": "Diavola", 
+    "price": 12.00, 
+    "desc": "Tomaten, Fior di latte, scharfe Salami, Lombardi", 
+    "desc_it": "Pomodoro, fior di latte, salame piccante, lombardi", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Siciliana", 
+    "name_it": "Siciliana", 
+    "price": 12.00, 
+    "desc": "Tomaten, Fior di latte, Oliven, Kapern, Sardellen", 
+    "desc_it": "Pomodoro, fior di latte, olive, capperi, acciughe", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Quattro formaggi", 
+    "name_it": "Quattro formaggi", 
+    "price": 11.50, 
+    "desc": "Tomaten, Fior di latte, Bufala, Gorgonzola, Parmesan", 
+    "desc_it": "Pomodoro, fior di latte, bufala, gorgonzola, parmigiano", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Meeresfrüchte", 
+    "name_it": "Meeresfrüchte", 
+    "price": 12.50, 
+    "desc": "Tomaten, Fior di latte, Meeresfrüchte, Knoblauch, Petersilie", 
+    "desc_it": "Pomodoro, fior di latte, frutti di mare, aglio, prezzemolo", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Tonno", 
+    "name_it": "Tonno", 
+    "price": 9.50, 
+    "desc": "Tomaten, Fior di latte, Thunfisch, Zwiebel", 
+    "desc_it": "Pomodoro, fior di latte, tonno, cipolla", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Garnelen", 
+    "name_it": "Garnelen", 
+    "price": 13.00, 
+    "desc": "Tomaten, Fior di latte, Garnelen, Cocktailtomaten, Knoblauch", 
+    "desc_it": "Pomodoro, fior di latte, gamberi, pomodorini, aglio", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Lachs", 
+    "name_it": "Lachs", 
+    "price": 12.50, 
+    "desc": "Tomaten, Fior di latte, Lachs, Zucchini", 
+    "desc_it": "Pomodoro, fior di latte, salmone, zucchine", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Calzone", 
+    "name_it": "Calzone", 
+    "price": 10.50, 
+    "desc": "Tomaten, Fior di latte, Schinken, Champignon", 
+    "desc_it": "Pomodoro, fior di latte, prosciutto, champignon", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Bauern", 
+    "name_it": "Bauern", 
+    "price": 10.00, 
+    "desc": "Tomaten, Fior di latte, Speck, Zwiebel, Knoblauch", 
+    "desc_it": "Pomodoro, fior di latte, speck, cipolla, aglio", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Bufalina", 
+    "name_it": "Bufalina", 
+    "price": 11.50, 
+    "desc": "Tomaten, Fior di latte, Bufala, Rucola, Cocktailtomaten, Parmesan", 
+    "desc_it": "Pomodoro, fior di latte, bufala, rucola, pomodorini, parmigiano", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Parma", 
+    "name_it": "Parma", 
+    "price": 12.50, 
+    "desc": "Tomaten, Fior di latte, Rucola, Cocktailtomaten, Rohschinken, Parmesan", 
+    "desc_it": "Pomodoro, fior di latte, rucola, pomodorini, crudo, parmigiano", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Gemüse", 
+    "name_it": "Gemüse", 
+    "price": 11.00, 
+    "desc": "Tomaten, Fior di latte, Gemüse, Parmesan, Knoblauch", 
+    "desc_it": "Pomodoro, fior di latte, verdure, parmigiano, aglio", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Vegana", 
+    "name_it": "Vegana", 
+    "price": 11.00, 
+    "desc": "Tomaten, Gemüse, Knoblauch, Olivenöl", 
+    "desc_it": "Pomodoro, verdura, aglio, olio d’oliva", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Parmigiana", 
+    "name_it": "Parmigiana", 
+    "price": 11.50, 
+    "desc": "Tomaten, Fior di latte, Melanzane, Parmesan", 
+    "desc_it": "Pomodoro, fior di latte, melanzane, parmigiano", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Autunno", 
+    "name_it": "Autunno", 
+    "price": 12.00, 
+    "desc": "Tomaten, Fior di latte, Gorgonzola, Speck, Walnüsse", 
+    "desc_it": "Pomodoro, fior di latte, gorgonzola, speck, noci", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Parnetz", 
+    "name_it": "Parnetz", 
+    "price": 13.00, 
+    "desc": "Tomaten, Fior di latte, Speck, Pfifferlinge, Spinat, Knoblauch", 
+    "desc_it": "Pomodoro, fior di latte, speck, finferli, spinaci, aglio", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Primavera", 
+    "name_it": "Primavera", 
+    "price": 12.50, 
+    "desc": "Tomaten, Fior di latte, Bufala, Cocktailtomaten, Basilikumpesto, Ricotta", 
+    "desc_it": "Pomodoro, fior di latte, bufala, pomodorini, pesto alla genovese, ricotta", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Rustica", 
+    "name_it": "Rustica", 
+    "price": 12.50, 
+    "desc": "Tomaten, Fior di latte, scharfe Salami, Gorgonzola, Zwiebel, Lombardi", 
+    "desc_it": "Pomodoro, fior di latte, salame piccante, gorgonzola, cipolla, lombardi", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Sisinius", 
+    "name_it": "Sisinius", 
+    "price": 13.00, 
+    "desc": "Tomaten, Fior di latte, scharfe Salami, Zwiebel, Paprika, Pfifferlinge, Ei", 
+    "desc_it": "Pomodoro, fior di latte, salame piccante, cipolla, peperoni, finferli, uova", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Mediterranea", 
+    "name_it": "Mediterranea", 
+    "price": 13.00, 
+    "desc": "Tomaten, Fior di latte, Artischocken, Cocktailtomaten, Oliven, Ricotta, Parmesan", 
+    "desc_it": "Pomodoro, fior di latte, carciofi, pomodorini, olive, ricotta, parmigiano", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Vinschger", 
+    "name_it": "Vinschger", 
+    "price": 13.00, 
+    "desc": "Tomaten, Fior di latte, Speck, Zwiebel, Gorgonzola, Pfifferlinge, Parmesan, Knoblauch", 
+    "desc_it": "Pomodoro, fior di latte, speck, cipolla, gorgonzola, finferli, parmigiano, aglio", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Italia", 
+    "name_it": "Italia", 
+    "price": 13.50, 
+    "desc": "Tomaten, Fior di latte, Cocktailtomaten, Rohschinken, Burrata, Basilikum", 
+    "desc_it": "Pomodoro, fior di latte, pomodorini, crudo, burrata, basilico", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { "type": "header", "name": "PIZZE BIANCHE", "view": "b" },
+  { 
+    "type": "product", 
+    "name": "Genovese", 
+    "name_it": "Genovese", 
+    "price": 13.00, 
+    "desc": "Basilikumpesto, Fior di latte, Cocktailomaten, Rohschinken, Parmesan", 
+    "desc_it": "Pesto alla genovese, fior di latte, pomodorini, crudo, parmigiano", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Carbonara", 
+    "name_it": "Carbonara", 
+    "price": 12.00, 
+    "desc": "Fior di latte, Speck, Ei, Parmesan, Pfeffer", 
+    "desc_it": "Fior di latte, speck, uova, parmigiano, pepe", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Superba", 
+    "name_it": "Superba", 
+    "price": 12.00, 
+    "desc": "Pesto, Fior di latte, Cocktailtomaten, Burrata, Basilikum", 
+    "desc_it": "Pesto, fior di latte, pomodorini, burrata, basilico", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { "type": "header", "name": "KINDER PIZZA", "view": "b" },
+  { 
+    "type": "product", 
+    "name": "Micky Maus", 
+    "name_it": "Micky Maus", 
+    "price": 5.50, 
+    "desc": "Tomaten, Fior di latte", 
+    "desc_it": "Pomodoro, fior di latte", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Scooby Doo", 
+    "name_it": "Scooby Doo", 
+    "price": 6.50, 
+    "desc": "Tomaten, Fior di latte, milde Salami, Mais", 
+    "desc_it": "Pomodoro, fior di latte, salame, mais", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Nemo", 
+    "name_it": "Nemo", 
+    "price": 7.00, 
+    "desc": "Tomate, Fior di latte, 2 Zutaten nach Wahl", 
+    "desc_it": "Pomodoro, fior di latte, 2 condimenti a scelta", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }
+]

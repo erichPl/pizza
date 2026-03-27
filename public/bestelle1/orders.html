@@ -27,7 +27,7 @@
         
         .done-btn { 
             width: 100%; background: #0f3460; color: white; border: none; padding: 10px; 
-            margin-top: 15px; border-radius: 6px; cursor: pointer; font-weight: bold;
+            /*margin-top: 15px; border-radius: 6px; cursor: pointer; font-weight: bold;*/
             transition: 0.3s;
         }
         .done-btn:hover { background: #27ae60; }
@@ -123,23 +123,29 @@
         <span>🍻 Bar-Monitor</span>
         <span id="clock" style="font-size: 18px; color: #e94560;"></span>
     </h1>
+	<label class="switch">
+        <input type="checkbox" id="bon-toggle" onchange="setBon(this.checked)">
+        <span class="slider"></span>
+    </label>
+    <span style="color: #888; font-size: 0.9rem;">Bon-Druck aktivieren</span>
 
-
-<button onclick="printAllMarked()" style="background: #007bff; color: white; padding: 15px; margin: 10px; width: calc(100% - 20px); cursor: pointer; border-radius: 8px; font-weight: bold;">
-    🖨️ Alle markierten Bons zusammen drucken
-</button>
-<div style="margin: 10px; display: flex; gap: 10px;">
-    <button onclick="document.querySelectorAll('.print-checkbox').forEach(b => b.checked = true)" style="padding: 10px;">Alle markieren</button>
-    <button onclick="printSelected()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; flex: 1; font-weight: bold;">
-        Markierte Bons drucken
-    </button>
-</div>
+	<button class="btnPr" onclick="printAllMarked()" style="background: #007bff; color: white; padding: 15px; margin: 10px; width: calc(100% - 20px); cursor: pointer; border-radius: 8px; font-weight: bold;">
+		🖨️ Alle markierten Bons zusammen drucken
+	</button>
+	<div style="margin: 10px; display: flex; gap: 10px;">
+		<button class="btnPr" onclick="document.querySelectorAll('.print-checkbox').forEach(b => b.checked = true)" style="padding: 10px;">Alle markieren</button>
+		<button  class="btnPr" onclick="printSelected()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; flex: 1; font-weight: bold;">
+			Markierte Bons drucken
+		</button>
+	</div>
 
     <div id="ordersContainer" class="order-grid">
         </div>
 
     <script>
 
+// Oben im Script:
+setBon(false);
 
 	
 //Dasmit checkboxen für Bon Ddruck nach intervall erhalten bleiben
@@ -256,7 +262,7 @@ function renderOrders(orders) {
         return `
             <div class="order-card" data-id="${order._id}" style="border-left: 5px solid ${isPrinted ? '#555' : '#00ca4e'};">
                 <div class="order-header" style="display: flex; align-items: center; gap: 10px;">
-                    <input type="checkbox" class="print-checkbox" value="${order._id}" 
+                    <input type="checkbox" class="print-checkbox, btnPr" value="${order._id}" 
                            ${isPrinted ? 'disabled' : ''} 
                            style="width: 22px; height: 22px; cursor: ${isPrinted ? 'default' : 'pointer'};">
                     
@@ -297,27 +303,32 @@ function renderOrders(orders) {
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="print-btn" onclick="printOrder('${order._id}')" 
-                            ${isPrinted ? 'disabled' : ''} 
-                            style="flex: 1; padding: 10px; background: ${isPrinted ? '#222' : '#444'}; 
-                                   color: ${isPrinted ? '#555' : 'white'}; border: 1px solid ${isPrinted ? '#333' : 'transparent'}; 
-                                   cursor: ${isPrinted ? 'default' : 'pointer'}; border-radius: 5px;">
-                        ${isPrinted ? 'Gedruckt' : '🖨️ Bon'}
-                    </button>
-                
-                    <div style="display: flex; flex-direction: column; gap: 5px; flex: 2;">
-                        <button class="done-btn" onclick="removeOrder('${order._id}')" 
-                                style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">
-                            Erledigt / Serviert
-                        </button>
-                        
-                        <button class="storno-btn" onclick="cancelOrder('${order._id}')" 
-                                style="width: 100%; padding: 5px; background: #ff4b2b; color: white; border: none; cursor: pointer; border-radius: 5px; font-size: 0.8rem; opacity: 0.8;">
-                            ❌ Stornieren
-                        </button>
-                    </div>
-                </div>
+<div style="display: flex; gap: 10px; margin-top: 15px; align-items: stretch;">
+    
+    <button class="print-btn btnPr" onclick="printOrder('${order._id}')" 
+            ${isPrinted ? 'disabled' : ''} 
+            style="flex: 1; padding: 10px; background: ${isPrinted ? '#222' : '#444'}; 
+                   color: ${isPrinted ? '#555' : 'white'}; border: 1px solid ${isPrinted ? '#333' : 'transparent'}; 
+                   cursor: ${isPrinted ? 'default' : 'pointer'}; border-radius: 5px;">
+        ${isPrinted ? 'Gedruckt' : '🖨️ Bon'}
+    </button>
+
+    <div style="display: flex; flex: 3; gap: 10px;">
+        
+        <button class="storno-btn" onclick="cancelOrder('${order._id}')" 
+                style="flex: 0.7; padding: 10px; background: #ff4b2b; color: white; border: none; 
+                       cursor: pointer; border-radius: 5px; font-size: 0.85rem; font-weight: bold;">
+            Storno
+        </button>
+
+        <button class="done-btn" onclick="removeOrder('${order._id}')" 
+                style="flex: 2; padding: 10px; background: #28a745; color: white; border: none; 
+                       cursor: pointer; border-radius: 5px; font-weight: bold;">
+            Erledigt / Serviert
+        </button>
+        
+    </div>
+</div>
             </div>
         `;
     }).join('');
@@ -459,6 +470,28 @@ async function cancelOrder(id) {
         } catch (err) {
             console.error("Netzwerkfehler beim Stornieren:", err);
             alert("Netzwerkfehler. Bitte Internetverbindung prüfen.");
+        }
+    }
+}
+
+function setBon(value) {
+    isBon = value; // Update der Variable (true/false)
+
+    // Wir suchen, ob der Style-Tag schon existiert
+    let styleTag = document.getElementById('bon-hide-style');
+
+    if (!isBon) {
+        // Wenn Bon aus ist: Style-Tag erstellen, falls noch nicht da
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'bon-hide-style';
+            styleTag.innerHTML = `.btnPr { display: none !important; }`;
+            document.head.appendChild(styleTag);
+        }
+    } else {
+        // Wenn Bon an ist: Den Style-Tag einfach löschen
+        if (styleTag) {
+            styleTag.remove();
         }
     }
 }

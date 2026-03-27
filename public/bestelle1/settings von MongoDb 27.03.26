@@ -1,0 +1,9 @@
+{
+  "_id": {
+    "$oid": "69c62ebf4dbbc78c40c159a6"
+  },
+  "type": "settings",
+  "__v": 0,
+  "items": [],
+  "isGeolocation": false
+}

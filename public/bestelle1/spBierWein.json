@@ -1,0 +1,79 @@
+[
+ { 
+    "type": "header", 
+    "name": "GETRÄNKE", 
+    "name_it": "BIBITE", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "BIER VOM FASS", 
+    "name_it": "BIRRA ALLA SPINA", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Forst Pils", 
+    "name_it": "Forst Pils", 
+    "price": "2,30 / 4,60", 
+    "desc": "0,2 l / 0,4 l", 
+    "desc_it": "0,2 l / 0,4 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Felsenkeller", 
+    "name_it": "Felsenkeller", 
+    "price": "3,70", 
+    "desc": "0,3 l", 
+    "desc_it": "0,3 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Weihenstephaner Weizen", 
+    "name_it": "Weihenstephaner Weizen", 
+    "price": "3,50 / 5,50", 
+    "desc": "0,3 l / 0,5 l", 
+    "desc_it": "0,3 l / 0,5 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "header", 
+    "name": "WEIN", 
+    "name_it": "VINO", 
+    "price": "", 
+    "desc": "", 
+    "desc_it": "", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  },
+  { 
+    "type": "product", 
+    "name": "Hauswein rot/weiß", 
+    "name_it": "Vino della casa rosso/bianco", 
+    "price": "2,00 / 4,00 / 8,00", 
+    "desc": "0,1 l / 0,25 l / 0,5 l", 
+    "desc_it": "0,1 l / 0,25 l / 0,5 l", 
+    "ingredients": "", 
+    "ingredients_it": "", 
+    "view": "b" 
+  }
+]
