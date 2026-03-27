@@ -24,7 +24,7 @@
 	};
 
 
-      async function init() {
+ async function init() {
     const params = new URLSearchParams(window.location.search);
 	(currentLang === 'it') ? 
 	document.getElementById('tisch-view').innerText = "Tisch " + (params.get('tisch') || "/"):
@@ -54,85 +54,71 @@
     }
 }
 
-		let currentLang = localStorage.getItem('selectedLang') || 'de';
+let currentLang = localStorage.getItem('selectedLang') || 'de';
 
-		function setLanguage(lang) {
-			currentLang = lang;
-			localStorage.setItem('selectedLang', lang);
-			
-			// 1. Das Sprachpaket für diese Funktion definieren (Wichtig!)
-			const txt = i18n[lang] || i18n.de;
-			
-			
-			// --- Tischanzeige übersetzen ---
-			const params = new URLSearchParams(window.location.search);
-			const tischNr = params.get('tisch') || "?";
-			const tischElement = document.getElementById('tisch-view');
-			if (tischElement) {
-				tischElement.innerText = txt.tisch + " " + tischNr;
+function setLanguage(lang) {
+	currentLang = lang;
+	localStorage.setItem('selectedLang', lang);
+	
+	// 1. Das Sprachpaket für diese Funktion definieren (Wichtig!)
+	const txt = i18n[lang] || i18n.de;
+	
+	
+	// --- Tischanzeige übersetzen ---
+	const params = new URLSearchParams(window.location.search);
+	const tischNr = params.get('tisch') || "?";
+	const tischElement = document.getElementById('tisch-view');
+	if (tischElement) {
+		tischElement.innerText = txt.tisch + " " + tischNr;
+	}
+	
+	
+	// 2. Die Flaggen-Optik anpassen
+	document.getElementById('lang-de').style.opacity = (lang === 'de' ? '1' : '0.4');
+	document.getElementById('lang-it').style.opacity = (lang === 'it' ? '1' : '0.4');
+
+	// 3. Die Buttons im Modal-Footer übersetzen (über ihre IDs)
+	const btnSave = document.getElementById('btn-save');
+	const btnCancel = document.getElementById('btn-cancel');
+	
+	if (btnSave) btnSave.innerText = txt.fertig;
+	if (btnCancel) btnCancel.innerText = txt.abbrechen;
+
+	// Footer-Texte übersetzen
+	if (document.getElementById('link-impressum')) document.getElementById('link-impressum').innerText = txt.impressum;
+	if (document.getElementById('link-privacy')) document.getElementById('link-privacy').innerText = txt.privacy;
+	if (document.getElementById('footer-address')) document.getElementById('footer-address').innerText = txt.address;
+	if (document.getElementById('footer-region')) document.getElementById('footer-region').innerText = txt.region;
+	if (document.getElementById('footer-vat')) document.getElementById('footer-vat').innerText = txt.vat;
+
+	// 4. Den Rest der Seite neu zeichnen
+	renderMenu();
+	updateUI();
+}
+
+function getCountForProduct(index, category) {
+	if (category.includes("PIZZA")) {
+		// Zähle alle Einträge in pizzaCart, die von diesem Produkt stammen
+		return pizzaCart.filter(p => p.parentIdx === index).length;
+	} else {
+		// Bei Getränken einfach den Wert aus dem standardCart nehmen
+		return standardCart[index] || 0;
+	}
+}
+
+
+	function getTotalPizzaCount(index) {
+		// 1. Normale Pizzen zählen
+		let count = cart[index] || 0;
+		
+		// 2. Alle Spezial-Versionen (customCart) dazuaddieren, die zu dieser Pizza gehören
+		Object.keys(customCart).forEach(cIdx => {
+			if (customOrders[cIdx].parentIndex === index) {
+				count += (customCart[cIdx] || 0);
 			}
-			
-			
-			// 2. Die Flaggen-Optik anpassen
-			document.getElementById('lang-de').style.opacity = (lang === 'de' ? '1' : '0.4');
-			document.getElementById('lang-it').style.opacity = (lang === 'it' ? '1' : '0.4');
-
-			// 3. Die Buttons im Modal-Footer übersetzen (über ihre IDs)
-			const btnSave = document.getElementById('btn-save');
-			const btnCancel = document.getElementById('btn-cancel');
-			
-			if (btnSave) btnSave.innerText = txt.fertig;
-			if (btnCancel) btnCancel.innerText = txt.abbrechen;
-
-
-
-
-
-
-// Footer-Texte übersetzen
-    if (document.getElementById('link-impressum')) document.getElementById('link-impressum').innerText = txt.impressum;
-    if (document.getElementById('link-privacy')) document.getElementById('link-privacy').innerText = txt.privacy;
-    if (document.getElementById('footer-address')) document.getElementById('footer-address').innerText = txt.address;
-    if (document.getElementById('footer-region')) document.getElementById('footer-region').innerText = txt.region;
-    if (document.getElementById('footer-vat')) document.getElementById('footer-vat').innerText = txt.vat;
-
-
-
-
-
-
-
-			// 4. Den Rest der Seite neu zeichnen
-			renderMenu();
-			updateUI();
-		}
-
-
-
-
-		function getCountForProduct(index, category) {
-			if (category.includes("PIZZA")) {
-				// Zähle alle Einträge in pizzaCart, die von diesem Produkt stammen
-				return pizzaCart.filter(p => p.parentIdx === index).length;
-			} else {
-				// Bei Getränken einfach den Wert aus dem standardCart nehmen
-				return standardCart[index] || 0;
-			}
-		}
-
-
-		function getTotalPizzaCount(index) {
-			// 1. Normale Pizzen zählen
-			let count = cart[index] || 0;
-			
-			// 2. Alle Spezial-Versionen (customCart) dazuaddieren, die zu dieser Pizza gehören
-			Object.keys(customCart).forEach(cIdx => {
-				if (customOrders[cIdx].parentIndex === index) {
-					count += (customCart[cIdx] || 0);
-				}
-			});
-			return count;
-		}
+		});
+		return count;
+	}
 
 function renderMenu() {
     const menuDiv = document.getElementById('menu');
@@ -244,103 +230,26 @@ function renderMenu__() {
     menuDiv.innerHTML = html;
 }
 
-        function renderMenu__() {
-			const menuDiv = document.getElementById('menu');
-			let html = "";
-			let aktuelleKategorie = "";
-
-			items.forEach((item, index) => {
-				// FALL 1: Es ist eine Überschrift
-				if (item.type === 'header') {
-					aktuelleKategorie = item.name.toUpperCase();
-					html += `<h2>${item.name}</h2>`;
-					return; // Keine Buttons für Überschriften
-				}
-
-				// FALL 2: Es ist ein Produkt
-				const isExtra = aktuelleKategorie.includes("EXTRAS") || aktuelleKategorie.includes("ZUTATEN");
-
-				html += `
-				<div class="item">
-					<div class="info">
-						<strong>${item.name}</strong>
-						<span class="desc">${item.desc}</span>
-						<span class="preis">${item.price} €</span>
-					</div>
-					<div class="controls">
-						 ${!isExtra ? `
-							<div style="display: flex; align-items: center; gap: 10px; background: #222; padding: 5px; border-radius: 8px;">
-								<!-- Minus Button -->
-								<button class="btn-minus" onclick="changeQty(${index}, -1)" 
-										style="width:30px; height:30px; border-radius:5px; border:none; background:#444; color:white; cursor:pointer;">-</button>
-								
-								<!-- Mengen Anzeige -->
-								<span id="qty-${index}" style="min-width: 20px; text-align: center; font-weight: bold; color: #ffcc00;">
-									${displayQty}
-								</span>
-								
-								<!-- Plus Button -->
-								<button class="btn-plus" onclick="addItem(${index}, '${aktuelleKategorie}')" 
-										style="width:30px; height:30px; border-radius:5px; border:none; background:#007bff; color:white; cursor:pointer;">+</button>
-							</div>
-						` : ''}
-					</div>
-				</div>`;
-			});
-			menuDiv.innerHTML = html;
-		}
+      
 		
-		function changeQty(index, delta) {
-			if (delta < 0) {
-				// Logik für Minus
-				if (cart[index] && cart[index] > 0) {
-					cart[index] -= 1;
-				} else {
-					// Wenn keine normale Pizza mehr da ist, suche die letzte Spezial-Pizza dieses Typs
-					for (let i = customOrders.length - 1; i >= 0; i--) {
-						if (customOrders[i].parentIndex === index && customCart[i] > 0) {
-							customCart[i] -= 1;
-							break;
-						}
-					}
+function changeQty(index, delta) {
+	if (delta < 0) {
+		// Logik für Minus
+		if (cart[index] && cart[index] > 0) {
+			cart[index] -= 1;
+		} else {
+			// Wenn keine normale Pizza mehr da ist, suche die letzte Spezial-Pizza dieses Typs
+			for (let i = customOrders.length - 1; i >= 0; i--) {
+				if (customOrders[i].parentIndex === index && customCart[i] > 0) {
+					customCart[i] -= 1;
+					break;
 				}
 			}
-			updateUI();
-			renderMenu(); // Menü neu zeichnen, um die Zahlen zu aktualisieren
 		}
-		
-
-function addItem__(index, category) {
-    const item = items[index];
-    const cat = category.toUpperCase();
-    const isPizza = cat.includes("PIZZA") || cat.includes("KINDERPIZZA");
-    
-    // SICHERHEIT: Preis in String umwandeln, falls er vom Server als Zahl kommt
-    const priceStr = String(item.price);
-    const hasVariants = priceStr.includes('/');
-
-    if (isPizza || hasVariants) {
-        // Falls Cocktail mit Varianten
-        if (hasVariants && !isPizza) {
-            openVariantModal(index, category); // Dies öffnet das Fenster
-        } else {
-            // Normale Pizza-Logik
-            pizzaCart.push({
-                parentIdx: index,
-                name: item.name,
-                basePrice: parseFloat(priceStr.replace(',', '.')) || 0,
-                extras: [], removals: [], extraPrice: 0, kategorie: category
-            });
-            updateUI();
-        }
-    } else {
-        // Standard-Getränk ohne Varianten
-        standardCart[index] = (standardCart[index] || 0) + 1;
-        updateUI();
-    }
-    renderMenu();
-}
-
+	}
+	updateUI();
+	renderMenu(); // Menü neu zeichnen, um die Zahlen zu aktualisieren
+}		
 
 function addItem(index, category) {
     const item = items[index];
@@ -378,28 +287,6 @@ function addItem(index, category) {
     updateUI();
     renderMenu();
 }
-
-
-function removeItem_(index, category) {
-    if (category.includes("PIZZA") || category.includes("KINDERPIZZA")) {
-        // Suche die letzte Pizza dieses Typs im pizzaCart und entferne sie
-        for (let i = pizzaCart.length - 1; i >= 0; i--) {
-            if (pizzaCart[i].parentIdx === index) {
-                pizzaCart.splice(i, 1);
-                break;
-            }
-        }
-    } else {
-        // Bei Getränken einfach die Zahl im standardCart senken
-        if (standardCart[index] > 0) {
-            standardCart[index]--;
-            if (standardCart[index] === 0) delete standardCart[index];
-        }
-    }
-    updateUI(); // Warenkorb unten aktualisieren
-    renderMenu(); // Zahlen oben in der Liste aktualisieren
-}
-
 
 function removeItem(index, category) {
     const cat = category.toUpperCase();
@@ -500,119 +387,6 @@ function openCombinedModal(idx) {
             list.insertAdjacentHTML('afterbegin', hinweisHtml);
         }
     }
-}
-
-
-function openCombinedModal11(idx) {
-    const p = pizzaCart[idx];
-    const pOriginal = items[p.parentIdx];
-    
-    // Zähle, wie viele IDENTISCHE Produkte gerade im Warenkorb sind
-    const extrasKey = p.extras.map(e => e.name).sort().join(",");
-    const removalsKey = p.removals.sort().join(",");
-    const identische = pizzaCart.filter(item => 
-        item.parentIdx === p.parentIdx && 
-        item.size === p.size && 
-        item.extras.map(e => e.name).sort().join(",") === extrasKey &&
-        item.removals.sort().join(",") === removalsKey
-    ).length;
-
-    let hinweisHtml = "";
-    if (identische > 1) {
-        hinweisHtml = `
-            <div style="background: #332b00; color: #ffcc00; padding: 8px; border-radius: 5px; margin-bottom: 15px; font-size: 0.85rem; border: 1px solid #554400; text-align: center;">
-                ℹ️ Du änderst gerade <strong>eines</strong> von ${identische} identischen Produkten.
-            </div>`;
-    }
-
-    // Füge hinweisHtml oben in dein Modal-HTML ein
-    const modalContent = document.getElementById('modal-list');
-    modalContent.innerHTML = hinweisHtml + restlicherContent;
-    
-    document.getElementById('modal').style.display = 'block';
-}
-
-
-function openCorrectionModal4(parentIndex) {
-      alert("openCorrectionModal");
-	const lang = i18n[currentLang] || i18n.de;
-    const item = items[parentIndex];
-    const itemName = (currentLang === 'it' && item.name_it) ? item.name_it : item.name;
-
-	
-
-    // Wir gruppieren die vorhandenen Pizzen im Warenkorb nach ihrer Konfiguration
-    let varianten = {};
-    
-	// Zähle, wie viele verschiedene Varianten (Gruppen) es gibt
-	const anzahlVarianten = Object.keys(varianten).length;
-	
-	// 4. Den Text-Baustein festlegen
-    const zeigeFrage = anzahlVarianten > 1 
-        ? `<p style="text-align:center; font-size:0.9rem; color:#bbb; margin-bottom:20px;">${lang.korrekturFrage}</p>` 
-        : `<div style="margin-bottom:20px;"></div>`;
-	
-    pizzaCart.forEach((p, originalIdx) => {
-        if (p.parentIdx === parentIndex) {
-            // Erstelle einen Schlüssel für die Variante
-            const key = JSON.stringify({s: p.size, e: p.extras, r: p.removals});
-            if (!varianten[key]) {
-                varianten[key] = { 
-                    data: p, 
-                    count: 1, 
-                    indices: [originalIdx] // Wir merken uns die echten Indizes im pizzaCart
-                };
-            } else {
-                varianten[key].count++;
-                varianten[key].indices.push(originalIdx);
-            }
-        }
-    });
-
-    let modalHtml = `
-        <div id="correction-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; display:flex; align-items:center; justify-content:center; font-family:sans-serif;">
-            <div style="background:#1a1a1a; width:95%; max-width:450px; padding:20px; border-radius:12px; border:2px solid #ffcc00; color:white;">
-                <h3 style="color:#ffcc00; margin:0 0 10px 0; text-align:center;">${lang.korrekturTitel}</h3>               
-				<p style="text-align:center; font-size:0.9rem; color:#bbb; margin-bottom:20px;">${zeigeFrage}</p>				               
-                <div style="max-height:60vh; overflow-y:auto; padding-right:5px;">
-    `;
-
-    Object.values(varianten).forEach(v => {
-        const p = v.data;
-        const extrasText = p.extras.length > 0 ? `<br><small style="color:#2ecc71;">+ ${p.extras.map(e => e.name).join(', ')}</small>` : "";
-        const removalText = p.removals.length > 0 ? `<br><small style="color:#e74c3c;">${lang.ohne}: ${p.removals.join(', ')}</small>` : "";
-        const groesseText = p.size ? ` (${p.size})` : "";
-
-        modalHtml += `
-            <div style="background:#2a2a2a; margin-bottom:10px; padding:12px; border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
-                <div style="flex-grow:1; padding-right:10px; font-size:0.95rem;">
-                    <strong>${itemName}${groesseText}</strong>
-                    ${extrasText}${removalText}
-                </div>
-                
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <button onclick="executeModalRemove(${v.indices[v.indices.length-1]}, ${parentIndex})" 
-                            style="width:35px; height:35px; background:#444; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">-</button>
-                    
-                    <span style="font-weight:bold; color:#ffcc00; min-width:20px; text-align:center;">${v.count}</span>
-                    
-                    <button onclick="executeModalAdd(${v.indices[0]}, ${parentIndex})" 
-                            style="width:35px; height:35px; background:#007bff; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">+</button>
-                </div>
-            </div>
-        `;
-    });
-
-    modalHtml += `
-                </div>
-                <button onclick="closeCorrection()" style="width:100%; margin-top:20px; padding:12px; background:#ffcc00; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">${lang.schliessen}</button>
-            </div>
-        </div>
-    `;
-
-    // Altes Modal entfernen, falls vorhanden
-    closeCorrection();
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
 // Hilfsfunktionen für die Buttons im Modal
@@ -877,204 +651,6 @@ function generateOrderSummary() {
 }
 
 
-function updateUI4() {
-    const listDiv = document.getElementById('cart-items-list');
-    const bar = document.getElementById('cart-bar');
-    const lang = i18n[currentLang] || i18n.de;
-
-    let total = 0;
-    let absoluteProduktAnzahl = 0;
-    let cartHtml = "";
-
-    // 1. PIZZEN / KONFIGURIERBARE PRODUKTE (Einzeln auflisten)
-    pizzaCart.forEach((p, idx) => {
-        absoluteProduktAnzahl++;
-        const preisFuerDieseEins = p.basePrice + p.extraPrice;
-        total += preisFuerDieseEins;
-
-        const pOriginal = items[p.parentIdx];
-        const displayName = (currentLang === 'it' && pOriginal.name_it) ? pOriginal.name_it : p.name;
-        
-        const extraStrings = p.extras.map(e => {
-            const extraOriginal = items.find(item => item.name === e.name);
-            const displayExtraName = (currentLang === 'it' && extraOriginal?.name_it) ? extraOriginal.name_it : e.name;
-            return `<span style="color: #2ecc71;">+ ${displayExtraName}</span>`;
-        });
-
-        cartHtml += `
-        <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #ffcc00; padding: 10px; background: #2a2a2a; border-radius: 8px;">
-            <div style="display:flex; justify-content:space-between; align-items: flex-start;">
-                <div style="flex-grow:1;">
-                    <strong style="font-size: 1rem;">1x ${displayName} ${p.size ? '('+p.size+')' : ''}</strong>
-                    <div style="font-size: 0.85rem; margin-top: 4px;">
-                        ${extraStrings.length > 0 ? `<div>${extraStrings.join(', ')}</div>` : ''}
-                        ${p.removals.length > 0 ? `<div style="color:#ff4444;">${lang.ohne}: ${p.removals.join(', ')}</div>` : ''}
-                    </div>
-                    <button onclick="openCombinedModal(${idx})" style="margin-top:8px; padding: 5px 12px; background:#444; color:white; border:none; border-radius:4px; font-size:0.8rem; cursor:pointer;">✎ ${lang.aendern}</button>
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button onclick="changePizzaQty(${idx}, -1)" style="width:32px; height:32px; background:#444; color:white; border:none; border-radius:5px; font-weight:bold;">-</button>
-                    <span style="min-width: 15px; text-align: center; font-weight: bold; color: #ffcc00;">1</span>
-                    <button onclick="changePizzaQty(${idx}, 1)" style="width:32px; height:32px; background:#007bff; color:white; border:none; border-radius:5px; font-weight:bold;">+</button>
-                </div>
-            </div>
-        </div>`;
-    });
-
-    // 2. GETRÄNKE / STANDARDPRODUKTE
-    Object.keys(standardCart).forEach(id => {
-        const qty = standardCart[id];
-        if (qty <= 0) return;
-        
-        const drinkName = (currentLang === 'it' && items[id].name_it) ? items[id].name_it : items[id].name;
-        const price = parseFloat(items[id].price.replace(',', '.')) || 0;
-        
-        total += qty * price;
-        absoluteProduktAnzahl += qty;
-
-        cartHtml += `
-        <div class="cart-row" style="border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; margin-bottom: 8px; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
-            <span><strong>${qty}x ${drinkName}</strong></span>
-            <div style="display: flex; gap: 8px;">
-                <button onclick="changeStdQty(${id}, -1)" style="width:32px; height:32px; background:#444; color:white; border:none; border-radius:5px;">-</button>
-                <button onclick="changeStdQty(${id}, 1)" style="width:32px; height:32px; background:#007bff; color:white; border:none; border-radius:5px;">+</button>
-            </div>
-        </div>`;
-    });
-
-    bar.style.display = total > 0 ? 'block' : 'none';
-    listDiv.innerHTML = cartHtml; // Nur noch die Liste, kein Summary-Header mehr nötig
-
-    const orderBtn = document.getElementById('btn-send');
-    if (orderBtn) orderBtn.innerText = `${lang.bestellen} (${total.toFixed(2).replace('.', ',')} €)`;
-
-    // Menü-Counter aktualisieren
-    if (typeof renderMenu === "function") renderMenu();
-}
-
-
-
-function updateUI3() {
-    const listDiv = document.getElementById('cart-items-list');
-    const bar = document.getElementById('cart-bar');
-    const lang = i18n[currentLang] || i18n.de;
-
-    let total = 0;
-    let gruppen = {}; 
-    let absoluteProduktAnzahl = 0;
-
-    // 1. PIZZEN GRUPPIEREN
-    pizzaCart.forEach((p, idx) => {
-        absoluteProduktAnzahl++;
-        total += p.basePrice + p.extraPrice;
-
-        const pOriginal = items[p.parentIdx];
-        const displayName = (currentLang === 'it' && pOriginal.name_it) ? pOriginal.name_it : p.name;
-        
-        // Eindeutiger Schlüssel für identische Konfiguration
-        const extrasKey = p.extras.map(e => e.name).sort().join(",");
-        const removalsKey = p.removals.sort().join(",");
-        const groupKey = `${p.parentIdx}|${p.size || ''}|${extrasKey}|${removalsKey}`;
-
-		// In deiner updateUI() innerhalb von pizzaCart.forEach:
-
-		// WICHTIG: Der Schlüssel braucht p.parentIdx UND p.size
-		// Wenn p.size nicht da ist (normale Pizza), nutzen wir 'standard'
-		//const groupKey = `${p.parentIdx}|${p.size || 'standard'}|${extrasKey}|${removalsKey}`;
-
-		if (!gruppen[groupKey]) {
-			gruppen[groupKey] = { 
-				name: displayName, 
-				qty: 1, 
-				size: p.size, // Hier merken wir uns "0,2l" oder "Groß"
-				parentIdx: p.parentIdx,
-				extras: p.extras,
-				removals: p.removals,
-				firstIdx: idx // Referenz zum Löschen
-			};
-		} else {
-			gruppen[groupKey].qty += 1;
-		}
-    });
-
-    // 2. GETRÄNKE GRUPPIEREN (direkt in detailHtml einbauen)
-    let drinkHtml = "";
-    Object.keys(standardCart).forEach(id => {
-        const qty = standardCart[id];
-        const drinkName = (currentLang === 'it' && items[id].name_it) ? items[id].name_it : items[id].name;
-        const price = parseFloat(items[id].price.replace(',', '.')) || 0;
-        
-        total += qty * price;
-        absoluteProduktAnzahl += qty;
-
-        drinkHtml += `
-        <div class="cart-row" style="border-left: 4px solid #007bff; padding: 2px; background: #2a2a2a; margin-bottom: 5px; border-radius: 5px; display:flex; justify-content:space-between; align-items:center;">
-            <span><strong>${qty}x ${drinkName}</strong></span>
-            <div style="display: flex; gap: 8px;">
-                <button onclick="changeStdQty(${id}, -1)" style="width:35px; height:35px; background:#444; color:white; border:none; border-radius:5px;">-</button>
-                <button onclick="changeStdQty(${id}, 1)" style="width:35px; height:35px; background:#007bff; color:white; border:none; border-radius:5px;">+</button>
-            </div>
-        </div>`;
-    });
-
-    // 3. HTML GENERIEREN
-    let summaryHtml = "";
-    let pizzaDetailHtml = "";
-    const gruppenArray = Object.values(gruppen);
-
-    if (gruppenArray.length > 0 || absoluteProduktAnzahl > 0) {
-        // Vorschau-Zeile (Fließtext)
-        const vorschauTexte = gruppenArray.map(g => `${g.qty}x ${g.name}${g.size ? ' ('+g.size+')' : ''}`);
-        // Getränke zur Vorschau hinzufügen
-        Object.keys(standardCart).forEach(id => {
-            const drinkName = (currentLang === 'it' && items[id].name_it) ? items[id].name_it : items[id].name;
-            vorschauTexte.push(`${standardCart[id]}x ${drinkName}`);
-        });
-
-        summaryHtml = `
-            <div id="quick-summary" style="position: sticky; top: 0; background: #1a1a1a; border-bottom: 6px solid #ffcc00; padding: 6px; z-index: 1000; color: #ffcc00; font-size: 0.95rem; line-height: 1.2; word-wrap: break-word; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                <strong>(${absoluteProduktAnzahl})</strong> ${vorschauTexte.join(", ")}
-            </div>`;
-
-        // Detaillierte Pizza-Liste (Gruppiert)
-        gruppenArray.forEach(g => {
-            const extraStrings = g.extras.map(e => {
-                const extraOriginal = items.find(item => item.name === e.name);
-                const displayExtraName = (currentLang === 'it' && extraOriginal?.name_it) ? extraOriginal.name_it : e.name;
-                return `<span style="color: #2ecc71;">+ ${displayExtraName}</span>`;
-            });
-
-            pizzaDetailHtml += `
-            <div class="cart-row" style="margin-bottom: 5px; border-left: 4px solid #ffcc00; padding: 2px; background: #2a2a2a; border-radius: 5px;">
-                <div style="display:flex; justify-content:space-between; align-items: center;">
-                    <div style="flex-grow:1;">
-                        <strong>${g.qty}x ${g.name} ${g.size ? '('+g.size+')' : ''}</strong>
-                        <button onclick="openSelectionModal(${g.parentIdx})" style="margin-left:8px; padding: 4px 10px; background:#444; color:white; border:none; border-radius:3px; font-size:0.8rem;">✎ ${lang.aendern}</button>
-                    </div>
-                    <button class="btn-del-square" onclick="removePizza(${g.firstIdx})" >✕</button>
-                </div>
-                <div style="font-size: 0.85rem; margin-top: 5px;">
-                    ${extraStrings.length > 0 ? `<div>${extraStrings.join(', ')}</div>` : ''}
-                    ${g.removals.length > 0 ? `<div style="color:#ff4444;">${lang.ohne}: ${g.removals.join(', ')}</div>` : ''}
-                </div>
-            </div>`;
-        });
-    }
-
-    bar.style.display = total > 0 ? 'block' : 'none';
-    listDiv.innerHTML = summaryHtml + pizzaDetailHtml + drinkHtml;
-
-    // NEU: Menü aktualisieren, damit die Counter-Badges stimmen
-    if (typeof renderMenu === "function") {
-        renderMenu();
-    }
-
-
-    const orderBtn = document.getElementById('btn-send');
-    if (orderBtn) orderBtn.innerText = lang.bestellen;
-}
-
 function changePizzaQty(idx, change) {
     if (change === 1) {
         // Produkt kopieren (Clonen) und neu hinzufügen
@@ -1159,225 +735,53 @@ function closeSelection() {
 }
 
 
+function removePizza(idx) { pizzaCart.splice(idx, 1); updateUI(); }
+function changeStdQty(id, delta) { standardCart[id] += delta; if(standardCart[id]<=0) delete standardCart[id]; updateUI(); }
 
-function updateUI2() {
-    const listDiv = document.getElementById('cart-items-list');
-    const totalDiv = document.getElementById('cart-total');
-    const bar = document.getElementById('cart-bar');
-    const lang = i18n[currentLang] || i18n.de; // Aktuelle Sprache laden
+function openModal(idx, mode) {
+	currentPizzaIdx = idx;
+	const pizza = pizzaCart[idx];
+	const istKinderpizza = pizza.kategorie.toUpperCase().includes("KINDERPIZZA");
+	const modal = document.getElementById('modal');
+	const list = document.getElementById('modal-list');
+	modal.style.display = 'block';
+	list.innerHTML = "";
 
-    let html = "";
-    let total = 0;
-
-     // --- Den Text des Bestell-Buttons ändern ---
-    const orderBtn = document.getElementById('btn-send');
-    if (orderBtn) {
-        orderBtn.innerText = lang.bestellen;
-    }
-
-
-    pizzaCart.forEach((p, idx) => {
-        // 1. Namen übersetzen (Falls IT gewählt und vorhanden)
-        const pOriginal = items[p.parentIdx];
-        const displayName = (currentLang === 'it' && pOriginal.name_it) ? pOriginal.name_it : p.name;
-
-        // 2. Extras sortieren & übersetzen
-        const sortedExtras = [...p.extras].sort((a, b) => a.price - b.price);
-        const extraStrings = sortedExtras.map(e => {
-            // Wir suchen den Namen des Extras in der Sprache des Gastes
-            const extraOriginal = items.find(item => item.name === e.name);
-            const displayExtraName = (currentLang === 'it' && extraOriginal?.name_it) ? extraOriginal.name_it : e.name;
-
-            if (e.price < 0) {
-                return `<span style="color: #2ecc71;">${displayExtraName}</span>`; 
-            } else {
-                return `<span style="color: #2ecc71;">+ ${displayExtraName}</span>`; 
-            }
-        });
-
-        const extraHTML = extraStrings.length > 0 ? 
-            `<span class="extra-badge">${extraStrings.join(', ')}</span>` : '';
-
-        total += p.basePrice + p.extraPrice;
-
-        html += `
-        <div class="cart-row">
-            <div class="cart-header">
-                <div style="flex-grow: 1;">
-                    <strong>1x ${displayName}</strong>
-                    <button class="btn-edit" onclick="openCombinedModal(${idx})">✎ ${lang.aendern}</button>
-                </div>
-                <button class="btn-del-square" onclick="removePizza(${idx})">✕</button>
-            </div>
-            ${extraHTML}
-            ${p.removals.length > 0 ? `<span class="remove-badge">${lang.ohne}: ${p.removals.join(', ')}</span>` : ''}
-        </div>`;
-    });
-
-    Object.keys(standardCart).forEach(id => {
-        const qty = standardCart[id];
-        const price = parseFloat(items[id].price.replace(',', '.')) || 0;
-        total += qty * price;
-        
-        // Name des Getränks übersetzen
-        const drinkName = (currentLang === 'it' && items[id].name_it) ? items[id].name_it : items[id].name;
-
-        html += `<div class="cart-row" style="border-left-color:#007bff; display:flex; justify-content:space-between; align-items:center;">
-            <span><strong>${qty}x ${drinkName}</strong></span>
-            <div>
-                <button onclick="changeStdQty(${id}, -1)" style="width:35px; height:35px; background:#444; color:white; border:none; border-radius:5px;">-</button>
-                <button onclick="changeStdQty(${id}, 1)" style="width:35px; height:35px; background:#007bff; color:white; border:none; border-radius:5px; margin-left:8px;">+</button>
-            </div>
-        </div>`;
-    });
-
-    bar.style.display = total > 0 ? 'block' : 'none';
-    listDiv.innerHTML = html;
-    //totalDiv.innerText = `${lang.gesamt}: ${total.toFixed(2).replace('.', ',')} €`;
-}
-
-
-
-        function updateUI__() {
+	if (mode === 'remove') {
+		document.getElementById('modal-title').innerText = "Zutat abbestellen";
+		const ingredients = items[pizza.parentIdx].desc.split(',').map(s => s.trim());
+		ingredients.forEach(ing => {
+			const isRemoved = pizza.removals.includes(ing);
+			list.innerHTML += `<button onclick="toggleRemove('${ing}')" style="display:block; width:100%; padding:12px; margin:8px 0; background:${isRemoved ? '#ff8800' : '#444'}; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+				${ing} ${isRemoved ? '✓ (entfernt)' : ''}
+			</button>`;
+		});
+	} else {
+		document.getElementById('modal-title').innerText = "Extra hinzufügen";
+		let isExtra = false;
+		items.forEach(item => {
+			if (item.type === 'header') isExtra = item.name.toUpperCase().includes("EXTRAS") || item.name.toUpperCase().includes("ZUTATEN");
+			if (isExtra && item.type === 'product') {
 			
-            const listDiv = document.getElementById('cart-items-list');
-            const totalDiv = document.getElementById('cart-total');
-            const bar = document.getElementById('cart-bar');
-            let html = "";
-            let total = 0;
-
-            pizzaCart.forEach((p, idx) => {
-    // 1. Extras sortieren: Negative Preise nach vorne (z.B. -1.50 vor +2.00)
-    // WICHTIG: Funktioniert nur, wenn p.extras Objekte mit {name, price} sind!
-    const sortedExtras = [...p.extras].sort((a, b) => a.price - b.price);
-
-    // 2. Text zusammenbauen mit Logik für das Plus-Zeichen
-    const extraStrings = sortedExtras.map(e => {
-        if (e.price < 0) {
-            // Negativ (z.B. Kleine Pizza) -> Ohne Plus
-            return `<span style="color: #2ecc71;">${e.name}</span>`; 
-        } else {
-            // Positiv -> Mit Plus
-            return `<span style="color: #2ecc71;">+ ${e.name}</span>`; 
-        }
-    });
-
-    const extraHTML = extraStrings.length > 0 ? 
-        `<span class="extra-badge">${extraStrings.join(', ')}</span>` : '';
-
-    total += p.basePrice + p.extraPrice;
-
-   // Innerhalb der pizzaCart.forEach Schleife in updateUI:
-html += `
-<div class="cart-row">
-    <div class="cart-header">
-        <div style="flex-grow: 1;">
-            <strong>1x ${p.name}</strong>
-            <button class="btn-edit" onclick="openCombinedModal(${idx})">✎ ÄNDERN</button>
-        </div>
-        <button class="btn-del-square" onclick="removePizza(${idx})">✕</button>
-    </div>
-    ${extraHTML}
-    ${p.removals.length > 0 ? `<span class="remove-badge">OHNE: ${p.removals.join(', ')}</span>` : ''}
-</div>`;
-   
-   
-   
-});
-
-
-            Object.keys(standardCart).forEach(id => {
-                const qty = standardCart[id];
-                const price = parseFloat(items[id].price.replace(',', '.')) || 0;
-                total += qty * price;
-                html += `<div class="cart-row" style="border-left-color:#007bff; display:flex; justify-content:space-between; align-items:center;">
-                    <span><strong>${qty}x ${items[id].name}</strong></span>
-                    <div>
-                        <button onclick="changeStdQty(${id}, -1)" style="width:35px; height:35px; background:#444; color:white; border:none; border-radius:5px;">-</button>
-                        <button onclick="changeStdQty(${id}, 1)" style="width:35px; height:35px; background:#007bff; color:white; border:none; border-radius:5px; margin-left:8px;">+</button>
-                    </div>
-                </div>`;
-            });
-
-            bar.style.display = total > 0 ? 'block' : 'none';
-            listDiv.innerHTML = html;
-            //totalDiv.innerText = `Gesamtsumme: ${total.toFixed(2).replace('.', ',')} €`;
-        }
-
-        function removePizza(idx) { pizzaCart.splice(idx, 1); updateUI(); }
-        function changeStdQty(id, delta) { standardCart[id] += delta; if(standardCart[id]<=0) delete standardCart[id]; updateUI(); }
-
-        function openModal(idx, mode) {
-            currentPizzaIdx = idx;
-            const pizza = pizzaCart[idx];
-			const istKinderpizza = pizza.kategorie.toUpperCase().includes("KINDERPIZZA");
-            const modal = document.getElementById('modal');
-            const list = document.getElementById('modal-list');
-            modal.style.display = 'block';
-            list.innerHTML = "";
-
-            if (mode === 'remove') {
-                document.getElementById('modal-title').innerText = "Zutat abbestellen";
-                const ingredients = items[pizza.parentIdx].desc.split(',').map(s => s.trim());
-                ingredients.forEach(ing => {
-                    const isRemoved = pizza.removals.includes(ing);
-                    list.innerHTML += `<button onclick="toggleRemove('${ing}')" style="display:block; width:100%; padding:12px; margin:8px 0; background:${isRemoved ? '#ff8800' : '#444'}; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
-                        ${ing} ${isRemoved ? '✓ (entfernt)' : ''}
-                    </button>`;
-                });
-            } else {
-                document.getElementById('modal-title').innerText = "Extra hinzufügen";
-                let isExtra = false;
-                items.forEach(item => {
-                    if (item.type === 'header') isExtra = item.name.toUpperCase().includes("EXTRAS") || item.name.toUpperCase().includes("ZUTATEN");
-                    if (isExtra && item.type === 'product') {
-					
-					    // FILTER: Wenn Kinderpizza, dann keine negativen Preise anzeigen
-                        const pNum = parseFloat(item.price.replace(',', '.')) || 0;
-						
-						
-						// Logik für das Vorzeichen: Nur ein "+" wenn der Preis positiv ist
-						const vorzeichen = (pNum >= 0) ? "+" : "";
-						
-						if (istKinderpizza && pNum < 0) return; 
+				// FILTER: Wenn Kinderpizza, dann keine negativen Preise anzeigen
+				const pNum = parseFloat(item.price.replace(',', '.')) || 0;
 				
-                        list.innerHTML += `<button onclick="addExtra('${item.name}', '${item.price}')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#333; color:white; border:none; border-radius:8px; text-align:left; cursor:pointer; font-weight:bold;">
-                            ${item.name} (${vorzeichen}${item.price} €)
-                        </button>`;
-                    }
-                });
-            }
-        }
+				
+				// Logik für das Vorzeichen: Nur ein "+" wenn der Preis positiv ist
+				const vorzeichen = (pNum >= 0) ? "+" : "";
+				
+				if (istKinderpizza && pNum < 0) return; 
+		
+				list.innerHTML += `<button onclick="addExtra('${item.name}', '${item.price}')" style="display:block; width:100%; padding:12px; margin:8px 0; background:#333; color:white; border:none; border-radius:8px; text-align:left; cursor:pointer; font-weight:bold;">
+					${item.name} (${vorzeichen}${item.price} €)
+				</button>`;
+			}
+		});
+	}
+}
 		
 	
 let pizzaBackup = null; // Zwischenspeicher für "Abbrechen"
-
-function openCombinedModal10(idx) {
-    currentPizzaIdx = idx;
-    const pizza = pizzaCart[idx];
-    const pOriginal = items[pizza.parentIdx];
-    
-    // SICHERHEIT: Preis in Text umwandeln für den Check
-    const priceStr = String(pOriginal.price);
-    const hasVariants = priceStr.includes('/');
-    const isPizza = pizza.kategorie.toUpperCase().includes("PIZZA") || 
-                    pizza.kategorie.toUpperCase().includes("KINDERPIZZA");
-
-    const modal = document.getElementById('modal');
-    
-    if (hasVariants && !isPizza) {
-        // Es ist ein Cocktail/Getränk mit Größen -> Größen-Fenster öffnen
-        modal.style.display = 'block';
-        openVariantChangeModal(idx);
-    } else {
-        // Es ist eine Pizza -> Normales Zutaten-Fenster öffnen
-        // Backup für "Abbrechen" erstellen
-        pizzaBackup = JSON.parse(JSON.stringify(pizzaCart[idx])); 
-        modal.style.display = 'block';
-        renderModalContent();
-    }
-}
-
 
 function openVariantChangeModal(idx) {
     const p = pizzaCart[idx];
@@ -1437,33 +841,7 @@ function cancelModal() {
     closeModal();
 }
 
-function renderModalContent__() {
-    const list = document.getElementById('modal-list');
-    const pizza = pizzaCart[currentPizzaIdx];
-    const istKinder = pizza.kategorie.toUpperCase().includes("KINDERPIZZA");
-    list.innerHTML = "";
-
-    // ... (Deine Sektionen 1 bis 3 bleiben exakt gleich) ...
-
-    // Das Finale mit den zwei Buttons nebeneinander:
-    list.innerHTML += `
-        <div style="display:flex; gap:10px; margin-top:25px;">
-            <!-- SPEICHERN & FERTIG (Links, grün, groß) -->
-            <button onclick="closeModal()" 
-                style="flex:2; padding:15px; background:#00ca4e; color:white; border:none; border-radius:8px; font-weight:bold; font-size:1rem; cursor:pointer;">
-                SPEICHERN & FERTIG
-            </button>
-            
-            <!-- ABBRECHEN (Rechts, grau, schmaler) -->
-            <button onclick="cancelModal()" 
-                style="flex:1; padding:15px; background:#444; color:#ccc; border:none; border-radius:8px; font-weight:bold; font-size:0.9rem; cursor:pointer;">
-                ABBRECHEN
-            </button>
-        </div>`;
-}
-
 	
-		
 		
 	//let pizzaBackup = null; // Zwischenspeicher für "Abbrechen"
 
@@ -1613,42 +991,7 @@ function addExtra(name, priceStr) {
     closeModal();
 }
 
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
-async function sendOrder_() {
-	//alert("in sendOrder");
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTestMode = urlParams.get('test') === 'true';
-    const tisch = urlParams.get('tisch') || "Unbekannt";
-
-    if (isTestMode) {
-	    alert("🛠 Testmodus aktiv: Geolocation wird übersprungen.");
-        console.log("🛠 Testmodus aktiv: Geolocation wird übersprungen.");
-        // Wir übergeben im Testmodus 0,0 - die Distanz wird dann in executeOrder berechnet
-        await executeOrder(tisch, 0, 0); 
-        return;
-    }
-
-    const infoText = "📍 Zum Schutz vor Fehlbestellungen bitten wir Sie um eine kurze Standort-Bestätigung.\n\nVielen Dank für Ihre Mithilfe!";
-    
-    if (!confirm(infoText)) {
-        alert("Bestellung abgebrochen. Eine Standort-Verifizierung ist für die Sicherheit erforderlich.");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            await executeOrder(tisch, lat, lng);
-        },
-        async (error) => {
-            console.warn("Geolocation Fehler:", error.message);
-            alert("Standort konnte nicht ermittelt werden. Bitte prüfen Sie Ihre GPS-Einstellungen.");
-        },
-        { enableHighAccuracy: true, timeout: 8000 }
-    );
-}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
 
 let isGeolocation=false;
@@ -1681,7 +1024,6 @@ async function sendOrder() {
         { enableHighAccuracy: true, timeout: 8000 }
     );
 }
-
 
 async function executeOrder(tisch, lat, lng) {
 	//alert("in executeOrder");
@@ -1795,34 +1137,29 @@ async function executeOrder(tisch, lat, lng) {
         });
 
         if (res.ok) {
-            // 1. Arbeitsspeicher (Variablen) sofort leeren
+            // --- 1. SOFORT DAS FENSTER ZEIGEN ---
+            // Wir rufen das Fenster auf, BEVOR wir die großen Aufräumarbeiten machen
+            showCustomAlert();
+
+            // --- 2. AUFRÄUMEN IM HINTERGRUND ---
             pizzaCart = [];
             for (let id in standardCart) {
                 standardCart[id] = 0;
             }
 
-            // 2. Dauerspeicher (LocalStorage) komplett löschen
-            // Das verhindert, dass neue Fenster alte Daten laden!
             localStorage.removeItem('meinWarenkorb_Pizza');
             localStorage.removeItem('meinWarenkorb_Standard');
 
-            // 3. UI & Menü-Zähler aktualisieren
-            updateUI();
-            if (typeof renderMenu === "function") {
-                renderMenu(); 
-            }
+            // Hinweis: updateUI() und renderMenu() werden jetzt 
+            // automatisch nach 1.5s durch closeCustomAlert() aufgerufen.
+            // Das spart Rechenzeit im Moment des Klicks!
 
-            alert("Bestellung abgeschickt! 🍻"); 
-
-            // 4. Seite neu laden (Sorgt für einen absolut sauberen Status)
-            location.reload(); 
-            
         } else {
-            alert("Fehler beim Senden. Bitte Personal rufen!");
+            showErrorAlert("Fehler bei Übertragung");
         }
     } catch (err) {
-        console.error("Netzwerkfehler:", err);
-        alert("Server nicht erreichbar!");
+        console.error("Netzwerkfehler", err);
+        showErrorAlert("Netzwerkfehler");
     }
 }
 		
@@ -1948,43 +1285,6 @@ function getStandort() {
     );
 }
 
-function checkDevice__() {
-    // Einfacher Check auf mobile Endgeräte
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (!isMobile) {
-        // Zeige eine permanente Meldung über die Seite
-        document.body.innerHTML = `
-            <div style="text-align:center; padding:50px; font-family:sans-serif;">
-                <h1>📍 Mobilgerät erforderlich</h1>
-                <p>Aus Sicherheitsgründen sind Abhol-Bestellungen nur via Smartphone möglich.</p>
-                <p>Bitte scannen Sie den QR-Code vor Ort oder nutzen Sie Ihr Handy.</p>
-                <hr>
-                <p>Alternativ: <a href="mailto:deine@email.com">Bestellung per E-Mail anfragen</a></p>
-            </div>
-        `;
-        return false;
-    }
-    return true;
-}
-
-function checkDevice___() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTestMode = urlParams.get('test') === 'true';
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    // Wenn es kein Handy ist UND kein Testmodus aktiv ist -> Sperren
-    if (!isMobile && !isTestMode) {
-        document.body.innerHTML = `
-            <div style="text-align:center; padding:50px; font-family:sans-serif;">
-                <h1>📍 Mobilgerät erforderlich</h1>
-                <p>Bitte scannen Sie den QR-Code mit Ihrem Smartphone.</p>
-            </div>`;
-        return false;
-    }
-    return true;
-}
-
 
 function checkDevice() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -2099,6 +1399,74 @@ window.onload = async function() {
     }
 };
 
+
+// Diese Funktionen irgendwo in dein <script> Bereich kopieren:
+function showCustomAlert() {
+    const el = document.getElementById('customAlert');
+    const content = el.querySelector('div');
+    
+    // 1. Fenster anzeigen
+    el.style.display = 'flex';
+    
+    // 2. Sanft einblenden
+    //setTimeout(() => {
+        el.style.opacity = '1';
+        if(content) content.style.transform = 'scale(1)';
+    //}, 50);
+
+    // 3. NACH 3 SEKUNDEN AUTOMATISCH SCHLIESSEN
+    setTimeout(() => {
+        closeCustomAlert();
+    }, 1500); // 3000ms = 3 Sekunden Sichtbarkeit
+}
+
+function closeCustomAlert() {
+    const el = document.getElementById('customAlert');
+    el.style.opacity = '0'; // Sanft ausfaden
+    
+    setTimeout(() => {
+        el.style.display = 'none';
+
+        // 4. Erst jetzt UI aufräumen
+        if (typeof updateUI === "function") updateUI();
+        if (typeof renderMenu === "function") renderMenu();
+
+        // Optional: Nach oben scrollen
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+    }, 500); // Wartet auf das Ende der Ausblend-Animation
+}
+
+
+// Zeigt das Fehlerfenster mit variablem Text
+function showErrorAlert(nachricht) {
+    const el = document.getElementById('errorAlert');
+    const p = el.querySelector('p');
+    
+    // Falls ein Text übergeben wurde, setze ihn ein
+    if (nachricht) {
+        p.innerText = nachricht;
+    } else {
+        p.innerText = "Die Bestellung konnte nicht gesendet werden.";
+    }
+
+    el.style.display = 'flex';
+    //setTimeout(() => {
+        el.style.opacity = '1';
+        el.querySelector('div').style.transform = 'scale(1)';
+    //}, 50);
+}
+
+// Schließt das Fehlerfenster SICHER
+function closeErrorAlert() {
+    const el = document.getElementById('errorAlert');
+    el.style.opacity = '0';
+    
+    setTimeout(() => {
+        el.style.display = 'none';
+        // WICHTIG: Hier kein updateUI(), damit der Warenkorb voll bleibt!
+    }, 500);
+}
 
 /*
 		Ein weiterer Check: "Event Bubbling"
