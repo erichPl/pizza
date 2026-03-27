@@ -240,11 +240,20 @@ mongoose.connect(mongoURI)
     .catch(err => console.error("MongoDB Fehler:", err));
 
 */
-
+/*
 const menuSchema = new mongoose.Schema({
     type: { type: String, default: "order_menu" },
     items: Array
 });
+*/
+const menuSchema = new mongoose.Schema({
+    type: { type: String, default: "order_menu" },
+    items: Array,
+    // FÜGE DIESES FELD HINZU:
+    isGeolocation: { type: Boolean, default: false }
+}, { strict: false }); // 'strict: false' erlaubt zusätzliche Felder
+
+
 const OrderMenu = mongoose.model('OrderMenu', menuSchema);
 
 const orderSchema = new mongoose.Schema({
@@ -268,24 +277,68 @@ const orderSchema = new mongoose.Schema({
 const Order = mongoose.model('Order', orderSchema);
 
 
-app.get('/bestelle', (req, res) => {
+
+app.get('/gast', (req, res) => {
     res.sendFile(path.join(__dirname, 'public','bestelle1','bestelle.html'));
 });
 
-app.get('/orders', (req, res) => {
-    if (req.query.pw !== 'schaukel12') return res.status(403).send("Zugriff verweigert");
+app.get('/bar', (req, res) => {
+    //if (req.query.pw !== 'schaukell2') return res.status(403).send("Zugriff verweigert");
 	res.sendFile(path.join(__dirname, 'public','bestelle1','orders.html'));
 });
 app.get('/statistik', (req, res) => {
-    if (req.query.pw !== 'schaukel23!') return res.status(403).send("Zugriff verweigert");
+    //if (req.query.pw !== 'schaukel23!') return res.status(403).send("Zugriff verweigert");
 	res.sendFile(path.join(__dirname, 'public','bestelle1','statistik.html'));
 });
 
 
-app.get('/adminBest', (req, res) => {
-    if (req.query.pw !== 'leon2208') return res.status(403).send("Zugriff verweigert");
+app.get('/menue', (req, res) => {
+    //if (req.query.pw !== 'leon2208') return res.status(403).send("Zugriff verweigert");
     res.sendFile(path.join(__dirname, 'public','bestelle1','adminNode.html'));
 });
+
+app.get('/qr', (req, res) => {
+    //if (req.query.pw !== 'leon2208') return res.status(403).send("Zugriff verweigert");
+    res.sendFile(path.join(__dirname, 'public','bestelle1','qrCode.html'));
+});
+
+
+
+// Modell-Erweiterung oder Nutzung des bestehenden Schemas (für isGeolocation)
+// Wir nutzen einen festen Typ "settings", um das Dokument wiederzufinden
+
+app.get('/api/get-settings', async (req, res) => {
+    try {
+        let settings = await OrderMenu.findOne({ type: "settings" });
+        // Falls noch kein Dokument existiert, liefern wir Standardwerte
+        if (!settings) {
+            settings = { isGeolocation: false };
+        }
+        res.json(settings);
+    } catch (err) {
+        res.status(500).send("Fehler beim Laden der Einstellungen");
+    }
+});
+
+app.post('/api/save-settings', async (req, res) => {
+    try {
+        const { isGeolocation } = req.body;
+        await OrderMenu.findOneAndUpdate(
+            { type: "settings" },
+            { isGeolocation: isGeolocation },
+            { upsert: true, new: true }
+        );
+        res.json({ status: "ok", isGeolocation });
+    } catch (err) {
+        res.status(500).send("Fehler beim Speichern");
+    }
+});
+
+
+
+
+
+
 
 app.get('/api/order-menu', async (req, res) => {
     try {
