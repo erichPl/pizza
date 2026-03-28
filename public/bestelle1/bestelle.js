@@ -1165,12 +1165,23 @@ function cancelModal() {
 
 function renderModalContent() {
     const list = document.getElementById('modal-list');
-    // Wir holen uns die Pizza, die gerade im Fokus steht (über den Index)
     const pizza = pizzaCart[currentPizzaIdx]; 
-    if (!pizza) return; // Sicherheitssperre
+    if (!pizza) return;
 
     const pOriginal = items[pizza.parentIdx];
-    const istKinder = pizza.kategorie.toUpperCase().includes("KINDERPIZZA");
+
+    // --- NEUE LOGIK: ÜBERSCHRIFT FINDEN ---
+    let aktuelleKategorie = "";
+    // Wir gehen in der Original-Liste vom Produkt aus nach oben
+    for (let i = pizza.parentIdx; i >= 0; i--) {
+        if (items[i].type === 'header') {
+            aktuelleKategorie = items[i].name.toUpperCase();
+            break; // Erste Überschrift gefunden -> Stopp
+        }
+    }
+
+    // Jetzt prüfen wir, ob in der Überschrift "KINDER" vorkommt
+    const istKinder = aktuelleKategorie.includes("KINDER");
     
     const lang = i18n[currentLang] || i18n.de;
     const isIT = (currentLang === 'it');
@@ -1217,25 +1228,35 @@ function renderModalContent() {
     }
 
     // 3. SEKTION: EXTRAS (Hinzufügen)
-    const titelExtra = isIT ? "COSA AGGIUNGERE? (EXTRA)" : "WAS SOLL DAZU? (EXTRAS)";
-    html += `<div class="modal-section-title">${titelExtra}</div>`;
-    
-    let isExtraArea = false;
-    items.forEach(item => {
-        if (item.type === 'header') isExtraArea = item.name.toUpperCase().includes("EXTRAS");
-        if (isExtraArea && item.type === 'product') {
-            const pNum = parseFloat(String(item.price).replace(',', '.')) || 0;
-            if (pNum >= 0) {
-                const isActive = pizza.extras.some(ex => ex.name === item.name);
-                const displayName = (isIT && item.name_it) ? item.name_it : item.name;
-                html += `
-                    <button class="modal-btn ${isActive ? 'active-add' : ''}" 
-                            onclick="toggleExtra('${item.name}', '${item.price}')">
-                        ${displayName} ${isActive ? ' ✓' : ' +'}
-                    </button>`;
-            }
-        }
-    });
+	const titelExtra = isIT ? "COSA AGGIUNGERE? (EXTRA)" : "WAS SOLL DAZU? (EXTRAS)";
+	html += `<div class="modal-section-title">${titelExtra}</div>`;
+
+	let isExtraArea = false;
+	items.forEach(item => {
+		if (item.type === 'header') isExtraArea = item.name.toUpperCase().includes("EXTRAS");
+		if (isExtraArea && item.type === 'product') {
+			
+			// --- NEU: FILTER FÜR KINDERPIZZA ---
+			// Wir prüfen, ob im Namen das Wort "Pizza" vorkommt (z.B. "Extra große Pizza" oder "Extra kleine Pizza")
+			// Diese Optionen wollen wir bei einer Kinderpizza nicht anzeigen.
+			const isSizeOption = item.name.toLowerCase().includes("pizza");
+			if (istKinder && isSizeOption) {
+				return; // Überspringe diesen Button bei Kinderpizzen
+			}
+			// -----------------------------------
+
+			const pNum = parseFloat(String(item.price).replace(',', '.')) || 0;
+			if (pNum >= 0) {
+				const isActive = pizza.extras.some(ex => ex.name === item.name);
+				const displayName = (isIT && item.name_it) ? item.name_it : item.name;
+				html += `
+					<button class="modal-btn ${isActive ? 'active-add' : ''}" 
+							onclick="toggleExtra('${item.name}', '${item.price}')">
+						${displayName} ${isActive ? ' ✓' : ' +'}
+					</button>`;
+			}
+		}
+	});
 
     // --- ENTSCHEIDENDER SCHRITT ---
     // Das gesamte gesammelte HTML in die Liste schreiben!
