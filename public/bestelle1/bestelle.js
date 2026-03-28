@@ -1,5 +1,9 @@
   const urlParams = new URLSearchParams(window.location.search);
     const isTestMode = urlParams.get('test') === 'true';
+	
+	const namePizza="PIZZ";
+	
+	
 	let items = [];
         let standardCart = {}; 
         let pizzaCart = [];    
@@ -78,7 +82,7 @@ function setLanguage(lang) {
 	document.getElementById('lang-it').style.opacity = (lang === 'it' ? '1' : '0.4');
 
 	// 3. Die Buttons im Modal-Footer übersetzen (über ihre IDs)
-	const btnSave = document.getElementById('btn-save');
+	const btnSave = document.getElementById('btn-modal-done');
 	const btnCancel = document.getElementById('btn-cancel');
 	
 	if (btnSave) btnSave.innerText = txt.fertig;
@@ -97,7 +101,7 @@ function setLanguage(lang) {
 }
 
 function getCountForProduct(index, category) {
-	if (category.includes("PIZZA")) {
+	if (category.includes(namePizza)) {
 		// Zähle alle Einträge in pizzaCart, die von diesem Produkt stammen
 		return pizzaCart.filter(p => p.parentIdx === index).length;
 	} else {
@@ -253,33 +257,28 @@ function changeQty(index, delta) {
 
 function addItem(index, category) {
     const item = items[index];
-    const cat = category.toUpperCase();
-    const isPizza = cat.includes("PIZZA") || cat.includes("KINDERPIZZA");
-    
+    const itemName = item.name;
     const priceStr = String(item.price);
+
+    // Prüfung auf Auswahl
+    const hasSorts = itemName.includes(',');
     const hasVariants = priceStr.includes('/');
 
-    // 1. FALL: Es gibt Varianten (z.B. Klein / Groß oder Cocktail-Größen)
-    if (hasVariants) {
-        // Wir öffnen IMMER das Modal und beenden die Funktion hier mit return!
-        openVariantModal(index, category);
-        return; 
+    // A. FALL: Spezial-Getränk (Sorten/Größen) -> Muss in den pizzaCart
+    if (hasSorts || hasVariants) {
+        openSelectionModal(index, category, -1); 
+        return;
     }
 
-    // 2. FALL: Es ist eine normale Pizza ohne Varianten (direkt in den Korb)
-    if (isPizza) {
+    // B. FALL: Pizza -> In den pizzaCart
+    if (category.toUpperCase().includes(namePizza)) {
         pizzaCart.push({
-            parentIdx: index,
-            name: item.name,
-            size: "", // Keine Variante gewählt
+            parentIdx: index, name: itemName, size: "", 
             basePrice: parseFloat(priceStr.replace(',', '.')) || 0,
-            extras: [], 
-            removals: [], 
-            extraPrice: 0, 
-            kategorie: category
+            extras: [], removals: [], extraPrice: 0, kategorie: category
         });
     } 
-    // 3. FALL: Es ist ein Standard-Getränk (z.B. Cola ohne Varianten)
+    // C. FALL: Normales Getränk (Cola etc.) -> In den standardCart
     else {
         standardCart[index] = (standardCart[index] || 0) + 1;
     }
@@ -290,7 +289,8 @@ function addItem(index, category) {
 
 function removeItem(index, category) {
     const cat = category.toUpperCase();
-    if (cat.includes("PIZZA") || cat.includes("KINDERPIZZA")) {
+    //if (cat.includes("PIZZA") || cat.includes("KINDERPIZZA")|| cat.includes("PIZZE")) {
+    if (cat.includes(namePizza)) {
         // Alle Pizzen finden, die zu diesem Index gehören
         const passendePizzen = pizzaCart.filter(p => p.parentIdx === index);
 
@@ -327,13 +327,13 @@ function removeItem(index, category) {
     }
 }
 
+
 function openCombinedModal(idx) {
-    currentPizzaIdx = idx; // Wichtig für die Referenz
+    currentPizzaIdx = idx; 
     const p = pizzaCart[idx];
     const pOriginal = items[p.parentIdx];
-    const lang = i18n[currentLang] || i18n.de;
-
-    // 1. IDENTISCHE PRODUKTE ZÄHLEN (für den Hinweis)
+    
+    // 1. IDENTISCHE PRODUKTE ZÄHLEN (Für den gelben Hinweis-Kasten)
     const extrasKey = p.extras.map(e => e.name).sort().join(",");
     const removalsKey = p.removals.sort().join(",");
     const identische = pizzaCart.filter(item => 
@@ -343,45 +343,104 @@ function openCombinedModal(idx) {
         item.removals.sort().join(",") === removalsKey
     ).length;
 
-    // 2. HINWEIS-HTML GENERIEREN
     let hinweisHtml = "";
     if (identische > 1) {
         const text = currentLang === 'it' 
             ? `Stai modificando <strong>uno</strong> di ${identische} prodotti identici.` 
             : `Du änderst gerade <strong>eines</strong> von ${identische} identischen Produkten.`;
-            
-        hinweisHtml = `
-            <div id="edit-notice" style="background: #332b00; color: #ffcc00; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; border: 1px solid #554400; text-align: center;">
-                ℹ️ ${text}
-            </div>`;
+        hinweisHtml = `<div id="edit-notice" style="background: #332b00; color: #ffcc00; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; border: 1px solid #554400; text-align: center;">ℹ️ ${text}</div>`;
     }
 
-    // 3. ENTSCHEIDUNG: WELCHES MODAL ÖFFNEN?
+    // 2. ENTSCHEIDUNGS-LOGIK (Die "Weiche")
     const priceStr = String(pOriginal.price);
-    const hasVariants = priceStr.includes('/');
-    const isPizza = p.kategorie.toUpperCase().includes("PIZZA") || 
-                    p.kategorie.toUpperCase().includes("KINDERPIZZA");
+    const hasVariants = priceStr.includes('/'); // Getränk mit Größen?
+    const hasSorts = pOriginal.name.includes(',') || pOriginal.name.includes('/'); // Getränk mit Sorten?
+    
+    // Prüfen ob es eine Pizza ist (Groß-/Kleinschreibung ignorieren)
+    const isPizza = p.kategorie.toUpperCase().includes(namePizza);
 
     const modal = document.getElementById('modal');
     modal.style.display = 'block';
 
-    if (hasVariants && !isPizza) {
-        // Fall A: Cocktail/Getränk mit Größen (0.2l / 0.4l)
-        openVariantChangeModal(idx);
+    // FALL A: Getränk / Produkt mit Auswahl (Sorte oder Größe)
+    // Bedingung: Hat Varianten/Sorten UND ist KEINE Pizza
+    if ((hasVariants || hasSorts) && !isPizza) {
         
-        // Hinweis nachträglich oben einfügen, falls vorhanden
+        // Erst das Auswahl-Fenster für Getränke bauen
+        openSelectionModal(p.parentIdx, p.kategorie, idx);
+        
+        // Den gelben Hinweis oben einfügen, falls nötig
+        if (hinweisHtml) {
+            const list = document.getElementById('modal-list');
+            list.insertAdjacentHTML('afterbegin', hinweisHtml);
+        }
+    } 
+    // FALL B: Pizza oder normales Gericht (Extras & Ohne Liste)
+    else {
+        // Backup erstellen für Abbruch-Funktion
+        pizzaBackup = JSON.parse(JSON.stringify(pizzaCart[idx])); 
+        
+        // Das Pizza-Fenster (Extras/Ohne) bauen
+        renderModalContent();
+
+        // Den gelben Hinweis oben einfügen, falls nötig
+        if (hinweisHtml) {
+            const list = document.getElementById('modal-list');
+            list.insertAdjacentHTML('afterbegin', hinweisHtml);
+        }
+    }
+}
+
+function openCombinedModal0(idx) {
+    currentPizzaIdx = idx; 
+    const p = pizzaCart[idx];
+    const pOriginal = items[p.parentIdx];
+    const lang = i18n[currentLang] || i18n.de;
+
+    // 1. IDENTISCHE PRODUKTE ZÄHLEN (Dein Code bleibt gleich)
+    const extrasKey = p.extras.map(e => e.name).sort().join(",");
+    const removalsKey = p.removals.sort().join(",");
+    const identische = pizzaCart.filter(item => 
+        item.parentIdx === p.parentIdx && 
+        (item.size || "") === (p.size || "") && 
+        item.extras.map(e => e.name).sort().join(",") === extrasKey &&
+        item.removals.sort().join(",") === removalsKey
+    ).length;
+
+    let hinweisHtml = "";
+    if (identische > 1) {
+        const text = currentLang === 'it' 
+            ? `Stai modificando <strong>uno</strong> di ${identische} prodotti identici.` 
+            : `Du änderst gerade <strong>eines</strong> von ${identische} identischen Produkten.`;
+        hinweisHtml = `<div id="edit-notice" style="background: #332b00; color: #ffcc00; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; border: 1px solid #554400; text-align: center;">ℹ️ ${text}</div>`;
+    }
+
+    // 2. ENTSCHEIDUNG LOGIK VERBESSERN
+    const priceStr = String(pOriginal.price);
+    const hasVariants = priceStr.includes('/'); // Hat Größen (0.2/0.4)
+    const hasSorts = pOriginal.name.includes(',') || pOriginal.name.includes('/'); // NEU: Hat Sorten (Cola, Fanta)
+    
+    const isPizza = p.kategorie.toUpperCase().includes(namePizza)
+                    
+
+    const modal = document.getElementById('modal');
+    modal.style.display = 'block';
+
+    // Wenn es Sorten ODER Größen hat (und keine Pizza ist), öffne das Auswahl-Modal
+    if ((hasVariants || hasSorts) && !isPizza) {
+        // Wir nutzen hier openSelectionModal, da diese Funktion 
+        // bereits die Logik für Sorten-Buttons und Größen-Buttons enthält
+        openSelectionModal(p.parentIdx, p.kategorie, idx);
+        
         if (hinweisHtml) {
             const list = document.getElementById('modal-list');
             list.insertAdjacentHTML('afterbegin', hinweisHtml);
         }
     } else {
-        // Fall B: Pizza oder Produkt mit Zutaten-Checkliste
+        // Fall B: Pizza oder normales Gericht
         pizzaBackup = JSON.parse(JSON.stringify(pizzaCart[idx])); 
-        
-        // Den Inhalt zeichnen
         renderModalContent();
 
-        // Hinweis oben einfügen
         if (hinweisHtml) {
             const list = document.getElementById('modal-list');
             list.insertAdjacentHTML('afterbegin', hinweisHtml);
@@ -422,7 +481,7 @@ function closeCorrection() {
 
 //let wurdeGeladen = false; // Diese Variable überlebt den Funktionsaufruf
 
-function updateUI() {
+function updateUI21() {
 	//loadCart();
 	
 	/*
@@ -480,6 +539,7 @@ function updateUI() {
             gruppen[groupKey].qty += 1;
         }
     });
+	
 
     // --- 2. GETRÄNKE VERARBEITEN ---
     let drinkHtml = "";
@@ -559,6 +619,130 @@ function updateUI() {
     if (typeof renderMenu === "function") renderMenu();
 	saveCart();
 	
+}
+
+function updateUI() {
+    const listDiv = document.getElementById('cart-items-list');
+    const bar = document.getElementById('cart-bar');
+    const lang = i18n[currentLang] || i18n.de;
+
+    if (!listDiv || !bar) return;
+
+    let total = 0;
+    let absoluteProduktAnzahl = 0;
+    let gruppen = {}; 
+    let vorschauGruppen = {}; 
+
+    // --- 1. DATEN VERARBEITEN (PIZZEN & SPEZIAL-GETRÄNKE) ---
+    pizzaCart.forEach((p, originalIdx) => {
+        total += p.basePrice + p.extraPrice;
+        absoluteProduktAnzahl++;
+
+        const pOriginal = items[p.parentIdx];
+        const isDrink = !p.kategorie.toUpperCase().includes(namePizza);
+        
+        // Name für die Anzeige (Entweder gewählte Sorte oder Originalname)
+        const displayName = p.name || ((currentLang === 'it' && pOriginal.name_it) ? pOriginal.name_it : pOriginal.name);
+
+        // Für Quick-Summary
+        vorschauGruppen[displayName] = (vorschauGruppen[displayName] || 0) + 1;
+
+        // Gruppierungsschlüssel (isDrink einbezogen, damit Getränke nicht mit Pizzen verschmelzen)
+        const extrasKey = p.extras.map(e => e.name).sort().join(",");
+        const removalsKey = p.removals.sort().join(",");
+        const groupKey = `${p.parentIdx}|${p.size || ''}|${extrasKey}|${removalsKey}|${displayName}`;
+
+        if (!gruppen[groupKey]) {
+            gruppen[groupKey] = {
+                name: displayName,
+                qty: 1,
+                size: p.size,
+                parentIdx: p.parentIdx,
+                extras: p.extras,
+                removals: p.removals,
+                sampleIdx: originalIdx,
+                isSpecialDrink: isDrink // Flag für das Design
+            };
+        } else {
+            gruppen[groupKey].qty += 1;
+        }
+    });
+
+    // --- 2. STANDARD-GETRÄNKE VERARBEITEN (Bleibt gleich) ---
+    let drinkHtml = "";
+    Object.keys(standardCart).forEach(id => {
+        const qty = standardCart[id];
+        if (qty <= 0) return;
+        const pOriginal = items[id];
+        const drinkName = (currentLang === 'it' && pOriginal.name_it) ? pOriginal.name_it : pOriginal.name;
+        const price = parseFloat(String(pOriginal.price).replace(',', '.')) || 0;
+        total += qty * price;
+        absoluteProduktAnzahl += qty;
+        vorschauGruppen[drinkName] = (vorschauGruppen[drinkName] || 0) + qty;
+
+        drinkHtml += `
+        <div class="cart-row" style="border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; margin-bottom: 8px; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
+            <span><strong>${qty}x ${drinkName}</strong></span>
+            <div style="display: flex; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
+                <button onclick="changeStdQty(${id}, -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px; font-weight:bold;">–</button>
+                <button onclick="changeStdQty(${id}, 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px; font-weight:bold;">+</button>
+            </div>
+        </div>`;
+    });
+
+    // --- 3. PIZZA & SPEZIAL-DRINK HTML GENERIEREN ---
+    let pizzaDetailHtml = "";
+    Object.values(gruppen).forEach(g => {
+        if (g.isSpecialDrink) {
+            // DESIGN FÜR SPEZIAL-GETRÄNKE (Blauer Rand, kein Zutaten-Text)
+            pizzaDetailHtml += `
+            <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="flex-grow:1;">
+                    <strong style="color:white;">${g.qty}x ${g.name}</strong> 
+                    <span style="color:#aaa; font-size:0.85rem;">${g.size ? g.size : ''}</span>
+                    <br>
+                    <button onclick="openCombinedModal(${g.sampleIdx})" style="margin-top:5px; padding: 2px 8px; background:#444; color:#ffcc00; border:none; border-radius:4px; font-size:0.7rem; cursor:pointer;">✎ ${lang.aendern}</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
+                    <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px;">–</button>
+                    <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px;">+</button>
+                </div>
+            </div>`;
+        } else {
+            // DESIGN FÜR PIZZEN (Gelber Rand, mit Zutaten)
+            const extraStrings = g.extras.map(e => `<span style="color: #2ecc71;">+ ${e.name}</span>`);
+            pizzaDetailHtml += `
+            <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #ffcc00; padding: 10px; background: #2a2a2a; border-radius: 8px;">
+                <div style="display:flex; justify-content:space-between; align-items: center;">
+                    <div style="flex-grow:1;">
+                        <strong>${g.qty}x ${g.name} ${g.size ? '('+g.size+')' : ''}</strong>
+                        <div style="font-size: 0.82rem; margin-top: 4px;">
+                            ${extraStrings.join(', ')}
+                            ${g.removals.length > 0 ? `<div style="color:#ff4444;">${lang.ohne}: ${g.removals.join(', ')}</div>` : ''}
+                        </div>
+                        <button onclick="openCombinedModal(${g.sampleIdx})" style="margin-top:8px; padding: 4px 12px; background:#444; color:white; border:none; border-radius:4px; font-size:0.75rem;">✎ ${lang.aendern}</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
+                        <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px;">–</button>
+                        <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px;">+</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+    });
+
+    // --- 4. ZUSAMMENFASSUNG & FINALE ANZEIGE ---
+    let summaryHtml = "";
+    if (absoluteProduktAnzahl > 0) {
+        const vorschauTexte = Object.entries(vorschauGruppen).map(([name, qty]) => `${qty}x ${name}`);
+        summaryHtml = `<div id="quick-summary" style="position: sticky; top: 0; background: #1a1a1a; border-bottom: 4px solid #ffcc00; padding: 10px; z-index: 1000; color: #ffcc00; font-size: 0.85rem;"><strong>(${absoluteProduktAnzahl})</strong> ${vorschauTexte.join(", ")}</div>`;
+    }
+
+    bar.style.display = absoluteProduktAnzahl > 0 ? 'block' : 'none';
+    listDiv.innerHTML = summaryHtml + pizzaDetailHtml + drinkHtml;
+
+    if (typeof renderMenu === "function") renderMenu();
+    saveCart();
 }
 
 function saveCart() {
@@ -664,71 +848,205 @@ function changePizzaQty(idx, change) {
 }
 
 
-function openSelectionModal(parentIndex) {
-    const lang = i18n[currentLang] || i18n.de;
-    const item = items[parentIndex];
-    const itemName = (currentLang === 'it' && item.name_it) ? item.name_it : item.name;
+function openSelectionModal(itemIndex, category, cartIdx = -1) {
+    const item = items[itemIndex];
+    const modal = document.getElementById('modal');
+    const list = document.getElementById('modal-list');
+    
+    document.getElementById('modal-title').innerText = "Auswahl treffen";
+    list.innerHTML = "";
 
-    // 1. Zähle, wie viele Exemplare dieses Produkts im Warenkorb sind
-    // Wir filtern den pizzaCart und merken uns die echten Indizes
-    const passendeProdukte = [];
-    pizzaCart.forEach((p, idx) => {
-        if (p.parentIdx === parentIndex) {
-            passendeProdukte.push(idx);
+    const isEditing = cartIdx > -1;
+    const currentItemInCart = isEditing ? pizzaCart[cartIdx] : null;
+
+    window.currentChoice = {
+        sorte: isEditing ? currentItemInCart.name : "",
+        preis: isEditing ? currentItemInCart.basePrice : 0,
+        label: isEditing ? currentItemInCart.size : ""
+    };
+
+    let html = "";
+
+// TEIL A: SORTEN
+    if (item.name.includes(',') || item.name.includes('/')) {
+        html += `<p style="color:#ffcc00; margin-bottom:10px;">Sorte wählen:</p>`;
+        
+        let sorten = [];
+        
+        // Spezial-Logik für "Name mit/ohne"
+        if (item.name.includes('/') && !item.name.includes(',')) {
+            const parts = item.name.split('/');
+            const firstPart = parts[0].trim(); // z.B. "Wasser mit"
+            const secondPart = parts[1].trim(); // z.B. "ohne"
+            
+            // Wir nehmen das erste Wort vom ersten Teil als Basis (z.B. "Wasser")
+            const baseName = firstPart.split(' ')[0]; 
+            
+            // Falls der zweite Teil nur ein Wort ist (wie "ohne"), hängen wir den Basisnamen davor
+            if (!secondPart.includes(' ')) {
+                sorten = [firstPart, `${baseName} ${secondPart}`];
+            } else {
+                sorten = parts.map(s => s.trim());
+            }
+        } else {
+            // Standard-Verhalten für Komma-Listen
+            sorten = item.name.split(/[,/]/).map(s => s.trim());
         }
-    });
 
-    // --- NEU: LOGIK ZUM ÜBERSPRÜNGEN ---
-    if (passendeProdukte.length === 0) return; // Nichts im Warenkorb
-
-    if (passendeProdukte.length === 1) {
-        console.log("Nur ein Produkt gefunden, springe direkt zum CombinedModal...");
-        // Öffne direkt das Bearbeitungsfenster für dieses eine Produkt
-        openCombinedModal(passendeProdukte[0]); 
-        return; // Beende hier, damit das Auswahl-Modal nicht erscheint
+        html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:15px;">`;
+        sorten.forEach((s, i) => {
+            // WICHTIG: .trim() beim Vergleich, um Leerzeichen-Fehler zu vermeiden
+            const active = s.trim() === window.currentChoice.sorte.trim() ? 'background:#ffcc00; color:black;' : 'background:#333; color:white;';
+            html += `<button class="sorte-btn" id="sorte-${i}" onclick="selectSorte(${i}, '${s}')" 
+                     style="padding:12px; border:1px solid #555; border-radius:8px; cursor:pointer; ${active}">
+                     ${s}
+                     </button>`;
+        });
+        html += `</div>`;
     }
-    // -----------------------------------
 
-    // Ab hier dein bisheriger Code für das Modal (wenn es mehr als 1 gibt)
-    let modalHtml = `
-        <div id="selection-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:flex; align-items:center; justify-content:center;">
-            <div style="background:#1a1a1a; width:90%; max-width:450px; padding:20px; border-radius:12px; border:2px solid #ffcc00;">
-                <h3 style="color:#ffcc00; text-align:center;">${itemName}</h3>
-                <p style="text-align:center; color:#888;">${lang.korrekturFrage}</p>
-                <div style="max-height:50vh; overflow-y:auto; padding-right:5px;">
-    `;
+    // TEIL B: GRÖSSEN
+    const priceStr = String(item.price);
+    if (priceStr.includes('/')) {
+        html += `<p style="color:#ffcc00; margin:10px 0;">Größe wählen:</p>`;
+        const preise = priceStr.split('/');
+        const labels = (item.desc && item.desc.includes('/')) ? item.desc.split('/') : ["0,2l", "0,4l"];
+        
+        html += `<div style="display:flex; gap:10px; margin-bottom:20px;">`;
+        preise.forEach((p, i) => {
+            const pNum = parseFloat(p.trim().replace(',', '.')) || 0;
+            const lText = labels[i].trim();
+            const active = pNum === window.currentChoice.preis ? 'background:#007bff; border-color:#ffcc00;' : 'background:#444; border-color:transparent;';
+            html += `<button class="size-btn" id="size-${i}" onclick="selectSize(${i}, ${pNum}, '${lText}')" style="flex:1; padding:15px 5px; color:white; border:2px solid; border-radius:8px; font-weight:bold; cursor:pointer; ${active}">${lText}<br>${p.trim()} €</button>`;
+        });
+        html += `</div>`;
+    }
 
-    pizzaCart.forEach((p, idx) => {
-        if (p.parentIdx === parentIndex) {
-            const extras = p.extras.map(e => e.name).join(", ");
-            const removals = p.removals.join(", ");
+/*
+    // TEIL C: BESTÄTIGEN (Wieder zurück im HTML-String)
+    const btnText = isEditing ? "Änderung speichern" : "Hinzufügen ✓";
+    html += `<button id="btnConfirmSelection" onclick="confirmSelection(${itemIndex}, '${category}', ${cartIdx})" style="width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:10px; font-weight:bold; font-size:1.1rem; cursor:pointer; margin-top:20px;">${btnText}</button>`;
+*/
+    list.innerHTML = html;
+    modal.style.display = 'block';
+    
+    /*
+	// WICHTIG: Den Footer-Button (unten) verstecken wir hier, damit er nicht verwirrt
+    const footerBtn = document.getElementById('btn-modal-done');
+    if (footerBtn) {
+        footerBtn.style.display = "none"; 
+    }*/
+	
+	const footerBtn = document.getElementById('btn-modal-done');
 
-            modalHtml += `
-                <div style="background:#2a2a2a; padding:12px; margin-bottom:8px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-size:0.9rem; color:white;">
-                        <strong>1x ${itemName} ${p.size ? '('+p.size+')' : ''}</strong>
-                        <div style="font-size:0.75rem; color:#aaa;">
-                            ${extras ? '+ ' + extras : ''} ${removals ? '| ' + lang.ohne + ' ' + removals : ''}
-                        </div>
-                    </div>
-                    <button onclick="closeSelection(); openCombinedModal(${idx})" 
-                            style="background:#007bff; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">
-                        ${lang.aendern}
-                    </button>
-                </div>
-            `;
-        }
-    });
+	if (footerBtn) {
+		// Weg A: Eine bestehende Funktion zuweisen
+		//footerBtn.onclick = closeModal; 
 
-    modalHtml += `
-                </div>
-                <button onclick="closeSelection()" style="width:100%; margin-top:15px; padding:12px; background:#444; color:white; border:none; border-radius:8px; cursor:pointer;">${lang.schliessen}</button>
-            </div>
-        </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+		// Weg B: Eine Funktion mit Parametern zuweisen (Wichtig für Getränke!)
+		footerBtn.onclick = function() {
+			confirmSelection(itemIndex, category, cartIdx);
+		};
+	}
+	
 }
+
+
+// DIESE FUNKTIONEN HABEN GEFEHLT:
+
+function selectSorte(idx, name) {
+    // 1. Daten für confirmSelection vorbereiten
+    if (!window.currentChoice) window.currentChoice = {};
+    window.currentChoice.sorte = name;
+
+    // 2. Optik: Buttons umschalten
+    document.querySelectorAll('.sorte-btn').forEach(btn => {
+        btn.style.background = "#333";
+        btn.style.color = "white";
+    });
+    const sel = document.getElementById(`sorte-${idx}`);
+    if (sel) {
+        sel.style.background = "#ffcc00";
+        sel.style.color = "black";
+    }
+}
+
+function selectSize(idx, price, label) {
+    // 1. Daten für confirmSelection vorbereiten
+    if (!window.currentChoice) window.currentChoice = {};
+    window.currentChoice.preis = price;
+    window.currentChoice.label = label;
+
+    // 2. Optik: Buttons umschalten
+    document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.style.background = "#444";
+        btn.style.borderColor = "transparent";
+    });
+    const sel = document.getElementById(`size-${idx}`);
+    if (sel) {
+        sel.style.background = "#007bff";
+        sel.style.borderColor = "#ffcc00";
+    }
+}
+
+
+function confirmSelection(itemIndex, category, cartIdx) {
+    const item = items[itemIndex];
+    if (!item) return;
+
+    // A. SICHERSTELLEN, DASS DER SPEICHER EXISTIERT
+    if (!window.currentChoice) {
+        window.currentChoice = { sorte: "", preis: 0, label: "" };
+    }
+
+    // B. PRÜFUNG: WAS WIRD BENÖTIGT?
+    const brauchtSorte = item.name.includes(',') || item.name.includes('/');
+    const brauchtGroesse = String(item.price).includes('/');
+
+    // C. ABBRUCH-CHECK (Validierung)
+    if (brauchtSorte && !window.currentChoice.sorte) {
+        alert("Bitte wählen Sie eine Sorte!");
+        return;
+    }
+    if (brauchtGroesse && (!window.currentChoice.preis || window.currentChoice.preis === 0)) {
+        alert("Bitte wählen Sie eine Größe!");
+        return;
+    }
+
+    // D. DATEN FIXIEREN
+    const finalName = brauchtSorte ? window.currentChoice.sorte : item.name;
+    const finalPrice = brauchtGroesse ? window.currentChoice.preis : parseFloat(String(item.price).replace(',', '.'));
+    const finalSize = window.currentChoice.label || "";
+
+    // E. OBJEKT ERSTELLEN
+    const cartObj = {
+        parentIdx: itemIndex,
+        name: finalName,
+        size: finalSize,
+        basePrice: finalPrice,
+        extraPrice: 0,
+        extras: [],
+        removals: [],
+        kategorie: category
+    };
+
+    // F. IN DEN WARENKORB SCHREIBEN
+    if (cartIdx > -1) {
+        pizzaCart[cartIdx] = cartObj; // Ändern
+    } else {
+        pizzaCart.push(cartObj); // Neu hinzufügen
+    }
+
+    // G. RESET & CLOSE
+    window.currentChoice = { sorte: "", preis: 0, label: "" };
+    closeModal();
+    updateUI();
+    if (typeof renderMenu === "function") renderMenu();
+	
+	//wieder zurücksetzen für Pizza
+	footerBtn.onclick = closeModal; 
+}
+
 function closeSelection() {
     const m = document.getElementById('selection-modal');
     if (m) m.remove();
@@ -847,33 +1165,33 @@ function cancelModal() {
 
 function renderModalContent() {
     const list = document.getElementById('modal-list');
-    const pizza = pizzaCart[currentPizzaIdx];
+    // Wir holen uns die Pizza, die gerade im Fokus steht (über den Index)
+    const pizza = pizzaCart[currentPizzaIdx]; 
+    if (!pizza) return; // Sicherheitssperre
+
     const pOriginal = items[pizza.parentIdx];
     const istKinder = pizza.kategorie.toUpperCase().includes("KINDERPIZZA");
     
     const lang = i18n[currentLang] || i18n.de;
     const isIT = (currentLang === 'it');
     
+    // Titel im Modal-Kopf setzen
     const displayNameHeader = (isIT && pOriginal.name_it) ? pOriginal.name_it : pOriginal.name;
     document.getElementById('modal-title').innerText = lang.anpassen + ": " + displayNameHeader;
     
-    if(document.getElementById('btn-save')) document.getElementById('btn-save').innerText = lang.fertig;
-    if(document.getElementById('btn-cancel')) document.getElementById('btn-cancel').innerText = lang.abbrechen;
-	
-    list.innerHTML = "";
+    // Wir sammeln alles in der Variable 'html'
+    let html = "";
 
-    // 1. SEKTION: GRÖSSE / TYP (Negative Extras)
+    // 1. SEKTION: GRÖSSE / TYP (Negative Extras wie "Klein")
     if (!istKinder) {
         const negItems = items.filter(item => (parseFloat(String(item.price)?.replace(',','.')) || 0) < 0);
         if (negItems.length > 0) {
             const titelNeg = isIT ? "MISURA / TIPO" : "GRÖSSE / TYP";
-            list.innerHTML += `<div class="modal-section-title">${titelNeg}</div>`;
+            html += `<div class="modal-section-title">${titelNeg}</div>`;
             negItems.forEach(e => {
                 const isActive = pizza.extras.some(ex => ex.name === e.name);
                 const displayName = (isIT && e.name_it) ? e.name_it : e.name;
-                
-                // PREIS-INFO HIER ENTFERNT (nur noch Name und Checkmark)
-                list.innerHTML += `
+                html += `
                     <button class="modal-btn ${isActive ? 'active-add' : ''}" onclick="toggleExtra('${e.name}', '${e.price}')">
                         ${displayName} ${isActive ? ' ✓' : ''} 
                     </button>`;
@@ -881,24 +1199,26 @@ function renderModalContent() {
         }
     }
 
-    // 2. SEKTION: OHNE (Abbestellen)
+    // 2. SEKTION: OHNE (Zutaten abbestellen)
     const titelOhne = isIT ? "COSA TOGLIERE? (SENZA)" : "WAS SOLL WEG? (OHNE)";
-    list.innerHTML += `<div class="modal-section-title">${titelOhne}</div>`;
-    const descToSplit = (isIT && pOriginal.desc_it) ? pOriginal.desc_it : pOriginal.desc;
-    const ingredients = descToSplit.split(',').map(s => s.trim());
+    html += `<div class="modal-section-title">${titelOhne}</div>`;
     
-    ingredients.forEach(ing => {
-        const isOff = pizza.removals.includes(ing);
-        const wegZusatz = isIT ? "togli" : "weg";
-        list.innerHTML += `
-            <button class="modal-btn ${isOff ? 'active-remove' : ''}" onclick="toggleRemoveInModal('${ing}')">
-                ${ing} ${isOff ? ' ✓ ('+wegZusatz+')' : ' -'}
-            </button>`;
-    });
+    const descToSplit = (isIT && pOriginal.desc_it) ? pOriginal.desc_it : (pOriginal.desc || "");
+    if (descToSplit) {
+        const ingredients = descToSplit.split(',').map(s => s.trim());
+        ingredients.forEach(ing => {
+            const isOff = pizza.removals.includes(ing);
+            const wegZusatz = isIT ? "togli" : "weg";
+            html += `
+                <button class="modal-btn ${isOff ? 'active-remove' : ''}" onclick="toggleRemoveInModal('${ing}')">
+                    ${ing} ${isOff ? ' ✓ ('+wegZusatz+')' : ' -'}
+                </button>`;
+        });
+    }
 
     // 3. SEKTION: EXTRAS (Hinzufügen)
     const titelExtra = isIT ? "COSA AGGIUNGERE? (EXTRA)" : "WAS SOLL DAZU? (EXTRAS)";
-    list.innerHTML += `<div class="modal-section-title">${titelExtra}</div>`;
+    html += `<div class="modal-section-title">${titelExtra}</div>`;
     
     let isExtraArea = false;
     items.forEach(item => {
@@ -908,9 +1228,7 @@ function renderModalContent() {
             if (pNum >= 0) {
                 const isActive = pizza.extras.some(ex => ex.name === item.name);
                 const displayName = (isIT && item.name_it) ? item.name_it : item.name;
-
-                // PREIS-INFO BLEIBT ENTFERNT
-                list.innerHTML += `
+                html += `
                     <button class="modal-btn ${isActive ? 'active-add' : ''}" 
                             onclick="toggleExtra('${item.name}', '${item.price}')">
                         ${displayName} ${isActive ? ' ✓' : ' +'}
@@ -918,9 +1236,22 @@ function renderModalContent() {
             }
         }
     });
-	
+
+    // --- ENTSCHEIDENDER SCHRITT ---
+    // Das gesamte gesammelte HTML in die Liste schreiben!
+    list.innerHTML = html;
+
+    // Footer-Bereich sicherstellen
     const footer = document.getElementById('modal-footer');
     if (footer) footer.style.display = 'flex';
+    
+    const footerBtn = document.getElementById('btn-modal-done');
+    if (footerBtn) {
+        footerBtn.style.display = "block";
+        footerBtn.innerText = lang.fertig || "Fertig & Speichern";
+        footerBtn.style.background = "#28a745"; // Standardfarbe (z.B. Blau oder Dunkel)
+        footerBtn.onclick = closeModal; 
+    }
 }
 
 

@@ -311,7 +311,7 @@ body::after {
 			text-transform: uppercase; 
 		}
 
-.btn-send { 
+.btn-send{ 
     background: #00ca4e;    /* Dein originales Grün */
     color: white; 
     width: 100%; 
@@ -326,6 +326,8 @@ body::after {
     text-transform: uppercase; /* Sieht oft professioneller aus */
     line-height: 1.2;
 }
+
+
 
 /* Kleiner Effekt beim Draufklicken */
 .btn-send:active {
@@ -415,11 +417,11 @@ body::after {
         
         <!-- Diese Buttons stehen FEST darunter (außerhalb des Scrolls) -->
         <div id="modal-footer" style="display: flex; gap: 10px; margin-top: 20px;">
-            <button id="btn-save" onclick="closeModal()" 
-                style="flex: 2; padding: 15px; background: #00ca4e; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">
+            <button id="btn-modal-done" onclick="closeModal()" 
+                style="flex: 2; padding: 15px; background:  #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">
                 SPEICHERN & FERTIG
             </button>
-            <button id="btn-cancel" onclick="cancelModal()" 
+            <button id="btn-modal-cancel" onclick="cancelModal()" 
                 style="flex: 1; padding: 15px; background: #444; color: #ccc; border: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer;">
                 ABBRECHEN
             </button>
