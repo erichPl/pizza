@@ -344,6 +344,20 @@ function renderOrders(orders) {
 		// 3. Der Bar-Ansicht sagen, dass sie dem "Bar-Raum" beitreten soll
 		socket.emit('join-bar');
 
+// --- HIER DEN HERZSCHLAG EINBAUEN ---
+socket.on('connect', () => {
+    console.log("Verbindung aktiv - Starte Herzschlag...");
+    setInterval(() => {
+        if (socket.connected) {
+            socket.emit('heartbeat'); 
+        }
+    }, 20000); // Alle 20 Sekunden kurz "klopfen"
+});
+// ------------------------------------
+
+
+
+		
 		// 4. Auf das Signal vom Server warten
 		socket.on('neue-bestellung', (data) => {
 			console.log("🚀 Live-Update: Neue Bestellung vom Server erhalten!");
