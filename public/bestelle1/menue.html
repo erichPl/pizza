@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Speisekarte Admin | Synchronized Full-Width</title>
+    <style>
+
+
+
+
+/* Die graue Einstellungs-Box kompakter machen */
+.settings-box {
+    background: #eee; 
+    padding: 3px 8px !important; /* Weniger Innenabstand oben/unten */
+    margin-bottom: 5px !important;  /* Nur noch 5px Abstand nach unten zum Menü */
+    border-radius: 8px;
+}
+
+/* Den Abstand innerhalb der Box (zwischen Überschrift und Checkbox) verringern */
+.settings-box h3 {
+    font-size: 1rem;
+    margin: 0 0 5px 0 !important; /* Nur minimaler Abstand unter der Überschrift */
+}
+
+/* Die Zeile mit der Checkbox und dem Button */
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 0 !important;
+}
+
+/* Den grauen Button etwas zierlicher machen, damit er nicht so hoch baut */
+.btn-secondary {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    cursor: pointer;
+}
+
+
+
+/* 1. Den weißen Header-Kasten schrumpfen */
+header { 
+    background: white; 
+    padding: 5px 15px !important; /* Von 15px auf 5px reduziert */
+    border-radius: 10px; 
+    margin-bottom: 5px !important; /* Von 15px auf 5px reduziert */
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    height: 50px; /* Feste, kleine Höhe */
+}
+
+.header-top-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    margin-bottom: 10px; /* Schiebt alles darunter (Status & Settings) ein Stück weg */
+}
+
+.header-top-row h1 {
+    margin: 0 !important;
+    white-space: nowrap; /* Verhindert, dass die Überschrift umbricht */
+    font-size: 1.3rem;   /* Etwas kleiner, damit mehr Platz für Buttons ist */
+    flex-grow: 1;        /* Schiebt die Buttons nach rechts, wenn gewünscht */
+}
+
+/* 2. Den Bereich der Buttons (Neu & Speichern) kompakt machen */
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 0 !important; /* Entfernt die 20px von vorher */
+    padding-bottom: 0 !important; /* Entfernt die 15px von vorher */
+    border-bottom: none !important; /* Entfernt die Trennlinie, die Platz fraß */
+}
+
+/* 3. Die Buttons selbst etwas flacher machen, damit sie in den schmalen Header passen */
+.btn-add, .btn-save-top {
+    padding: 6px 15px !important; /* Von 12px auf 6px Höhe reduziert */
+    border-radius: 6px;
+    margin-right: 10px;
+	cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border: none;
+}
+
+/* 4. Die Überschrift anpassen */
+header h1 {
+    font-size: 1.2rem !important; /* Etwas kleiner, passend zum schmalen Rahmen */
+    margin: 0 !important;
+}
+
+
+.btn-save-top:hover {
+    background: #219150;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+.btn-save-top:active {
+    transform: translateY(0);
+}
+	
+#undo-banner {
+    display: none; 
+    position: fixed; 
+    top: 20px; 
+    right: 20px; 
+    background: #27ae60; 
+    color: white; 
+    padding: 15px 25px; 
+    border-radius: 8px; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    /* WICHTIG: Er muss über allem schweben */
+    z-index: 999999 !important; 
+    cursor: pointer; 
+    font-weight: bold;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+	
+	
+	
+.admin-grid-row {
+    display: grid !important;
+    /* Deine neuen Proportionen: Name, Beschr, Zutaten, Preis */
+    grid-template-columns: 1.2fr 3.5fr 3.5fr 0.8fr !important; 
+    gap: 12px;
+    width: 100%;
+    align-items: start;
+}
+
+/* Der neue Button für das Einfügen dazwischen */
+.insert-area-mini {
+    background: #3498db;
+    color: white;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; cursor: pointer; font-weight: bold;
+    font-size: 18px; line-height: 1;
+}
+.insert-area-mini:hover { background: #2980b9; }
+
+/* Die linke Spalte braucht ein wenig mehr Platz für 3 Elemente (Ü, +, X) */
+.left-action-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; 
+    width: 40px; /* Leicht verbreitert */
+    flex-shrink: 0;
+}
+	
+	
+	.delete-area {
+    background: #ff4444;
+    color: white;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.delete-area:hover {
+    background: #cc0000;
+}
+
+/* Der Container für den gesamten Block */
+.content-area {
+    display: flex;
+    flex-direction: column; /* Stapelt top-row und row-it übereinander */
+    width: 100%;
+}
+
+/* Sorgt dafür, dass die DE-Felder nebeneinander bleiben, falls gewünscht */
+.row-de, .row-it {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+	
+	textarea {
+    width: 100%;
+    resize: none;            /* Deaktiviert die manuelle Ecke zum Ziehen */
+    overflow: hidden;        /* Versteckt den Scrollbalken */
+    min-height: 32px;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: block;
+    line-height: 1.4;
+}
+	
+        :root {
+            --bg-color: #eef2f7;
+            --card-bg: #ffffff;
+            --it-bg: #f9f9f9;
+            --primary: #3498db;
+            --accent: #27ae60;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; padding: 10px; }
+        .main-container { width: 99%; margin: 0 auto; }
+        
+        header { 
+            background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .product-block {
+            display: grid;
+            grid-template-columns: 60px 50px 1fr 60px; 
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid var(--primary);
+        }
+
+        /* Header Styling */
+        .is-header { border-left-color: #f1c40f; }
+        .is-header .row-de { background: #3498db !important; color: white; }
+        .is-header .row-it { background: #2980b9 !important; color: white; }
+        .is-header input { background: rgba(255,255,255,0.2) !important; color: white !important; border-color: rgba(255,255,255,0.3) !important; }
+
+        .side-controls, .check-area { grid-row: 1 / span 2; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f8f9fa; border-right: 1px solid #eee; }
+        .delete-area { grid-row: 1 / span 2; display: flex; justify-content: center; align-items: center; background: #fff5f5; color: #e74c3c; cursor: pointer; font-size: 10px; }
+        .delete-area:hover { background: #ff4d4d; color: white; }
+
+        .content-area { grid-column: 3; display: flex; flex-direction: column; }
+        
+        /* SYNCHRONISATION DER SPALTEN */
+        .row-de, .row-it { 
+            display: flex; gap: 15px; padding: 12px 20px; align-items: flex-end; width: 100%; box-sizing: border-box;
+        }
+        .row-it { background: var(--it-bg); border-top: 1px solid #eee; }
+
+        .f-group { display: flex; flex-direction: column; }
+        
+        /* Hier definieren wir feste Breiten, damit DE und IT exakt fluchten */
+        .col-name { width: 15%; }
+        .col-desc { width: 35%; }
+        .col-ingr { width: 35%; }
+        .col-admin { width: 100px; }
+        .col-small { width: 50px; }
+
+        .label-tag { font-size: 10px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+        .is-header .label-tag { color: #d1e9ff; }
+        
+        input[type="text"] {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 15px;
+        }
+
+        .btn-sort { background: white; border: 1px solid #ccc; padding: 5px; margin: 2px; border-radius: 4px; cursor: pointer; width: 35px; }
+        .btn-modal-done { 
+            width: 100%; padding: 20px; background: var(--accent); color: white; 
+            border: none; border-radius: 10px; font-size: 22px; font-weight: bold; 
+            cursor: pointer; margin-top: 20px; margin-bottom: 40px;
+        }
+
+        .status-bar { padding: 12px; background: #d1ecf1; border-radius: 6px; margin-bottom: 15px; font-weight: bold; }
+		
+		
+		.admin-grid-row {
+    display: grid;
+    /* Spalten-Verhältnis: Name(1.2), Beschreibung(3.5), Zutaten(3.5), Preis/Admin(0.8) */
+    /* Insgesamt 9 Anteile (fr = fraction) */
+    grid-template-columns: 1.2fr 3.5fr 3.5fr 0.8fr; 
+    gap: 12px; /* Horizontaler Abstand zwischen den Feldern */
+    width: 100%;
+    align-items: start;
+}
+
+
+/* 1. Deutsch in Blau */
+.row-de textarea, 
+.row-de input {
+    color: #0056b3 !important; /* Ein schönes, dunkleres Blau */
+    font-weight: 500;
+    border: 1px solid #ccc !important; /* Rahmen sicherstellen */
+}
+
+/* 2. Preis-Feld mit Rahmen und grünem Akzent */
+.f-price {
+    width: 100% !important;
+    border: 1px solid #27ae60 !important; /* Grüner Rahmen für den Preis */
+    border-radius: 4px;
+    padding: 6px;
+    text-align: right;
+    font-weight: bold;
+    color: #27ae60 !important;
+    background-color: #f9fffb; /* Ganz leichter grüner Schimmer im Hintergrund */
+    box-sizing: border-box;
+}
+
+/* 3. View-Feld Rahmen sicherstellen */
+.f-view {
+    border: 1px solid #ccc !important;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+/* 4. Labels für Deutsch ebenfalls blau (optional, für bessere Zuordnung) */
+.row-de .label-tag {
+    color: #0056b3;
+    opacity: 0.8;
+}
+
+
+/* Grundblock-Layout */
+.product-block {
+    display: flex !important;
+    gap: 10px;
+    padding: 12px;
+    align-items: flex-start;
+    border-bottom: 1px solid #eee;
+}
+
+/* Linke Spalte (Pfeile, Ü, X) */
+.left-action-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; 
+    width: 35px;
+    flex-shrink: 0;
+}
+
+.delete-area-mini {
+    background: #ff4444;
+    color: white;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; cursor: pointer; font-weight: bold;
+}
+
+/* Inhaltsbereich & Raster */
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-grid-row {
+    display: grid !important;
+    /* Festes Raster: Name 15%, Beschr. 35%, Zutaten 40%, Preis 10% */
+    grid-template-columns: 15% 35% 40% 10% !important;
+    gap: 12px;
+    width: 100%;
+}
+
+/* DEUTSCH: Blau & Rahmen */
+.row-de textarea, .row-de input {
+    color: #0056b3 !important;
+    border: 1px solid #ccc !important;
+}
+
+/* ITALIENISCH: Normal & Rahmen */
+.row-it {
+    border-top: 1px dashed #ddd;
+    padding-top: 8px;
+}
+.row-it textarea, .row-it input {
+    color: #333 !important;
+    border: 1px solid #ccc !important;
+}
+
+/* PREIS: Grüner Rahmen & Farbe */
+.f-price {
+    border: 1px solid #27ae60 !important;
+    color: #27ae60 !important;
+    font-weight: bold;
+    text-align: right;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+/* Textarea Grundeinstellungen */
+textarea {
+    width: 100%;
+    border-radius: 4px;
+    padding: 6px;
+    resize: none;
+    overflow: hidden;
+}
+
+    </style>
+</head>
+<body>
+<div id="undo-banner" onclick="undoDelete()">
+    ↩️ Zeile gelöscht. Rückgängig machen?
+</div>
+<div class="main-container">
+    <header>
+        <div class="header-top-row">
+            <h1>🍴 Menü-Verwaltung</h1>
+            <!--div class="header-actions">-->
+                <button class="btn-add" onclick="addNewRow()">+ Neues Produkt</button>
+                <button class="btn-save-top" id="btn-save" onclick="saveToCloud()">💾 Speichern</button>
+            <!--</div>-->
+        </div>
+        
+        <div id="status" style="margin-bottom: 15px; font-weight: bold; color: #27ae60; min-height: 1.2em;"></div>
+
+        <div class="settings-box">
+            <!--<h3>System-Einstellungen</h3>-->
+            <div class="settings-row">
+                <label><input type="checkbox" id="geoCheckbox"> Geolocation-Pflicht (GPS) aktiv</label>
+                <button class="btn-secondary" onclick="saveSettings()">Einstellungen speichern</button>
+            </div>
+        </div>
+    </header>
+    
+    <div id="menuContainer"></div>
+</div>
+
+<script>
+    async function loadData() {
+        try {
+            const res = await fetch('/api/order-menu');
+            const items = await res.json();
+            renderList(items);
+			
+			// In loadData nach renderList(items):
+setTimeout(() => {
+    document.querySelectorAll('textarea').forEach(el => autoGrow(el));
+}, 100);
+			
+           document.getElementById('status').innerText = "✅ Daten geladen.";
+        } catch (err) { document.getElementById('status').innerText = "❌ Fehler beim Laden."; }
+    }
+
+    function renderList(items) {
+        const container = document.getElementById('menuContainer');
+        container.innerHTML = '';
+        items.forEach(item => addRow(item));
+    }
+
+    function addRow(item = {}) {
+        const container = document.getElementById('menuContainer');
+        const isHeader = item.type === 'header';
+        const block = document.createElement('div');
+        block.className = `product-block ${isHeader ? 'is-header' : ''}`;
+        
+   // In deiner addRow Funktion:
+// Ersetze den Bereich <div class="content-area"> in deiner addRow Funktion:
+// In der addRow(item = {}) Funktion:
+block.innerHTML = `
+    <div class="side-controls">
+        <button class="btn-sort" onclick="${isHeader ? 'moveGroup(this, -1)' : 'move(this, -1)'}">↑</button>
+        <button class="btn-sort" onclick="${isHeader ? 'moveGroup(this, 1)' : 'move(this, 1)'}">↓</button>
+    </div>
+    
+    <div class="left-action-area">
+        <div class="check-box-mini">
+            <span class="label-tag">Ü</span>
+            <input type="checkbox" class="f-type-check" onchange="toggleType(this)" ${isHeader ? 'checked' : ''}>
+        </div>
+        <div class="insert-area-mini" onclick="insertAfterMe(this)" title="Darunter einfügen">+</div>
+        <div class="delete-area-mini" onclick="deleteMe(this)" title="Löschen">✕</div>
+    </div>
+
+    <div class="content-area">
+        <div class="admin-grid-row row-de">
+            <div class="f-group"><span class="label-tag">Name (DE)</span><textarea class="f-name" oninput="autoGrow(this)" rows="1">${item.name || ''}</textarea></div>
+            <div class="f-group"><span class="label-tag">Beschreibung (DE)</span><textarea class="f-desc" oninput="autoGrow(this)" rows="1">${item.desc || ''}</textarea></div>
+            <div class="f-group"><span class="label-tag">Zutaten (DE)</span><textarea class="f-ingredients" oninput="autoGrow(this)" rows="1">${item.ingredients || ''}</textarea></div>
+            <div class="f-group"><span class="label-tag">Preis (€)</span><input type="text" class="f-price" value="${item.price || ''}"></div>
+        </div>
+
+        <div class="admin-grid-row row-it">
+            <div class="f-group"><span class="label-tag">Name (IT)</span><textarea class="f-name_it" oninput="autoGrow(this)" rows="1">${item.name_it || ''}</textarea></div>
+            <div class="f-group"><span class="label-tag">Beschreibung (IT)</span><textarea class="f-desc_it" oninput="autoGrow(this)" rows="1">${item.desc_it || ''}</textarea></div>
+            <div class="f-group"><span class="label-tag">Zutaten (IT)</span><textarea class="f-ingredients_it" oninput="autoGrow(this)" rows="1">${item.ingredients_it || ''}</textarea></div>
+            <div class="f-group">
+                <div style="display: flex; gap: 5px; width: 100%;">
+                    <div style="flex: 1;"><span class="label-tag">View</span><input type="text" class="f-view" value="${item.view || 'b'}" style="text-align:center;"></div>
+                    <div style="flex: 1; display:flex; flex-direction:column; align-items:center;"><span class="label-tag">Sicht</span><input type="checkbox" class="f-visible" ${item.hidePrice === true ? '' : 'checked'}></div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+        container.appendChild(block);
+    }
+
+    function toggleType(cb) { cb.closest('.product-block').classList.toggle('is-header', cb.checked); }
+    function move(btn, dir) {
+        const block = btn.closest('.product-block');
+        if (dir === -1 && block.previousElementSibling) block.parentNode.insertBefore(block, block.previousElementSibling);
+        else if (dir === 1 && block.nextElementSibling) block.parentNode.insertBefore(block.nextElementSibling, block);
+    }
+	
+    // Diese Variablen müssen AUẞERHALB der Funktion stehen (global)
+let deleteTimeout = null;
+
+let lastDeletedItem = null;
+let lastDeletedPosition = null;
+
+function deleteMe(el) {
+    const block = el.closest('.product-block');
+    if (!block) return;
+
+    if (!confirm('Wirklich löschen?')) return;
+
+    // 1. Position merken (das Element DANACH)
+    lastDeletedPosition = block.nextSibling;
+    // 2. Das Element klonen oder Referenz speichern
+    lastDeletedItem = block;
+    
+    // 3. Aus dem HTML entfernen (statt nur verstecken)
+    block.remove(); 
+    
+    // 4. Banner anzeigen
+    const banner = document.getElementById('undo-banner');
+    if (banner) {
+        banner.style.display = 'block';
+        
+        // Nach 10 Sekunden den Speicher für das gelöschte Item leeren
+        if (window.deleteTimeout) clearTimeout(window.deleteTimeout);
+        window.deleteTimeout = setTimeout(() => {
+            banner.style.display = 'none';
+            lastDeletedItem = null; 
+        }, 10000);
+    }
+}
+
+function undoDelete() {
+    if (lastDeletedItem) {
+        const container = document.getElementById('menuContainer');
+        
+        // Wieder an der alten Stelle einfügen
+        if (lastDeletedPosition) {
+            container.insertBefore(lastDeletedItem, lastDeletedPosition);
+        } else {
+            // Falls es das letzte Element war
+            container.appendChild(lastDeletedItem);
+        }
+        
+        // Banner sofort weg
+        document.getElementById('undo-banner').style.display = 'none';
+        
+        // WICHTIG: Falls scrollen nötig ist
+        lastDeletedItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        lastDeletedItem = null;
+        if (window.deleteTimeout) clearTimeout(window.deleteTimeout);
+    }
+}
+	
+    function addNewRow() { addRow({ type: 'product', view: 'b' }); window.scrollTo(0, document.body.scrollHeight); }
+
+    async function saveToCloud() {
+        const blocks = document.querySelectorAll('.product-block');
+        const items = Array.from(blocks).map(b => ({
+            type: b.querySelector('.f-type-check').checked ? 'header' : 'product',
+            name: b.querySelector('.f-name').value,
+            desc: b.querySelector('.f-desc').value,
+            ingredients: b.querySelector('.f-ingredients').value,
+            price: b.querySelector('.f-price').value,
+            name_it: b.querySelector('.f-name_it').value,
+            desc_it: b.querySelector('.f-desc_it').value,
+            ingredients_it: b.querySelector('.f-ingredients_it').value,
+            view: b.querySelector('.f-view').value,
+            hidePrice: !b.querySelector('.f-visible').checked
+        }));
+        try {
+            const res = await fetch('/api/order-menu', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items }) });
+            if (res.ok) alert("Gespeichert!");
+        } catch (err) { alert("Fehler!"); }
+    }
+	
+	
+	// Beim Laden der Admin-Seite den aktuellen Status holen
+	async function loadSettings() {
+		const res = await fetch('/api/get-settings');
+		const data = await res.json();
+		document.getElementById('geoCheckbox').checked = data.isGeolocation;
+	}
+
+	async function saveSettings() {
+		const isActive = document.getElementById('geoCheckbox').checked;
+		const res = await fetch('/api/save-settings', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ isGeolocation: isActive })
+		});
+		if (res.ok) alert("Einstellungen gespeichert!");
+	}
+
+function moveGroup(btn, dir) {
+    const headerBlock = btn.closest('.product-block');
+    const parent = headerBlock.parentNode;
+    
+    // 1. Alle Elemente dieser Gruppe finden (Header + Produkte darunter)
+    let group = [headerBlock];
+    let next = headerBlock.nextElementSibling;
+    while (next && !next.classList.contains('is-header')) {
+        group.push(next);
+        next = next.nextElementSibling;
+    }
+
+    if (dir === -1) { // NACH OBEN
+        const prevHeader = headerBlock.previousElementSibling;
+        if (!prevHeader) return; // Schon ganz oben
+
+        // Wir müssen den Header der Gruppe davor finden
+        let targetHeader = prevHeader;
+        while (targetHeader.previousElementSibling && !targetHeader.classList.contains('is-header')) {
+            targetHeader = targetHeader.previousElementSibling;
+        }
+        // Ganze Gruppe vor diesen Ziel-Header schieben
+        group.forEach(el => parent.insertBefore(el, targetHeader));
+        
+    } else { // NACH UNTEN
+        // Finde das Ende der aktuellen Gruppe
+        let lastOfGroup = group[group.length - 1];
+        let nextHeader = lastOfGroup.nextElementSibling;
+        
+        if (!nextHeader) return; // Schon ganz unten
+
+        // Finde das Ende der NÄCHSTEN Gruppe
+        let nextGroupEnd = nextHeader;
+        while (nextGroupEnd.nextElementSibling && !nextGroupEnd.nextElementSibling.classList.contains('is-header')) {
+            nextGroupEnd = nextGroupEnd.nextElementSibling;
+        }
+        
+        // Verschiebe die aktuelle Gruppe hinter das Ende der nächsten Gruppe
+        group.reverse().forEach(el => {
+            parent.insertBefore(el, nextGroupEnd.nextElementSibling);
+        });
+    }
+    headerBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+
+function autoGrow(element) {
+    element.style.height = "5px"; // Kurz verkleinern, um die Scrollhöhe neu zu berechnen
+    element.style.height = (element.scrollHeight) + "px";
+}
+
+
+
+function insertAfterMe(el) {
+    const currentBlock = el.closest('.product-block');
+    // Wir rufen einfach addRow auf, aber wir hängen es nicht an das Ende an
+    const newItem = { type: 'product', view: 'b', name: '', desc: '', price: '' };
+    
+    // Temporäres Div zum Generieren des Blocks nutzen
+    const tempDiv = document.createElement('div');
+    // Wir speichern den aktuellen Container-Zustand kurz
+    const container = document.getElementById('menuContainer');
+    
+    // Da addRow normalerweise appendChild nutzt, machen wir es hier manuell:
+    addRow(newItem); 
+    const newBlock = container.lastElementChild; // Das gerade erstellte Element nehmen
+    
+    // Und nun an die richtige Stelle schieben (nach dem aktuellen Block)
+    currentBlock.parentNode.insertBefore(newBlock, currentBlock.nextSibling);
+    
+    // UI-Fokus und AutoGrow
+    setTimeout(() => {
+        newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        newBlock.querySelector('.f-name').focus();
+        newBlock.querySelectorAll('textarea').forEach(tx => autoGrow(tx));
+    }, 50);
+}
+
+
+
+
+	// Initial aufrufen
+	loadSettings();		
+	
+    loadData();
+</script>
+</body>
+</html>
