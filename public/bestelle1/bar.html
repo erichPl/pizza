@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Bar-Monitor | Neue Bestellungen</title>
+	<script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; padding: 20px; }
+        h1 { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #16213e; padding-bottom: 10px; }
+        
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 20px; }
+        
+        .order-card { 
+            background: #16213e; border-radius: 12px; padding: 15px; 
+            border-left: 8px solid #e94560; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #0f3460; padding-bottom: 5px; }
+        .tisch-num { font-size: 24px; font-weight: bold; color: #e94560; }
+        .uhrzeit { color: #888; font-size: 14px; }
+
+
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item-row { padding: 8px 0; border-bottom: 1px solid #0f3460; font-size: 18px; }
+        .item-row:last-child { border-bottom: none; }
+        
+        .extras { font-size: 14px; color: #00d2ff; display: block; margin-top: 4px; font-style: italic; }
+        
+        .done-btn { 
+            width: 100%; background: #0f3460; color: white; border: none; padding: 10px; 
+            /*margin-top: 15px; border-radius: 6px; cursor: pointer; font-weight: bold;*/
+            transition: 0.3s;
+        }
+        .done-btn:hover { background: #27ae60; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .no-orders { text-align: center; color: #555; margin-top: 100px; font-size: 24px; }
+		
+		
+		.price-tag {
+    background-color: #00ca4e;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    float: right; /* Schiebt den Preis nach rechts oben */
+}
+
+.order-header {
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+
+@keyframes text-flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.text-blink {
+    animation: text-flash 1.5s infinite;
+}
+		
+@media print {
+    /* 1. Grund-Einstellungen für das Papier */
+    html, body {
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: white !important;
+    }
+
+    /* 2. ALLES auf der Seite komplett ausblenden */
+    body * {
+        display: none !important;
+    }
+
+   /* 3. Den Container und die Druck-Bereiche gezielt wiederbeleben */
+    /* Ersetze #ordersContainer durch die ID deines Haupt-Containers */
+    #ordersContainer, 
+    .print-area, 
+    .print-area * {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    /* 4. Layout der Bons untereinander */
+    .print-area {
+        position: relative !important;
+        width: 80mm; /* Breite für Bondrucker */
+        margin: 0 auto 10mm auto !important; /* Abstand zwischen den Bons */
+        padding: 5mm !important;
+        border-bottom: 2px dashed black !important; /* Abrisskante */
+        color: black !important;
+        page-break-inside: avoid; /* Bon nicht mitten im Text trennen */
+		float: none !important; /* Sicherheitshalber Floats entfernen */
+    }
+
+    /* 5. Spezifische Korrekturen innerhalb des Bons beim Drucken */
+    .print-area .item-list { display: block !important; list-style: none; padding: 0; }
+    .print-area .item-row { display: flex !important; justify-content: space-between; }
+    
+    /* Buttons und Checkboxen NIEMALS drucken */
+    .print-btn, .done-btn, .print-checkbox, .no-orders {
+        display: none !important;
+    }
+}
+
+/* Dein Stil für den Monitor bleibt gleich */
+.order-card.is-printed {
+    opacity: 0.6;
+    border-left: 5px solid #555 !important;
+    filter: grayscale(0.5);
+}
+		
+    </style>
+</head>
+<body>
+
+    <h1>
+        <span>🍻 Bar-Monitor</span>
+        <span id="clock" style="font-size: 18px; color: #e94560;"></span>
+    </h1>
+	<label class="switch">
+        <input type="checkbox" id="bon-toggle" onchange="setBon(this.checked)">
+        <span class="slider"></span>
+    </label>
+    <span style="color: #888; font-size: 0.9rem;">Bon-Druck aktivieren</span>
+
+	<button class="btnPr" onclick="printAllMarked()" style="background: #007bff; color: white; padding: 15px; margin: 10px; width: calc(100% - 20px); cursor: pointer; border-radius: 8px; font-weight: bold;">
+		🖨️ Alle markierten Bons zusammen drucken
+	</button>
+	<div style="margin: 10px; display: flex; gap: 10px;">
+		<button class="btnPr" onclick="document.querySelectorAll('.print-checkbox').forEach(b => b.checked = true)" style="padding: 10px;">Alle markieren</button>
+		<button  class="btnPr" onclick="printSelected()" style="padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; flex: 1; font-weight: bold;">
+			Markierte Bons drucken
+		</button>
+	</div>
+
+    <div id="ordersContainer" class="order-grid">
+        </div>
+
+    <script>
+
+// Oben im Script:
+setBon(false);
+
+	
+//Dasmit checkboxen für Bon Ddruck nach intervall erhalten bleiben
+let currentSelectedIds = new Set(); // Ein Set speichert IDs eindeutig
+
+// Diese Funktion rufst du mit dem 'onchange' der Checkbox auf
+function toggleSelection(id) {
+    if (currentSelectedIds.has(id)) {
+        currentSelectedIds.delete(id);
+    } else {
+        currentSelectedIds.add(id);
+    }
+}	
+	
+	
+        // Automatische Uhrzeit oben rechts
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('de-DE');
+        }, 1000);
+
+
+
+
+        async function fetchOrders__() {
+            try {
+                const res = await fetch('/api/get-orders');
+                const orders = await res.json();
+                renderOrders(orders);
+            } catch (err) { console.error("Fehler beim Laden:", err); }
+        }
+		
+let lastOrderCount = 0;
+const notificationSound = new Audio('/bestelle1/notification.mp3');
+
+async function fetchOrders() {
+    try {
+        // HIER DIE URL KORRIGIEREN: Wieder 'get-orders' statt 'orders'
+        const res = await fetch('/api/get-orders'); 
+        
+        if (!res.ok) throw new Error("Server antwortet nicht korrekt");
+        
+        const orders = await res.json();
+        
+        // Nur die neuen Bestellungen filtern
+        const newOrders = orders.filter(o => o.status === 'neu');
+
+        // Ton abspielen bei neuen Bestellungen
+        if (newOrders.length > lastOrderCount) {
+            notificationSound.play().catch(err => {
+                console.log("Audio-Autoplay blockiert - bitte einmal auf die Seite klicken.");
+            });
+        }
+        
+        lastOrderCount = newOrders.length;
+        renderOrders(newOrders);
+        
+    } catch (err) {
+        console.error("Fehler beim Laden:", err);
+    }
+}
+		
+		
+
+function renderOrders(orders) {
+    const container = document.getElementById('ordersContainer');
+    if (orders.length === 0) {
+        container.innerHTML = '<div class="no-orders">Momentan keine Bestellungen... 🍕</div>';
+        return;
+    }
+
+    const printedOrders = JSON.parse(localStorage.getItem('printedOrders') || '[]');
+    const jetzt = new Date();
+
+    container.innerHTML = orders.map(order => {
+        const isPrinted = printedOrders.includes(order._id);
+        
+        // --- WARTEZEIT BERECHNEN ---
+        const erstellt = order.erstelltAm ? new Date(order.erstelltAm) : jetzt;
+        const diffMinuten = Math.floor((jetzt - erstellt) / 60000);
+
+        // --- FARB-LOGIK FÜR DEN TEXT ---
+        let textFarbe = '#00ca4e'; // Standard: Grün
+        let blinkKlasse = '';
+
+        if (diffMinuten >= 20) {
+            textFarbe = '#ff4b2b'; // Kritisch: Rot
+            blinkKlasse = 'text-blink'; // Optionaler Blink-Effekt für den Text
+        } else if (diffMinuten >= 10) {
+            textFarbe = '#ffbd44'; // Warnung: Gelb/Orange
+        }
+        // --- ENTFERNUNG BERECHNEN ---
+        let distanzHTML = 5;
+
+		if (order.coords && order.coords.distanz !== undefined) {
+			// Wenn es ein Test am PC ist
+			if (order.coords.distanz === -1) {
+				distanzHTML = '<div style="font-size: 0.8rem; color: #3498db;">💻 TESTMODUS</div>';
+			} 
+			// Wenn echte GPS Daten da sind
+			else {
+				const km = (order.coords.distanz / 1000).toFixed(2);
+				const dFarbe = order.coords.distanz > 1000 ? "#ff4b2b" : "#00ca4e";
+				
+				// Wir bauen den Text einfach zusammen:
+				distanzHTML = '<div style="font-size: 0.9rem; font-weight: bold; color: ' + dFarbe + ';">📍 ' + km + ' km</div>';
+			}
+		} else {
+			// Wenn der Kunde kein GPS erlaubt hat
+			distanzHTML = '<div style="font-size: 0.7rem; color: #777;">Kein GPS</div>';
+		}
+
+
+
+        return `
+            <div class="order-card" data-id="${order._id}" style="border-left: 5px solid ${isPrinted ? '#555' : '#00ca4e'};">
+                <div class="order-header" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" class="print-checkbox, btnPr" value="${order._id}" 
+                           ${isPrinted ? 'disabled' : ''} 
+                           style="width: 22px; height: 22px; cursor: ${isPrinted ? 'default' : 'pointer'};">
+                    
+                    <div style="flex: 1;">
+						<span class="tisch-num ${blinkKlasse}" style="font-weight: bold; font-size: 1.5rem; color: ${textFarbe}; display: block;">
+							Tisch ${order.tisch} 
+						</span>
+						${distanzHTML}
+					</div>
+                    
+                    <div style="text-align: right;">
+                        <span class="uhrzeit" style="color: #aaa; display: block; font-size: 0.9rem;">${order.zeit} Uhr</span>
+                        <span style="font-size: 0.7rem; color: ${textFarbe}; font-weight: bold;">
+                             ${isPrinted ? '' : diffMinuten + ' MIN.'}
+                        </span>
+                    </div>
+                </div>
+                
+                <ul class="item-list" style="padding: 0; margin-top: 10px;">
+                    ${order.details.map(item => `
+                        <li class="item-row" style="margin-bottom: 12px; list-style: none; border-bottom: 1px solid #444; padding-bottom: 5px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <strong style="color: #fff;">${item.artikel}</strong>
+                                <span style="color: #fff;">${item.preis} €</span>
+                            </div>
+                            ${item.extras && item.extras.length > 0 ? `<div style="font-size: 0.85rem; color: #00ca4e; margin-left: 15px; font-style: italic;">+ ${item.extras.map(e => e.name).join(', ')}</div>` : ''}
+                            ${item.removals && item.removals.length > 0 ? `<div style="font-size: 0.85rem; color: #ff4b2b; margin-left: 15px; font-weight: bold;">OHNE: ${item.removals.join(', ')}</div>` : ''}
+                        </li>
+                    `).join('')}
+                </ul>
+
+                <div class="order-footer" style="border-top: 1px dotted #555; margin-top: 10px; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="text-transform: uppercase; font-size: 0.8rem; color: #aaa;">Gesamt</span>
+                        <strong style="font-size: 1.3rem; color: #fff;">
+                            ${Number(order.gesamtpreis || 0).toFixed(2).replace('.', ',')} €
+                        </strong>
+                    </div>
+                </div>
+
+<div style="display: flex; gap: 10px; margin-top: 15px; align-items: stretch;">
+    
+    <button class="print-btn btnPr" onclick="printOrder('${order._id}')" 
+            ${isPrinted ? 'disabled' : ''} 
+            style="flex: 1; padding: 10px; background: ${isPrinted ? '#222' : '#444'}; 
+                   color: ${isPrinted ? '#555' : 'white'}; border: 1px solid ${isPrinted ? '#333' : 'transparent'}; 
+                   cursor: ${isPrinted ? 'default' : 'pointer'}; border-radius: 5px;">
+        ${isPrinted ? 'Gedruckt' : '🖨️ Bon'}
+    </button>
+
+    <div style="display: flex; flex: 3; gap: 10px;">
+        
+        <button class="storno-btn" onclick="cancelOrder('${order._id}')" 
+                style="flex: 0.7; padding: 10px; background: #ff4b2b; color: white; border: none; 
+                       cursor: pointer; border-radius: 5px; font-size: 0.85rem; font-weight: bold;">
+            Storno
+        </button>
+
+        <button class="done-btn" onclick="removeOrder('${order._id}')" 
+                style="flex: 2; padding: 10px; background: #28a745; color: white; border: none; 
+                       cursor: pointer; border-radius: 5px; font-weight: bold;">
+            Erledigt / Serviert
+        </button>
+        
+    </div>
+</div>
+            </div>
+        `;
+    }).join('');
+}
+       // 1. Initialer Aufruf beim Laden der Seite
+		fetchOrders();
+
+		// 2. Websocket-Verbindung aufbauen
+		const socket = io();
+
+		// 3. Der Bar-Ansicht sagen, dass sie dem "Bar-Raum" beitreten soll
+		socket.emit('join-bar');
+
+		// 4. Auf das Signal vom Server warten
+		socket.on('neue-bestellung', (data) => {
+			console.log("🚀 Live-Update: Neue Bestellung vom Server erhalten!");
+			
+			// Wir rufen deine bestehende Funktion auf. 
+			// Diese holt die aktuellen Daten und spielt den Ton ab.
+			fetchOrders(); 
+		});
+
+		// 5. Sicherheits-Netz: Falls das WLAN mal kurz weg ist, 
+		// prüft die Seite jede Minute trotzdem einmal manuell nach.
+		setInterval(fetchOrders, 60000);
+
+		// 6. Die Uhrzeit-Anzeige (hast du schon, kann so bleiben)
+		setInterval(() => {
+			const clockEl = document.getElementById('clock');
+			if(clockEl) clockEl.innerText = new Date().toLocaleTimeString('de-DE');
+		}, 1000);
+
+        //Lösch-Funktion
+       
+
+	 async function removeOrder(id) {
+    if (confirm('Bestellung als erledigt markieren?')) {
+        try {
+            // 1. Abfrage an den Server
+            const res = await fetch(`/api/orders/${id}/done`, { 
+                method: 'PATCH' 
+            });
+
+            if (res.ok) {
+                // --- NEU: AUFRÄUMEN DES DRUCK-SPEICHERS ---
+                // Wir holen die Liste, werfen die erledigte ID raus und speichern neu
+                let printedOrders = JSON.parse(localStorage.getItem('printedOrders') || '[]');
+                printedOrders = printedOrders.filter(orderId => orderId !== id);
+                localStorage.setItem('printedOrders', JSON.stringify(printedOrders));
+                // ------------------------------------------
+
+                // Sobald alles sauber ist, Liste neu laden
+                fetchOrders(); 
+            } else {
+                alert("Server-Fehler beim Markieren.");
+            }
+        } catch (err) {
+            console.error("Netzwerkfehler:", err);
+        }
+    }
+}
+		
+		
+function printOrder(orderId) {
+    const orderCard = document.querySelector(`[data-id="${orderId}"]`);
+    if (!orderCard) return;
+
+    // 1. Drucken vorbereiten
+    orderCard.classList.add('print-area');
+    window.print();
+    orderCard.classList.remove('print-area');
+
+    // 2. Als gedruckt markieren (Lokal im Browser speichern)
+    markAsPrinted(orderId);
+}
+
+
+function printAllMarked() {
+    // 1. Alle Karten finden, die aktuell auf dem Monitor sind
+    const allCards = document.querySelectorAll('.order-card');
+    
+    if (allCards.length === 0) return alert("Keine Bestellungen zum Drucken da!");
+
+    // 2. Allen Karten die Druck-Klasse geben
+    allCards.forEach(card => card.classList.add('print-area'));
+
+    // 3. Druckdialog öffnen (jetzt sind alle Karten sichtbar für den Drucker)
+    window.print();
+
+    // 4. Nach dem Drucken: Allen Karten die Klasse wieder wegnehmen
+    // UND sie als "gedruckt" im Speicher markieren
+    allCards.forEach(card => {
+        card.classList.remove('print-area');
+        const orderId = card.getAttribute('data-id');
+        markAsPrinted(orderId); // Diese Funktion haben wir im vorletzten Schritt gebaut
+    });
+}
+
+// Hilfsfunktion zum Markieren (falls noch nicht vorhanden)
+function markAsPrinted(orderId) {
+    let printedOrders = JSON.parse(localStorage.getItem('printedOrders') || '[]');
+    if (!printedOrders.includes(orderId)) {
+        printedOrders.push(orderId);
+        localStorage.setItem('printedOrders', JSON.stringify(printedOrders));
+    }
+    fetchOrders(); // Seite neu laden, um die "Gedruckt"-Optik anzuzeigen
+}
+		
+	
+function printSelected() {
+    const selectedBoxes = document.querySelectorAll('.print-checkbox:checked');
+    if (selectedBoxes.length === 0) return alert("Bitte erst Bestellungen auswählen!");
+
+    // 1. Alle gewählten Karten markieren
+    selectedBoxes.forEach(box => {
+        const card = document.querySelector(`.order-card[data-id="${box.value}"]`);
+        if (card) card.classList.add('print-area');
+    });
+
+    // 2. Ein winziger Moment Pause (100ms), damit das CSS greifen kann
+    setTimeout(() => {
+        window.print();
+
+        // 3. Erst NACH dem Druck-Befehl aufräumen
+        selectedBoxes.forEach(box => {
+            const id = box.value;
+            const card = document.querySelector(`.order-card[data-id="${id}"]`);
+            
+            if (card) card.classList.remove('print-area');
+            
+            markAsPrinted(id); // Speichert im localStorage
+            box.checked = false; // Haken entfernen
+        });
+        
+        // Optional: Einmal neu laden, damit die "Gedruckt"-Optik überall stimmt
+        // Nach dem Drucken das Set leeren
+		currentSelectedIds.clear();
+		fetchOrders();
+    }, 100); 
+}
+
+
+async function cancelOrder(id) {
+    // Sicherheitsabfrage, damit man nicht aus Versehen storniert
+    if (confirm('Möchtest du diese Bestellung wirklich STORNIEREN? (Wird als Storno in der Datenbank markiert)')) {
+        try {
+            // WICHTIG: Die URL muss zu deinem Backend passen (z.B. /api/orders/ID/cancel)
+            const res = await fetch(`/api/orders/${id}/cancel`, { 
+                method: 'PATCH' 
+            });
+
+            if (res.ok) {
+                // 1. Druck-Status im Browser aufräumen
+                let printedOrders = JSON.parse(localStorage.getItem('printedOrders') || '[]');
+                printedOrders = printedOrders.filter(orderId => orderId !== id);
+                localStorage.setItem('printedOrders', JSON.stringify(printedOrders));
+
+                // 2. Ansicht aktualisieren
+                fetchOrders(); 
+            } else {
+                alert("Server-Fehler: Stornierung konnte nicht gespeichert werden.");
+            }
+        } catch (err) {
+            console.error("Netzwerkfehler beim Stornieren:", err);
+            alert("Netzwerkfehler. Bitte Internetverbindung prüfen.");
+        }
+    }
+}
+
+function setBon(value) {
+    isBon = value; // Update der Variable (true/false)
+
+    // Wir suchen, ob der Style-Tag schon existiert
+    let styleTag = document.getElementById('bon-hide-style');
+
+    if (!isBon) {
+        // Wenn Bon aus ist: Style-Tag erstellen, falls noch nicht da
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'bon-hide-style';
+            styleTag.innerHTML = `.btnPr { display: none !important; }`;
+            document.head.appendChild(styleTag);
+        }
+    } else {
+        // Wenn Bon an ist: Den Style-Tag einfach löschen
+        if (styleTag) {
+            styleTag.remove();
+        }
+    }
+}
+
+    </script>
+</body>
+</html>
