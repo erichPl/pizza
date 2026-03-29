@@ -70,6 +70,13 @@ const Order = mongoose.model('Order', orderSchema, 'orders');
 
 // --- 4. WEBSOCKET LOGIK ---
 io.on('connection', (socket) => {
+    
+    // NEU: Den Herzschlag empfangen und ignorieren
+    socket.on('heartbeat', () => {
+        // Wir machen hier gar nichts. 
+        // Der reine Datenaustausch hält Render davon ab, die Leitung zu puffern.
+    });
+    
     socket.on('join-bar', () => {
         socket.join('bar-room');
         console.log("Bar-Monitor verbunden.");
