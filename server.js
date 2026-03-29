@@ -77,11 +77,11 @@ io.on('connection', (socket) => {
 });
 
 // --- 5. HTML ROUTEN ---
-app.get('/gast', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','bestelle.html')));
-app.get('/bar', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','orders.html')));
+app.get('/gast', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','gast.html')));
+app.get('/bar', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','bar.html')));
 app.get('/statistik', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','statistik.html')));
-app.get('/menue', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','adminNode.html')));
-app.get('/qr', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','qrCode.html')));
+app.get('/menue', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','menue.html')));
+app.get('/qr', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','qre.html')));
 
 // --- 6. API: WEBSEITE (PIZZERIA) ---
 app.get('/api/data', async (req, res) => {
@@ -166,6 +166,22 @@ app.get('/api/get-orders', async (req, res) => {
     } catch (err) { res.status(500).send("Fehler"); }
 });
 
+// 2. DAS SPEICHERN (Nur für den Admin-Button)
+app.put('/api/order-menu', async (req, res) => {
+    try {
+        const { items } = req.body; 
+        await OrderMenu.findOneAndUpdate(
+            { type: "order_menu" }, 
+            { items: items }, 
+            { upsert: true } // Erstellt das Dokument, falls es das erste Mal ist
+        );
+        res.json({ success: true });
+    } catch (err) { 
+        res.status(500).send("Fehler beim Speichern"); 
+    }
+});
+
+
 app.patch('/api/orders/:id/done', async (req, res) => {
     try {
         // findByIdAndUpdate gibt standardmäßig ein Mongoose-Dokument zurück, 
@@ -222,6 +238,25 @@ app.get('/api/get-fixed-menu', async (req, res) => {
 
 
 
+
+// Variable für die Einstellungen (vorerst im Arbeitsspeicher, später DB möglich)
+let systemSettings = { isGeolocation: false };
+
+// 1. Einstellungen abrufen
+app.get('/api/get-settings', (req, res) => {
+    res.json(systemSettings);
+});
+
+// 2. Einstellungen speichern
+app.post('/api/save-settings', (req, res) => {
+    if (req.body && typeof req.body.isGeolocation === 'boolean') {
+        systemSettings.isGeolocation = req.body.isGeolocation;
+        console.log("System-Einstellungen aktualisiert:", systemSettings);
+        res.json({ success: true, settings: systemSettings });
+    } else {
+        res.status(400).json({ error: "Ungültige Daten" });
+    }
+});
 
 
 
