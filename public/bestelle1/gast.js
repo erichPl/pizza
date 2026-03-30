@@ -1370,9 +1370,14 @@ function closeModal() { document.getElementById('modal').style.display = 'none';
 
 let isGeolocation=false;
 async function sendOrder() {
-    const urlParams = new URLSearchParams(window.location.search);
+    
+	const urlParams = new URLSearchParams(window.location.search);
     const isTestMode = urlParams.get('test') === 'true';
     const tisch = urlParams.get('tisch') || "Unbekannt";
+
+
+
+  
 
     // NEU: Wenn Geolocation generell AUS ist ODER Testmodus AN ist
     if (!isGeolocation || isTestMode) {
@@ -1408,6 +1413,21 @@ async function executeOrder(tisch, lat, lng) {
     let artikelDetails = [];
     let gesamtSumme = 0;
     let berechneteDistanz = null;
+
+    const btn = document.getElementById('btn-send'); // Die ID deines Buttons
+    
+    // 1. Prüfen, ob der Button schon gesperrt ist (verhindert Doppelklick)
+    if (btn.disabled) return;
+    // 2. Button sperren und Optik ändern
+    btn.disabled = true;
+    const originalText = btn.innerText;
+    btn.innerText = "⏳ Sende Bestellung...";
+    btn.style.opacity = "0.5";
+    btn.style.cursor = "not-allowed";
+
+
+
+
 
     if (isGeolocation){
 		// Distanz berechnen, wenn Koordinaten vorhanden
@@ -1515,6 +1535,15 @@ async function executeOrder(tisch, lat, lng) {
             // Wir rufen das Fenster auf, BEVOR wir die großen Aufräumarbeiten machen
             showCustomAlert();
 
+
+            // 2. Button endgültig verstecken oder Text ändern
+    // Wir lassen ihn 'disabled', damit kein zweiter Klick möglich ist,
+    // während der Warenkorb im Hintergrund geleert wird.
+    btn.innerText = "✅ Bestellung abgeschlossen";
+    btn.style.backgroundColor = "#28a745"; // Schön grün machen
+
+
+
             // --- 2. AUFRÄUMEN IM HINTERGRUND ---
             pizzaCart = [];
             for (let id in standardCart) {
@@ -1524,6 +1553,10 @@ async function executeOrder(tisch, lat, lng) {
             localStorage.removeItem('meinWarenkorb_Pizza');
             localStorage.removeItem('meinWarenkorb_Standard');
 
+
+		// 4. UI aktualisieren, damit der Warenkorb auch optisch leer ist
+			if (typeof updateUI === "function") updateUI();
+			
             // Hinweis: updateUI() und renderMenu() werden jetzt 
             // automatisch nach 1.5s durch closeCustomAlert() aufgerufen.
             // Das spart Rechenzeit im Moment des Klicks!
@@ -1534,6 +1567,14 @@ async function executeOrder(tisch, lat, lng) {
     } catch (err) {
         console.error("Netzwerkfehler", err);
         showErrorAlert("Netzwerkfehler");
+		// Falls ein Fehler passiert: Button wieder freigeben!
+        alert("Fehler: " + err.message);
+        btn.disabled = false;
+        btn.innerText = originalText;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+		
+		
     }
 }
 		
