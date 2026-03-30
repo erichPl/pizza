@@ -1578,7 +1578,12 @@ async function executeOrder(tisch, lat, lng) {
     }
 }
 		
-		
+// Alle 20 Sekunden ein winziger "Wachhalte-Gruß" an den Server
+setInterval(() => {
+    fetch('/api/data?ping=' + Date.now())
+        .then(() => console.log("Gast-Leitung gewärmt"))
+        .catch(() => {}); 
+}, 20000);		
 		
 		
 		
