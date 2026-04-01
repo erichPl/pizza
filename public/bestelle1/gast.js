@@ -1,90 +1,61 @@
-  const urlParams = new URLSearchParams(window.location.search);
-    const isTestMode = urlParams.get('test') === 'true';
-	
-	const namePizza="PIZZ";
-	
-	
-	let items = [];
-        let standardCart = {}; 
-        let pizzaCart = [];    
-        let currentPizzaIdx = null;
+const urlParams = new URLSearchParams(window.location.search);
+
+const isTestMode = urlParams.get('test') === 'true'; //bei Tconst urlParams = new URLSearchParams(window.location.search);st braucht es nie Geolocation
+const tisch = urlParams.get('tisch') || "/";
+const namePizza="PIZZ"; //Wenn dies in der Überschrift enthalten ist, dann werden die Produkte als Pizza behandelt
+const nameExtras="EXTRAS";
 
 
-	const i18n = {
-		de: {impressumLink: "/bestelle1/impressumWsDe.html",
-        privacyLink: "/bestelle1/datenschutzWsDe.html",
-			impressum: "Impressum",
-        privacy: "Datenschutz",tisch: "TISCH", aendern: "ÄNDERN", ohne: "OHNE", extra: "EXTRA", gesamt: "Gesamtbetrag", bestellen: "JETZT BESTELLEN", anpassen: "Anpassen", abbrechen: "ABBRECHEN", fertig: "SPEICHERN", weg: "weg", produkt: "Produkt", produkte: "Produkte",
-        korrekturTitel: "Bestellung anpassen",
-        korrekturFrage: "Welche Version möchtest du ändern?",
-        schliessen: "Schließen", impressum: "Impressum",
-        privacy: "Datenschutz",address: "Vinschgaustraße 74, 39023 Laas (BZ)",
-        region: "Südtirol, Italien",
-        vat: "MwSt.-Nr.: 12345678901"		},
-		it: {impressumLink: "/bestelle1/impressumWsIt.html",
-        privacyLink: "/bestelle1/datenschutzWsIt.html",impressum: "Note Legali",
-        privacy: "Privacy",tisch: "TAVOLO", aendern: "MODIFICA", ohne: "SENZA", extra: "EXTRA", gesamt: "Totale", bestellen: "ORDINA ORA", anpassen: "Modifica", abbrechen: "ANNULLA", fertig: "SALVA", weg: "togli", produkt: "prodotto", produkte: "prodotti",
-		korrekturTitel: "Modifica ordine",
-        korrekturFrage: "Quale versione vuoi cambiare?",
-        schliessen: "Chiudi",impressum: "Note legali",
-        privacy: "Privacy", address: "Via Venosta 74, 39023 Lasa (BZ)",
-        region: "Alto Adige, Italia",
-        vat: "P.IVA: 12345678901"}
-	};
 
-// Ganz oben in deinem Script (außerhalb der Funktion) definieren:
-const specialDescItems = new Set(); 
+// ==========================================
+// 1. GLOBALE VARIABLEN & KONFIGURATION
+// ==========================================
+let items = [];  //Alle Produkte der Speisekarte (mit Überschriften)
+let pizzaCart = []; //Warenkorb für angepasste Pizzas
+let standardCart = {}; // Warenkorb für Getränke/Standardartikel
+const specialDescItems = new Set();	// IDs für Spezial-Produkte (in desc mit Beistrich getrennt und/oder im Preis mit / getrennt (z.B. Fanta,Cola  0.2 l/0.4 l  2,30/4,60
 
-async function init() {
-    const params = new URLSearchParams(window.location.search);
-    const tischStr = "Tisch " + (params.get('tisch') || "/");
-    document.getElementById('tisch-view').innerText = tischStr;
-    
-    setLanguage('de');
-
-    try {
-        const res = await fetch('/api/order-menu?v=' + Date.now());
-        if (!res.ok) throw new Error("Server antwortet nicht korrekt");
-
-        const data = await res.json(); 
-        
-        // 1. Daten filtern (dein bestehender Code)
-        items = data.filter(item => {
-            return item.view && item.view.toLowerCase().split(',').map(s => s.trim()).includes('b');
-        });
-
-        // --- 2. NEU: SPEZIAL-PRODUKTE ERKENNEN UND REINIGEN ---
-        items.forEach((item, index) => {
-            let priceStr = String(item.price);
-            
-            // Wenn der Preis ein "/" enthält
-            if (priceStr.includes('/')) {
-                const parts = priceStr.split('/').filter(p => p.trim() !== "");
-                
-                // Nur wenn genau EIN Preis vorhanden ist (z.B. "2,30/")
-                if (parts.length === 1) {
-                    // ID im Set speichern für addItem()
-                    specialDescItems.add(index);
-                    
-                    // Das "/" aus dem Preis löschen, damit renderMenu() es sauber anzeigt
-                    item.price = parts[0]; 
-                    
-                    // Markierung setzen, falls du später im CSS/Warenkorb darauf prüfen willst
-                    item.isAutoDesc = true;
-                }
-            }
-        });
-        // --- ENDE NEU ---
-
-        renderMenu();
-        console.log("Speisekarte erfolgreich geladen, gefiltert und Spezial-Preise bereinigt.");
-    } catch (e) { 
-        console.error(e);
-        document.getElementById('menu').innerText = "Fehler beim Laden der Speisekarte."; 
-    }
-}
+//let currentLang = 'de';
 let currentLang = localStorage.getItem('selectedLang') || 'de';
+let currentPizzaIdx = null; // Aktuell bearbeitete Pizza im Modal
 
+
+//das wird nicht gebraucht, da direkt zu items der productType gleich mit init hinzugefügt wird.
+//letMyItems=[]; //dies erhält noch ein Feld mit productType standard,beistrich,slash,pizza,kinderpizza,extra
+
+//standart ohne / im Preis, ohne , in name u. keine Pizza
+
+//let myKommaItems=[]; //Beistrich in name   (Fanta, Cola)
+//let mySlashItems=[]; // / in Preis (u. damit in desc 0.2 l/0.4 l
+//let myPizzaItems=[]; //Pizzas (unter Überschrift Pizza)
+//let myExtras= []; // Produkte unter Überschift Extras
+
+
+
+
+const i18n = {
+	de: {impressumLink: "/bestelle1/impressumWsDe.html",
+	privacyLink: "/bestelle1/datenschutzWsDe.html",
+		impressum: "Impressum",
+	privacy: "Datenschutz",tisch: "TISCH", aendern: "ÄNDERN", ohne: "OHNE", extra: "EXTRA", gesamt: "Gesamtbetrag", bestellen: "JETZT BESTELLEN", anpassen: "Anpassen", abbrechen: "ABBRECHEN", fertig: "SPEICHERN", weg: "weg", produkt: "Produkt", produkte: "Produkte",
+	korrekturTitel: "Bestellung anpassen",
+	korrekturFrage: "Welche Version möchtest du ändern?",
+	schliessen: "Schließen", impressum: "Impressum",
+	privacy: "Datenschutz",address: "Vinschgaustraße 74, 39023 Laas (BZ)",
+	region: "Südtirol, Italien",
+	vat: "MwSt.-Nr.: 12345678901"		},
+	it: {impressumLink: "/bestelle1/impressumWsIt.html",
+	privacyLink: "/bestelle1/datenschutzWsIt.html",impressum: "Note Legali",
+	privacy: "Privacy",tisch: "TAVOLO", aendern: "MODIFICA", ohne: "SENZA", extra: "EXTRA", gesamt: "Totale", bestellen: "ORDINA ORA", anpassen: "Modifica", abbrechen: "ANNULLA", fertig: "SALVA", weg: "togli", produkt: "prodotto", produkte: "prodotti",
+	korrekturTitel: "Modifica ordine",
+	korrekturFrage: "Quale versione vuoi cambiare?",
+	schliessen: "Chiudi",impressum: "Note legali",
+	privacy: "Privacy", address: "Via Venosta 74, 39023 Lasa (BZ)",
+	region: "Alto Adige, Italia",
+	vat: "P.IVA: 12345678901"}
+};
+
+ 
 function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('selectedLang', lang);
@@ -137,29 +108,132 @@ function setLanguage(lang) {
     updateUI();
 }
 
-function getCountForProduct(index, category) {
-	if (category.includes(namePizza)) {
-		// Zähle alle Einträge in pizzaCart, die von diesem Produkt stammen
-		return pizzaCart.filter(p => p.parentIdx === index).length;
-	} else {
-		// Bei Getränken einfach den Wert aus dem standardCart nehmen
-		return standardCart[index] || 0;
-	}
+
+//A meine Sortierung
+function mySorter(){	
+	let myHeaderPizza="";
+	items.forEach((item, index) => {
+		//Zuordnen eines index zum product bzw. header
+		item.index=index;
+		//schaue ob header Pizza oder EXTRAS ist
+		if (item.type=="header"){	
+			console.log(namePizza+" "+item.name+" includes:"+nameExtras.includes(item.name));
+			if (namePizza.includes(item.name)==true){
+			//if (1==1){
+				//alert("in");
+				myHeaderPizza="pizza";
+				if(item.name=="KINDER PIZZA"){
+					myHeaderPizza="kinderpizza";
+				}
+			}
+			else{
+				if (item.name=="EXTRAS"){
+					myHeaderPizza="extras";
+				}
+				else{
+				  myHeaderPizza="";
+				}
+			}
+			console.log(myHeaderPizza);				
+		}
+		//wenn header Pizza ist dann productType=pizza, wenn KINDERPIZZA dann kinderpizza, wenn EXTRAS dann extra
+		if (myHeaderPizza!=""){
+			if (item.type=="product"){
+				if (myHeaderPizza=="kinderpizza"){
+					item.productType="kinderpizza";
+				}
+				else{
+					if (myHeaderPizza=="extras"){
+						item.productType="extra";
+					}
+					else{  
+						item.productType="pizza";
+					}
+				}			
+			}
+		}			
+		//wenn keine Pizza und kein extra
+		else{
+			//wenn name Beistrich
+			if (item.name.includes(",")){
+				item.produktType="beistrich";
+				if (item.price.includes("/")){
+					item.produktType="beistrichslash";
+				}
+			}
+			else{
+				if (item.price.includes("/")){
+					item.productType="slash";
+				}
+				else{
+					item.productType="standard";
+				}
+			}
+			
+		}
+		console.log(item.type+" "+item.name+" "+item.desc+" "+item.price+" "+item.productType);	
+	})
+
 }
 
 
-	function getTotalPizzaCount(index) {
-		// 1. Normale Pizzen zählen
-		let count = cart[index] || 0;
+
+async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const tischStr = "Tisch " + (params.get('tisch') || "/");
+    document.getElementById('tisch-view').innerText = tischStr;
+    
+    setLanguage('de');
+
+    try {
+        //Daten aus Datenbank
+	    const res = await fetch('/api/order-menu?v=' + Date.now());
+        if (!res.ok) throw new Error("Server antwortet nicht korrekt");
+
+        const data = await res.json(); 
+        
+        // 1. Daten filtern (nur view b  oder B,m)
+        items = data.filter(item => {
+            return item.view && item.view.toLowerCase().split(',').map(s => s.trim()).includes('b');
+        });
 		
-		// 2. Alle Spezial-Versionen (customCart) dazuaddieren, die zu dieser Pizza gehören
-		Object.keys(customCart).forEach(cIdx => {
-			if (customOrders[cIdx].parentIndex === index) {
-				count += (customCart[cIdx] || 0);
-			}
-		});
-		return count;
-	}
+			
+		
+		
+	
+        //mySorter(); //Meine Sortierung zu Beginn
+        
+		// --- 2. NEU: SPEZIAL-PRODUKTE ERKENNEN UND REINIGEN --- (nur / im Preis)
+        items.forEach((item, index) => {
+            let priceStr = String(item.price);
+            
+            // Wenn der Preis ein "/" enthält
+            if (priceStr.includes('/')) {
+                const parts = priceStr.split('/').filter(p => p.trim() !== "");
+                
+                // Nur wenn genau EIN Preis vorhanden ist (z.B. "2,30/")
+                if (parts.length === 1) {
+                    // ID im Set speichern für addItem()
+                    specialDescItems.add(index);
+                    
+                    // Das "/" aus dem Preis löschen, damit renderMenu() es sauber anzeigt
+                    item.price = parts[0]; 
+                    
+                    // Markierung setzen, falls du später im CSS/Warenkorb darauf prüfen willst
+                    item.isAutoDesc = true;
+                }
+            }
+        });
+        // --- ENDE NEU ---
+
+        renderMenu();
+        console.log("Speisekarte erfolgreich geladen, gefiltert und Spezial-Preise bereinigt.");
+    } catch (e) { 
+        console.error(e);
+        document.getElementById('menu').innerText = "Fehler beim Laden der Speisekarte."; 
+    }
+}
+
 
 function renderMenu() {
     const menuDiv = document.getElementById('menu');
@@ -219,78 +293,11 @@ function renderMenu() {
     });
     menuDiv.innerHTML = html;
 }
-
-
-
-
-function renderMenu__() {
-    const menuDiv = document.getElementById('menu');
-    let html = "";
-    let currentCat = "";
-
-    items.forEach((item, index) => {
-        if (item.type === 'header') {
-            currentCat = item.name.toUpperCase();
-            html += `<h2>${item.name}</h2>`;
-            return;
-        }
-
-        const isExtra = currentCat.includes("EXTRAS") || currentCat.includes("ZUTATEN");
-        const count = getCountForProduct(index, currentCat);
-
-
-		const cat = currentCat.toUpperCase();
-		//const isPizzaType = cat.includes("PIZZA") || cat.includes("KINDERPIZZA");
-        html += `
-        <div class="item">
-            <div class="info">
-                <strong>${item.name}</strong>
-                <span class="desc">${item.desc}</span>
-                <span class="preis">${item.price} €</span>
-            </div>
-            <div class="controls">
-                ${!isExtra ? `
-                    <div style="display: flex; align-items: center; gap: 12px; background: #2a2a2a; padding: 5px 10px; border-radius: 10px;">
-                        <!-- MINUS: Verringert die Menge -->
-                        <button onclick="removeItem(${index}, '${currentCat}')" 
-                                style="width:30px; height:30px; background:#444; color:white; border:none; border-radius:5px; cursor:pointer;">-</button>
-                        
-                        <!-- ZAHL: Aktuelle Menge -->
-                        <span id="qty-${index}" style="min-width:20px; text-align:center; font-weight:bold; color:#ffcc00;">
-                            ${count}
-                        </span>
-                        
-                        <!-- PLUS: Fügt neues Item hinzu -->
-                        <button onclick="addItem(${index}, '${currentCat}')" 
-                                style="width:30px; height:30px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">+</button>
-                    </div>
-                ` : ''}
-            </div>
-        </div>`;
-    });
-    menuDiv.innerHTML = html;
+function addItem_(index, category){
+	//alert(index+" "+category);
+	//openSelectionModal(index, category, -1); 
+	openCombinedModal(index);
 }
-
-      
-		
-function changeQty(index, delta) {
-	if (delta < 0) {
-		// Logik für Minus
-		if (cart[index] && cart[index] > 0) {
-			cart[index] -= 1;
-		} else {
-			// Wenn keine normale Pizza mehr da ist, suche die letzte Spezial-Pizza dieses Typs
-			for (let i = customOrders.length - 1; i >= 0; i--) {
-				if (customOrders[i].parentIndex === index && customCart[i] > 0) {
-					customCart[i] -= 1;
-					break;
-				}
-			}
-		}
-	}
-	updateUI();
-	renderMenu(); // Menü neu zeichnen, um die Zahlen zu aktualisieren
-}		
 
 function addItem(index, category) {
     const item = items[index];
@@ -300,82 +307,58 @@ function addItem(index, category) {
     const hasSorts = itemName.includes(',');
     const hasVariants = priceStr.includes('/');
 
+	//alert("specialDescItems:"+index+" has:"+specialDescItems.has(index))
+  
+	// A. FALL: Spezial-Getränk (Sorten/Größen) PRÜFUNG: Ist es eine ID aus unserem Spezial-Set (z.B. "2,30/")?
+	if (hasSorts || hasVariants) {
+		console.log("hasSorte||hasVariants")
+		openSelectionModal(index, category, -1); 
+		return;
+	}
 
+	// B. FALL: Pizza - Produkt unter Überschrift isPizza ("PIZZ")
+	if (category.toUpperCase().includes(namePizza)) {
+		console.log("includesPizza")
+		// 1. Wir fügen die Pizza als "Entwurf" in den Warenkorb ein
+		const neuePizzaIdx = pizzaCart.push({
+			parentIdx: index, 
+			name: itemName, 
+			size: "", 
+			basePrice: parseFloat(priceStr.replace(',', '.')) || 0,
+			extras: [], 
+			removals: [], 
+			extraPrice: 0, 
+			kategorie: category
+		}) - 1; // Wir holen uns den Index des gerade hinzugefügten Elements
 
+		// 2. Wir öffnen sofort das Modal für genau diesen neuen Index
+		openCombinedModal(neuePizzaIdx);
+	} 
+	// C. FALL: Normales Getränk (Cola etc.)
+	else {
+		console.log("standardCart")
+		standardCart[index] = (standardCart[index] || 0) + 1;
+	}
 
-// 1. PRÜFUNG: Ist es eine ID aus unserem Spezial-Set (z.B. "2,30/")?
-    if (specialDescItems.has(index)) {
-        const desc = (currentLang === 'it' && item.desc_it) ? item.desc_it : item.desc;
-        
-        // Wir "missbrauchen" den pizzaCart, um die desc in 'size' zu speichern
-        pizzaCart.push({
-            parentIdx: index,
-            name: (currentLang === 'it' && item.name_it) ? item.name_it : item.name,
-            size: desc || "", // Hier landet "0,33l" etc.
-            basePrice: parseFloat(priceStr.replace(',', '.')) || 0,
-            extraPrice: 0,
-            extras: [],
-            removals: [],
-            kategorie: category
-        });
-if (typeof renderMenu === "function") renderMenu();
-        updateUI();
-        return; // WICHTIG: Hier abbrechen, damit es NICHT im standardCart landet!
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if (specialDescItems.has(index)) {
-    // Logik für direktes Hinzufügen zum pizzaCart inklusive desc...
-    // (Wie im vorherigen Schritt besprochen)
+	updateUI();
+	renderMenu();
 }
 
 
-    // A. FALL: Spezial-Getränk (Sorten/Größen)
-    if (hasSorts || hasVariants) {
-        openSelectionModal(index, category, -1); 
-        return;
-    }
 
-    // B. FALL: Pizza -> Sofort anpassen!
-    if (category.toUpperCase().includes(namePizza)) {
-        // 1. Wir fügen die Pizza als "Entwurf" in den Warenkorb ein
-        const neuePizzaIdx = pizzaCart.push({
-            parentIdx: index, 
-            name: itemName, 
-            size: "", 
-            basePrice: parseFloat(priceStr.replace(',', '.')) || 0,
-            extras: [], 
-            removals: [], 
-            extraPrice: 0, 
-            kategorie: category
-        }) - 1; // Wir holen uns den Index des gerade hinzugefügten Elements
 
-        // 2. Wir öffnen sofort das Modal für genau diesen neuen Index
-        openCombinedModal(neuePizzaIdx);
-    } 
-    // C. FALL: Normales Getränk (Cola etc.)
-    else {
-        standardCart[index] = (standardCart[index] || 0) + 1;
-    }
-
-    updateUI();
-    renderMenu();
+function getCountForProduct(index, category) {
+	if (category.includes(namePizza)) {
+		// Zähle alle Einträge in pizzaCart, die von diesem Produkt stammen
+		return pizzaCart.filter(p => p.parentIdx === index).length;
+	} else {
+		// Bei Getränken einfach den Wert aus dem standardCart nehmen
+		return standardCart[index] || 0;
+	}
 }
+
+
+
 
 
 function cancelCustomization() {
@@ -476,9 +459,9 @@ function openCombinedModal(idx) {
     modal.style.display = 'block';
 
     // FALL A: Getränk / Produkt mit Auswahl (Sorte oder Größe)
-    // Bedingung: Hat Varianten/Sorten UND ist KEINE Pizza
-    if ((hasVariants || hasSorts) && !isPizza) {
-        
+    // Bedingung: Hat Varianten/Sorten UND ist KEINE Pizza   //wenn das nicht ist geht es zu pizza zurück bei / u ,
+    if ((hasVariants || hasSorts) && !isPizza) {   
+	
         // Erst das Auswahl-Fenster für Getränke bauen
         openSelectionModal(p.parentIdx, p.kategorie, idx);
         
@@ -504,77 +487,21 @@ function openCombinedModal(idx) {
     }
 }
 
-function openCombinedModal0(idx) {
-    currentPizzaIdx = idx; 
-    const p = pizzaCart[idx];
-    const pOriginal = items[p.parentIdx];
-    const lang = i18n[currentLang] || i18n.de;
-
-    // 1. IDENTISCHE PRODUKTE ZÄHLEN (Dein Code bleibt gleich)
-    const extrasKey = p.extras.map(e => e.name).sort().join(",");
-    const removalsKey = p.removals.sort().join(",");
-    const identische = pizzaCart.filter(item => 
-        item.parentIdx === p.parentIdx && 
-        (item.size || "") === (p.size || "") && 
-        item.extras.map(e => e.name).sort().join(",") === extrasKey &&
-        item.removals.sort().join(",") === removalsKey
-    ).length;
-
-    let hinweisHtml = "";
-    if (identische > 1) {
-        const text = currentLang === 'it' 
-            ? `Stai modificando <strong>uno</strong> di ${identische} prodotti identici.` 
-            : `Du änderst gerade <strong>eines</strong> von ${identische} identischen Produkten.`;
-        hinweisHtml = `<div id="edit-notice" style="background: #332b00; color: #ffcc00; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; border: 1px solid #554400; text-align: center;">ℹ️ ${text}</div>`;
-    }
-
-    // 2. ENTSCHEIDUNG LOGIK VERBESSERN
-    const priceStr = String(pOriginal.price);
-    const hasVariants = priceStr.includes('/'); // Hat Größen (0.2/0.4)
-    const hasSorts = pOriginal.name.includes(',') || pOriginal.name.includes('/'); // NEU: Hat Sorten (Cola, Fanta)
-    
-    const isPizza = p.kategorie.toUpperCase().includes(namePizza)
-                    
-
-    const modal = document.getElementById('modal');
-    modal.style.display = 'block';
-
-    // Wenn es Sorten ODER Größen hat (und keine Pizza ist), öffne das Auswahl-Modal
-    if ((hasVariants || hasSorts) && !isPizza) {
-        // Wir nutzen hier openSelectionModal, da diese Funktion 
-        // bereits die Logik für Sorten-Buttons und Größen-Buttons enthält
-        openSelectionModal(p.parentIdx, p.kategorie, idx);
-        
-        if (hinweisHtml) {
-            const list = document.getElementById('modal-list');
-            list.insertAdjacentHTML('afterbegin', hinweisHtml);
-        }
-    } else {
-        // Fall B: Pizza oder normales Gericht
-        pizzaBackup = JSON.parse(JSON.stringify(pizzaCart[idx])); 
-        renderModalContent();
-
-        if (hinweisHtml) {
-            const list = document.getElementById('modal-list');
-            list.insertAdjacentHTML('afterbegin', hinweisHtml);
-        }
-    }
-}
 
 // Hilfsfunktionen für die Buttons im Modal
-function executeModalRemove(cartIdx, parentIdx) {
+function executeModalRemove_(cartIdx, parentIdx) {
     pizzaCart.splice(cartIdx, 1);
     finishUpdate(parentIdx);
 }
 
-function executeModalAdd(sampleIdx, parentIdx) {
+function executeModalAdd_(sampleIdx, parentIdx) {
     // Kopiert die Pizza an sampleIdx (inkl. aller Extras/Größen)
     const neuePizza = JSON.parse(JSON.stringify(pizzaCart[sampleIdx]));
     pizzaCart.push(neuePizza);
     finishUpdate(parentIdx);
 }
 
-function finishUpdate(parentIdx) {
+function finishUpdate_(parentIdx) {
     updateUI();
     renderMenu();
     // Wenn noch Pizzen dieses Typs da sind, Modal aktualisieren, sonst schließen
@@ -586,7 +513,7 @@ function finishUpdate(parentIdx) {
     }
 }
 
-function closeCorrection() {
+function closeCorrection_() {
     const m = document.getElementById('correction-modal');
     if (m) m.remove();
 }
@@ -665,88 +592,122 @@ function updateUI() {
         </div>`;
     });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // --- 3. PIZZA & SPEZIAL-DRINK HTML ---
+   // --- 3. PIZZA & SPEZIAL-DRINK HTML ---
     let pizzaDetailHtml = "";
-Object.values(gruppen).forEach(g => {
-    // 1. Die einzige Info, die wir noch brauchen: Ist es ein Spezial-Drink?
-    const isSpecial = specialDescItems.has(parseInt(g.parentIdx));
+    Object.values(gruppen).forEach(g => {
+        const isSpecial = specialDescItems.has(parseInt(g.parentIdx));
+        
+		//alert(isSpecial);
+        // Button Logik
+        const aendernButton = !isSpecial 
+            ? `<button onclick="openCombinedModal(${g.sampleIdx})" style="margin-top:8px; padding: 4px 12px; background:#444; color:white; border:none; border-radius:4px; font-size:0.75rem; cursor:pointer;">✎ ${lang.aendern}</button>` 
+            : "";
 
-    // 2. Ändern-Button: Nur wenn es KEIN Spezial-Drink ist
-    const aendernButton = !isSpecial 
-        ? `<br><button onclick="openCombinedModal(${g.sampleIdx})" style="margin-top:5px; padding: 2px 8px; background:#444; color:#ffcc00; border:none; border-radius:4px; font-size:0.7rem; cursor:pointer;">✎ ${lang.aendern}</button>` 
-        : "";
+        // Escape helper für Strings in onclick-Attributen
+        const escSize = (g.size || "").replace(/'/g, "\\'");
+        const escExtras = g.extras.map(e => e.name.replace(/'/g, "\\'")).join(",");
+        const escRemovals = g.removals.map(r => r.replace(/'/g, "\\'")).join(",");
 
-    if (g.isSpecialDrink) {
-        // --- GETRÄNKE LAYOUT ---
-        pizzaDetailHtml += `
-        <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
-            <div style="flex-grow:1;">
-                <strong style="color:white;">${g.qty}x ${g.name}</strong> 
-                <span style="color:#aaa; font-size:0.85rem;">${g.size ? g.size : ''}</span>
-                ${aendernButton}
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
-                <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px;">–</button>
-                <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px;">+</button>
-            </div>
-        </div>`;
-    } else {
-        // ... (hier kommt dein normaler Pizza-Code, dort bleibt der Button meistens drin)
-            const extraStrings = g.extras.map(e => `<span style="color: #2ecc71;">+ ${e.name}</span>`);
+        if (g.isSpecialDrink) {
+            // --- GETRÄNKE LAYOUT (Blau) ---
+            pizzaDetailHtml += `
+            <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="flex-grow:1;">
+                    <strong style="color:white;">${g.qty}x ${g.name}</strong> 
+                    <span style="color:#aaa; font-size:0.85rem;">${g.size ? g.size : ''}</span>
+                    <div style="display:block;">${aendernButton}</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
+                    <button onclick="changeGroupQty('${g.parentIdx}', '${escSize}', '${escExtras}', '${escRemovals}', -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px;">–</button>
+                    <button onclick="changeGroupQty('${g.parentIdx}', '${escSize}', '${escExtras}', '${escRemovals}', 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px;">+</button>
+                </div>
+            </div>`;
+        } else {
+            // --- PIZZA LAYOUT (Gelb) ---
+            // Extras Formatierung
+            const extraList = g.extras.length > 0 
+                ? g.extras.map(e => `<span style="color: #ffcc00;">+ ${e.name}</span>`).join(', ') 
+                : "";
+            
+            // Ohne-Zutaten Formatierung
+            const ohneList = g.removals.length > 0 
+                ? `<div style="color:#2ecc71; margin-top: 2px;">${lang.ohne}: ${g.removals.join(', ')}</div>` 
+                : "";
+
             pizzaDetailHtml += `
             <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #ffcc00; padding: 10px; background: #2a2a2a; border-radius: 8px;">
-                <div style="display:flex; justify-content:space-between; align-items: center;">
+                <div style="display:flex; justify-content:space-between; align-items: flex-start;">
                     <div style="flex-grow:1;">
-                        <strong>${g.qty}x ${g.name} ${g.size ? '('+g.size+')' : ''}</strong>
-                        <div style="font-size: 0.82rem; margin-top: 4px;">
-                            ${extraStrings.join(', ')}
-                            ${g.removals.length > 0 ? `<div style="color:#ff4444;">${lang.ohne}: ${g.removals.join(', ')}</div>` : ''}
+                        <strong style="color:white;">${g.qty}x ${g.name}</strong> 
+                        <span style="color:#aaa; font-size:0.9rem;">${g.size ? '('+g.size+')' : ''}</span>
+                        
+                        <div style="font-size: 0.82rem; margin-top: 4px; line-height: 1.3;">
+                            ${extraList}
+                            ${ohneList}
                         </div>
-                        <button onclick="openCombinedModal(${g.sampleIdx})" style="margin-top:8px; padding: 4px 12px; background:#444; color:white; border:none; border-radius:4px; font-size:0.75rem;">✎ ${lang.aendern}</button>
+                        
+                        ${aendernButton}
                     </div>
-                    <div style="display: flex; align-items: center; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
-                        <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px;">–</button>
-                        <button onclick="changeGroupQty('${g.parentIdx}', '${(g.size||"").replace(/'/g,"\\'")}', '${g.extras.map(e=>e.name).join(",")}', '${g.removals.join(",")}', 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px;">+</button>
+                    
+                    <div style="display: flex; align-items: center; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px; margin-left: 10px;">
+                        <button onclick="changeGroupQty('${g.parentIdx}', '${escSize}', '${escExtras}', '${escRemovals}', -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px;">–</button>
+                        <button onclick="changeGroupQty('${g.parentIdx}', '${escSize}', '${escExtras}', '${escRemovals}', 1)" style="width:34px; height:34px; background:#007bff; color:white; border:none; border-radius:4px;">+</button>
                     </div>
                 </div>
             </div>`;
         }
     });
 
-// --- 4. FINALE STRUKTUR (Neues Design für Schließen-Button) ---
-let cartHeader = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:12px;">
-        <h2 style="color:#ffcc00; margin:0; font-size:1.1rem; text-transform: uppercase; letter-spacing: 1px;">
-            ${lang.warenkorb || 'Warenkorb'}
-        </h2>
-        
-        <div onclick="toggleCart(false)" style="
-            cursor: pointer; 
-            width: 32px; 
-            height: 32px; 
-            background: #333; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin-right: 10px; /* Schiebt das X weiter nach links */
-            transition: background 0.2s;">
-            <span style="color: #888; font-size: 1.2rem; line-height: 1; font-family: sans-serif;">✕</span>
-        </div>
-    </div>
-`;
+ 
 
-// Wir hängen den Bestell-Button direkt unten an die Liste an
-let cartFooter = "";
-if (absoluteProduktAnzahl > 0) {
-    cartFooter = `
-    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #444;">
-        <button id="btn-send" class="btn-send" onclick="sendOrder()" 
-            style="width:100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-            🚀 ${lang.bestellen || 'JETZT BESTELLEN'}
-        </button>
-    </div>`;
-}
+// --- 4. FINALE STRUKTUR ---
+    let cartHeader = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:12px;">
+            <h2 style="color:#ffcc00; margin:0; font-size:1.1rem; text-transform: uppercase; letter-spacing: 1px;">
+                ${lang.produkte || 'Warenkorb'}
+            </h2>
+            <div onclick="toggleCart(false)" style="cursor: pointer; width: 32px; height: 32px; background: #444; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <span style="color: white; font-size: 1.2rem;">✕</span>
+            </div>
+        </div>
+    `;
+let totalHtml="";
+    // Warenkorb Summe hinzufügen
+/*    let totalHtml = `
+        <div style="margin: 15px 0; padding: 10px; background: #1a1a1a; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333;">
+            <strong style="color: #aaa;">${lang.gesamt || 'Gesamt'}:</strong>
+            <strong style="color: #ffcc00; font-size: 1.2rem;">${total.toFixed(2)} €</strong>
+        </div>
+    `;*/
+	
+
+    let cartFooter = "";
+    if (absoluteProduktAnzahl > 0) {
+        cartFooter = `
+        <div style="margin-top: 10px;">
+            <button id="btn-send" onclick="sendOrder()" 
+                style="width:100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer;">
+                🚀 ${lang.bestellen || 'JETZT BESTELLEN'}
+            </button>
+        </div>`;
+    }
 
 // Sichtbarkeit des Öffnen-Buttons (gelber Kreis oben rechts) steuern
 if (openBtn && badge) {
@@ -760,7 +721,20 @@ if (absoluteProduktAnzahl === 0) {
 }
 
 // ALLES zusammenfügen in das listDiv
-listDiv.innerHTML = cartHeader + pizzaDetailHtml + drinkHtml + cartFooter;
+// --- WICHTIG: Hier wird alles zusammengefügt und in das Div geschrieben ---
+    listDiv.innerHTML = cartHeader + pizzaDetailHtml + drinkHtml + totalHtml + cartFooter;
+
+    // Sichtbarkeit des Floating-Buttons (Badge)
+    if (openBtn && badge) {
+        badge.innerText = absoluteProduktAnzahl;
+        if (absoluteProduktAnzahl > 0) {
+            openBtn.style.display = 'flex';
+        } else {
+            openBtn.style.display = 'none';
+            // Falls der Warenkorb leer ist, schließen wir ihn auch
+            if (bar.style.display === 'block') toggleCart(false);
+        }
+    }
 
 if (typeof renderMenu === "function") renderMenu();
 saveCart();
@@ -856,7 +830,7 @@ function generateOrderSummary() {
 }
 
 
-function changePizzaQty(idx, change) {
+function changePizzaQty_(idx, change) {
     if (change === 1) {
         // Produkt kopieren (Clonen) und neu hinzufügen
         const neueKopie = JSON.parse(JSON.stringify(pizzaCart[idx]));
@@ -868,7 +842,7 @@ function changePizzaQty(idx, change) {
     updateUI();
 }
 
-
+//Fenster 2 fpr Zutaten Extras und ohne (bei Pizzas)
 function openSelectionModal(itemIndex, category, cartIdx = -1) {
     const item = items[itemIndex];
     const modal = document.getElementById('modal');
@@ -888,7 +862,7 @@ function openSelectionModal(itemIndex, category, cartIdx = -1) {
 
     let html = "";
 
-// TEIL A: SORTEN
+     // TEIL A: SORTEN u Variants ("," in desc  Fanta,Cola oder "/" in Preis)
     if (item.name.includes(',') || item.name.includes('/')) {
         html += `<p style="color:#ffcc00; margin-bottom:10px;">Sorte wählen:</p>`;
         
@@ -938,7 +912,9 @@ function openSelectionModal(itemIndex, category, cartIdx = -1) {
             const pNum = parseFloat(p.trim().replace(',', '.')) || 0;
             const lText = labels[i].trim();
             const active = pNum === window.currentChoice.preis ? 'background:#007bff; border-color:#ffcc00;' : 'background:#444; border-color:transparent;';
-            html += `<button class="size-btn" id="size-${i}" onclick="selectSize(${i}, ${pNum}, '${lText}')" style="flex:1; padding:15px 5px; color:white; border:2px solid; border-radius:8px; font-weight:bold; cursor:pointer; ${active}">${lText}<br>${p.trim()} €</button>`;
+            html += `<button class="size-btn" id="size-${i}" onclick="selectSize(${i}, ${pNum}, '${lText}')" style="flex:1; padding:15px 5px; 
+			color:white; border:2px solid; border-radius:8px; font-weight:bold; cursor:pointer; ${active}">${lText}</button>`;
+			//color:white; border:2px solid; border-radius:8px; font-weight:bold; cursor:pointer; ${active}">${lText}<br>${p.trim()} €</button>`;
         });
         html += `</div>`;
     }
@@ -1119,11 +1095,12 @@ function openModal(idx, mode) {
 		});
 	}
 }
-		
 	
 let pizzaBackup = null; // Zwischenspeicher für "Abbrechen"
 
+//nicht verwendet?
 function openVariantChangeModal(idx) {
+	alert("openVariantChangeModal");
     const p = pizzaCart[idx];
     const item = items[p.parentIdx];
     const list = document.getElementById('modal-list');
@@ -1187,141 +1164,106 @@ function cancelModal() {
 
 function renderModalContent() {
     const list = document.getElementById('modal-list');
-    const pizza = pizzaCart[currentPizzaIdx]; 
+    const pizza = pizzaCart[currentPizzaIdx];
     if (!pizza) return;
 
     const pOriginal = items[pizza.parentIdx];
-
-    // --- NEUE LOGIK: ÜBERSCHRIFT FINDEN ---
-    let aktuelleKategorie = "";
-    // Wir gehen in der Original-Liste vom Produkt aus nach oben
-    for (let i = pizza.parentIdx; i >= 0; i--) {
-        if (items[i].type === 'header') {
-            aktuelleKategorie = items[i].name.toUpperCase();
-            break; // Erste Überschrift gefunden -> Stopp
-        }
-    }
-
-    // Jetzt prüfen wir, ob in der Überschrift "KINDER" vorkommt
-    const istKinder = aktuelleKategorie.includes("KINDER");
-    
-    const lang = i18n[currentLang] || i18n.de;
     const isIT = (currentLang === 'it');
+    const lang = i18n[currentLang] || i18n.de;
     
-    // Titel im Modal-Kopf setzen
+    // Titel setzen
     const displayNameHeader = (isIT && pOriginal.name_it) ? pOriginal.name_it : pOriginal.name;
     document.getElementById('modal-title').innerText = lang.anpassen + ": " + displayNameHeader;
-    
-    // Wir sammeln alles in der Variable 'html'
+
     let html = "";
 
-    // 1. SEKTION: GRÖSSE / TYP (Negative Extras wie "Klein")
-    if (!istKinder) {
-        const negItems = items.filter(item => (parseFloat(String(item.price)?.replace(',','.')) || 0) < 0);
-        if (negItems.length > 0) {
-            const titelNeg = isIT ? "MISURA / TIPO" : "GRÖSSE / TYP";
-            html += `<div class="modal-section-title">${titelNeg}</div>`;
-            negItems.forEach(e => {
-                const isActive = pizza.extras.some(ex => ex.name === e.name);
-                const displayName = (isIT && e.name_it) ? e.name_it : e.name;
-                html += `
-                    <button class="modal-btn ${isActive ? 'active-add' : ''}" onclick="toggleExtra('${e.name}', '${e.price}')">
-                        ${displayName} ${isActive ? ' ✓' : ''} 
-                    </button>`;
-            });
-        }
-    }
+	// --- SEKTION: OHNE (Zutaten abbestellen) ---
+	const titelOhne = isIT ? "COSA TOGLIERE? (SENZA)" : "WAS SOLL WEG? (OHNE)";
+	const wegZusatz = isIT ? "Senza" : "Ohne";
 
-    // 2. SEKTION: OHNE (Zutaten abbestellen)
-    const titelOhne = isIT ? "COSA TOGLIERE? (SENZA)" : "WAS SOLL WEG? (OHNE)";
-    html += `<div class="modal-section-title">${titelOhne}</div>`;
-    
-    const descToSplit = (isIT && pOriginal.desc_it) ? pOriginal.desc_it : (pOriginal.desc || "");
-    if (descToSplit) {
-        const ingredients = descToSplit.split(',').map(s => s.trim());
-        ingredients.forEach(ing => {
-            const isOff = pizza.removals.includes(ing);
-            const wegZusatz = isIT ? "togli" : "weg";
-            html += `
-                <button class="modal-btn ${isOff ? 'active-remove' : ''}" onclick="toggleRemoveInModal('${ing}')">
-                    ${ing} ${isOff ? ' ✓ ('+wegZusatz+')' : ' -'}
-                </button>`;
-        });
-    }
+	// Wir erstellen den String für die Anzeige unter dem Button
+	// pizza.removals ist das Array mit den Namen der abgewählten Zutaten
+	const gewaehlteRemovals = pizza.removals.join(", ");
 
-    // 3. SEKTION: EXTRAS (Hinzufügen)
-	const titelExtra = isIT ? "COSA AGGIUNGERE? (EXTRA)" : "WAS SOLL DAZU? (EXTRAS)";
-	html += `<div class="modal-section-title">${titelExtra}</div>`;
-
-	let isExtraArea = false;
-	items.forEach(item => {
-		if (item.type === 'header') isExtraArea = item.name.toUpperCase().includes("EXTRAS");
-		if (isExtraArea && item.type === 'product') {
+	//html += `<div class="modal-section-title" style="margin-top:20px;">${titelOhne}</div>`;    
+		
+	html += `
+		<div style="padding: 10px 0;">
+			  <button class="modal-btn" style="background: #444444 !important; color: white;  width: 100%; height: 55px; background:transparent;" 
+					onclick="openRemovalsSelection()">
+				– ${isIT ? "Rimovi ingredienti" : "Zutaten entfernen"}
+			</button>
 			
-			// --- NEU: FILTER FÜR KINDERPIZZA ---
-			// Wir prüfen, ob im Namen das Wort "Pizza" vorkommt (z.B. "Extra große Pizza" oder "Extra kleine Pizza")
-			// Diese Optionen wollen wir bei einer Kinderpizza nicht anzeigen.
-			const isSizeOption = item.name.toLowerCase().includes("pizza");
-			if (istKinder && isSizeOption) {
-				return; // Überspringe diesen Button bei Kinderpizzen
-			}
-			// -----------------------------------
+			${gewaehlteRemovals ? `
+				<div style="color:#2ecc71; font-size:0.85rem; margin-top:8px; font-weight:bold;">
+					✕ ${wegZusatz}: ${gewaehlteRemovals}
+				</div>` : ''}
+		</div>
+	`;
+	
+	
+	 // --- SEKTION: EXTRAS (Öffnet neues Fenster) ---
+    const titelExtra = isIT ? "EXTRA" : "EXTRAS HINZUFÜGEN";	
+    const gewaehlteExtras = pizza.extras.map(e => e.name).join(", ");
+    
+    html += `
+        <div style="padding: 10px 0;">
+            <button class="modal-btn"style="background: #444444 !important; color: white; width: 100%; height: 55px; background:transparent;" 
+                    onclick="openExtrasSelection()">
+                + ${isIT ? 'Aggiungi Extra' : 'Extras auswählen'}
+            </button>
+            ${gewaehlteExtras ? `<div style="color:#ffcc00; font-size:0.85rem; margin-top:8px; font-weight:bold;">✔ ${gewaehlteExtras}</div>` : ''}
+        </div>
+    `;
 
-			const pNum = parseFloat(String(item.price).replace(',', '.')) || 0;
-			if (pNum >= 0) {
-				const isActive = pizza.extras.some(ex => ex.name === item.name);
-				const displayName = (isIT && item.name_it) ? item.name_it : item.name;
-				html += `
-					<button class="modal-btn ${isActive ? 'active-add' : ''}" 
-							onclick="toggleExtra('${item.name}', '${item.price}')">
-						${displayName} ${isActive ? ' ✓' : ' +'}
-					</button>`;
-			}
-		}
-	});
-
-    // --- ENTSCHEIDENDER SCHRITT ---
-    // Das gesamte gesammelte HTML in die Liste schreiben!
     list.innerHTML = html;
 
-    // Footer-Bereich sicherstellen
-    const footer = document.getElementById('modal-footer');
-    if (footer) footer.style.display = 'flex';
-    
+    // Footer-Button "SPEICHERN" sicherstellen
     const footerBtn = document.getElementById('btn-modal-done');
     if (footerBtn) {
-        footerBtn.style.display = "block";
-        footerBtn.innerText = lang.fertig || "Fertig & Speichern";
-        footerBtn.style.background = "#28a745"; // Standardfarbe (z.B. Blau oder Dunkel)
+        footerBtn.innerText = lang.fertig || "SPEICHERN";
         footerBtn.onclick = closeModal; 
     }
 }
 
 
 
-// Funktionen, die den Zustand ändern und das Modal NEU ZEICHNEN
+
+// Diese Funktion wird aufgerufen, wenn man im Hauptmodal auf eine Zutat klickt
 function toggleRemoveInModal(ing) {
-    const p = pizzaCart[currentPizzaIdx];
-    if (p.removals.includes(ing)) p.removals = p.removals.filter(r => r !== ing);
-    else p.removals.push(ing);
-    renderModalContent(); // Bleibt offen, zeichnet nur neu
-    updateUI();
+    const pizza = pizzaCart[currentPizzaIdx];
+    if (!pizza) return;
+
+    // Falls das Array noch nicht existiert, erstellen
+    if (!pizza.removals) pizza.removals = [];
+    
+    const index = pizza.removals.indexOf(ing);
+    if (index > -1) {
+        // Zutat ist schon auf der "Weg"-Liste -> wieder hinzufügen (aus Liste entfernen)
+        pizza.removals.splice(index, 1);
+    } else {
+        // Zutat neu auf die "Weg"-Liste setzen
+        pizza.removals.push(ing);
+    }
+    
+    // WICHTIG: Das Modal sofort neu zeichnen, damit das Häkchen erscheint
+    renderModalContent();
 }
 
-function toggleExtra(name, priceStr) {
-    const p = pizzaCart[currentPizzaIdx];
-    const pNum = parseFloat(priceStr.replace(',', '.')) || 0;
+
+// Logik für die Extra-Buttons im 2. Fenster
+function toggleExtraInWindow(name, price) {
+    const pizza = pizzaCart[currentPizzaIdx];
+    const idx = pizza.extras.findIndex(e => e.name === name);
     
-    const existIdx = p.extras.findIndex(e => e.name === name);
-    if (existIdx > -1) {
-        p.extraPrice -= p.extras[existIdx].price;
-        p.extras.splice(existIdx, 1);
+    if (idx > -1) {
+        pizza.extraPrice -= pizza.extras[idx].price;
+        pizza.extras.splice(idx, 1);
     } else {
-        p.extras.push({ name: name, price: pNum });
-        p.extraPrice += pNum;
+        pizza.extras.push({name: name, price: price});
+        pizza.extraPrice += price;
     }
-    renderModalContent(); // Bleibt offen, zeichnet nur neu
-    updateUI();
+    renderExtrasContent(); // 2. Fenster aktualisieren
 }
 
 
@@ -1365,15 +1307,18 @@ function addExtra(name, priceStr) {
     closeModal();
 }
 
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function closeModal() {
+    // ... deine Logik zum Schließen ...
+    document.getElementById('modal').style.display = 'none';
+    
+    updateUI(); // <--- HIER REFRESH ERZWINGEN
+}
 
 
 let isGeolocation=false;
 async function sendOrder() {
     
-	const urlParams = new URLSearchParams(window.location.search);
-    const isTestMode = urlParams.get('test') === 'true';
-    const tisch = urlParams.get('tisch') || "Unbekannt";
+	
 
 
 
@@ -1917,6 +1862,189 @@ function toggleCart(forceState) {
         }
     }
 }
+
+//PIZZA EXTRAS 30.03.26
+function openExtrasSelection() {
+	//alert("openExtrasSelection");
+    // --- NEU: Zuerst das erste Fenster (ID: modal) verstecken ---
+    const firstModal = document.getElementById('modal');
+    if (firstModal) {
+        firstModal.style.display = 'none';
+    }
+
+    // 1. Erstelle das Overlay, falls es noch nicht existiert
+    let extraOverlay = document.getElementById('extras-overlay');
+    if (!extraOverlay) {
+        extraOverlay = document.createElement('div');
+        extraOverlay.id = 'extras-overlay';
+        // Styling für das neue Fenster
+        extraOverlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; padding:20px; overflow-y:auto; box-sizing:border-box; color:white; font-family:sans-serif;";
+        document.body.appendChild(extraOverlay);
+    }
+    extraOverlay.style.display = 'block';
+
+    const isIT = (currentLang === 'it');
+    const pizza = pizzaCart[currentPizzaIdx];
+    
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color:#ffcc00; margin:0;">${isIT ? 'Seleziona Extra' : 'Extras wählen'}</h2>
+                    <button onclick="closeExtrasSelection()" style="background:#444; color:white; border:none; border-radius:50%; width:30px; height:30px;">✕</button>
+                </div>`;
+    
+    html += `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+
+    let isExtraArea = false;
+    items.forEach(item => {
+        if (item.type === 'header') {
+            isExtraArea = item.name.toUpperCase().includes("EXTRAS") || item.name.toUpperCase().includes("ZUTATEN");
+        }
+        
+        if (isExtraArea && item.type === 'product') {
+            const names = item.name.split(',').map(n => n.trim());
+            const price = parseFloat(String(item.price).replace(',', '.')) || 0;
+
+            names.forEach(name => {
+                const isActive = pizza.extras.some(ex => ex.name === name);
+                
+                html += `
+                    <button class="modal-btn ${isActive ? 'active-add' : ''}" 
+						style="height:auto; padding:12px 5px; font-size:0.9rem; transition: background 0.2s;
+						${isActive 
+							? 'background-color: #ffcc00 !important; border: 2px solid #ffcc00; color: #ffffff;' 
+							: 'background-color: rgb(51,51,51); border: 1px solid #555; color: #ccc;'}"
+						onclick="toggleExtraFromWindow('${name}', ${price})">
+						${name}<br>
+						
+					</button>`;
+            });
+        }
+    });
+
+    html += `</div>`;
+    html += `<button onclick="closeExtrasSelection()" style="margin-top:30px; width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold;">${isIT ? 'OK / CHIUDI' : 'FERTIG / SCHLIESSEN'}</button>`;
+    
+    extraOverlay.innerHTML = html;
+}
+
+// Logik zum Hinzufügen/Entfernen im neuen Fenster
+function toggleExtraFromWindow(name, price) {
+    const pizza = pizzaCart[currentPizzaIdx];
+    const index = pizza.extras.findIndex(ex => ex.name === name);
+
+    if (index > -1) {
+        // Entfernen
+        pizza.extraPrice -= pizza.extras[index].price;
+        pizza.extras.splice(index, 1);
+    } else {
+        // Hinzufügen
+        pizza.extras.push({ name: name, price: price });
+        pizza.extraPrice += price;
+    }
+    
+    // Beide Fenster aktualisieren
+    openExtrasSelection(); 
+    renderModalContent(); 
+}
+
+// Schließt das Extra-Fenster und zeigt das Hauptmodal wieder
+function closeExtrasSelection() {
+    // 1. Extra-Fenster verstecken
+    const extraOverlay = document.getElementById('extras-overlay');
+    if (extraOverlay) {
+        extraOverlay.style.display = 'none';
+    }
+
+    // 2. Haupt-Fenster (modal) wieder anzeigen
+    const firstModal = document.getElementById('modal');
+    if (firstModal) {
+        firstModal.style.display = 'block';
+    }
+
+    // 3. Inhalt im Haupt-Fenster aktualisieren (damit gewählte Extras angezeigt werden)
+    renderModalContent();
+}
+
+function openRemovalsSelection() {
+    // --- 1. Fenster 1 (ID: modal) verstecken ---
+    const firstModal = document.getElementById('modal');
+    if (firstModal) {
+        firstModal.style.display = 'none';
+    }
+
+    // --- 2. Overlay finden oder NEU ERSTELLEN (genau wie bei Extras) ---
+    let extraOverlay = document.getElementById('extras-overlay');
+    if (!extraOverlay) {
+        extraOverlay = document.createElement('div');
+        extraOverlay.id = 'extras-overlay';
+        // Gleiches Styling wie bei den Extras für ein einheitliches Design
+        extraOverlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:3000; padding:20px; overflow-y:auto; box-sizing:border-box; color:white; font-family:sans-serif;";
+        document.body.appendChild(extraOverlay);
+    }
+    extraOverlay.style.display = 'block';
+
+    const isIT = (currentLang === 'it');
+    const pizza = pizzaCart[currentPizzaIdx];
+    const pOriginal = items[pizza.parentIdx];
+
+    let isOff = pizza.removals.includes(name);
+    // --- 3. Titel für "OHNE" anpassen ---
+    const titel = isIT ? 'Cosa togliere? (Senza)' : 'Zutaten abwählen (Ohne)';
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color:#ffcc00; margin:0;">${titel}</h2>
+                    <button onclick="closeExtrasSelection()" style="background:#444; color:white; border: 2px solid #ffcc00; border-radius:50%; width:30px; height:30px;">✕</button>
+                </div>`;
+    
+
+    html += `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+
+    // --- 4. Zutaten aus der Beschreibung der Pizza holen ---
+    const desc = (isIT && pOriginal.desc_it) ? pOriginal.desc_it : (pOriginal.desc || "");
+    const ingredients = desc.split(',').map(s => s.trim()).filter(s => s !== "");
+
+    ingredients.forEach(name => {
+        isOff = pizza.removals.includes(name);
+        const wegZusatz = isIT ? "togli" : "weg";
+        
+        // Nutzt onclick="toggleRemoval(...)" für die Logik
+        //Zuitaten entfernen
+		html += `
+            <button class="modal-btn ${isOff ? 'active-remove' : ''}" 
+                style="height:auto; padding:15px 5px; font-size:1rem; ${isOff ? 'border: 2px solid #27ae60; background: #2ecc71 !important; color:white;' : ''}"
+                onclick="toggleRemoval('${name.replace(/'/g, "\\'")}')">
+                ${name}
+                ${isOff ? `<br><small style="color:#ff4444;"></small>` : ''}
+            </button>`;
+    });
+
+    html += `</div>`;
+
+    // --- 5. Fertig-Button ---
+    const buttonText = isIT ? 'OK / CHIUDI' : 'FERTIG / SPEICHERN';
+    html += `<button onclick="closeExtrasSelection()" style="margin-top:30px; width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold;">${buttonText}</button>`;
+    
+    extraOverlay.innerHTML = html;
+}
+function toggleRemoval(ingName) {
+    const p = pizzaCart[currentPizzaIdx];
+    
+    // Falls das removals-Array noch nicht existiert (Sicherheitscheck)
+    if (!p.removals) p.removals = [];
+
+    const idx = p.removals.indexOf(ingName);
+
+    if (idx > -1) {
+        p.removals.splice(idx, 1); // Zutat wieder "drauf" auf die Pizza
+    } else {
+        p.removals.push(ingName); // Zutat "runter" von der Pizza
+    }
+
+    // 1. Warenkorb-UI im Hintergrund aktualisieren
+    updateUI(); 
+    
+    // 2. Fenster 2 (das Overlay) sofort neu zeichnen, damit man das "X" sieht
+    openRemovalsSelection(); 
+}
+
 
 /*
 		Ein weiterer Check: "Event Bubbling"
