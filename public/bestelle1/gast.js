@@ -34,7 +34,7 @@ let currentPizzaIdx = null; // Aktuell bearbeitete Pizza im Modal
 
 
 const i18n = {
-	de: {impressumLink: "/bestelle1/impressumWsDe.html",
+	de: {leeren:"Leeren",impressumLink: "/bestelle1/impressumWsDe.html",
 	privacyLink: "/bestelle1/datenschutzWsDe.html",
 		impressum: "Impressum",
 	privacy: "Datenschutz",tisch: "TISCH", aendern: "ÄNDERN", ohne: "OHNE", extra: "EXTRA", gesamt: "Gesamtbetrag", bestellen: "JETZT BESTELLEN", anpassen: "Anpassen", abbrechen: "ABBRECHEN", fertig: "SPEICHERN", weg: "weg", produkt: "Produkt", produkte: "Produkte",
@@ -44,7 +44,7 @@ const i18n = {
 	privacy: "Datenschutz",address: "Vinschgaustraße 74, 39023 Laas (BZ)",
 	region: "Südtirol, Italien",
 	vat: "MwSt.-Nr.: 12345678901"		},
-	it: {impressumLink: "/bestelle1/impressumWsIt.html",
+	it: {leeren:"Svouta",impressumLink: "/bestelle1/impressumWsIt.html",
 	privacyLink: "/bestelle1/datenschutzWsIt.html",impressum: "Note Legali",
 	privacy: "Privacy",tisch: "TAVOLO", aendern: "MODIFICA", ohne: "SENZA", extra: "EXTRA", gesamt: "Totale", bestellen: "ORDINA ORA", anpassen: "Modifica", abbrechen: "ANNULLA", fertig: "SALVA", weg: "togli", produkt: "prodotto", produkte: "prodotti",
 	korrekturTitel: "Modifica ordine",
@@ -176,7 +176,9 @@ function mySorter(){
 
 }
 
-
+//-------------------------------------------------------------------------------------------
+ //    Initialisierung mit Eimnlesen der Menükarte aus dbMongo
+//-------------------------------------------------------------------------------------------
 
 async function init() {
     const params = new URLSearchParams(window.location.search);
@@ -198,9 +200,7 @@ async function init() {
         });
 		
 			
-		
-		
-	
+
         //mySorter(); //Meine Sortierung zu Beginn
         
 		// --- 2. NEU: SPEZIAL-PRODUKTE ERKENNEN UND REINIGEN --- (nur / im Preis)
@@ -235,6 +235,9 @@ async function init() {
 }
 
 
+//----------------------------------------------------------------------------------
+//Menuekarte rendern aus eingelesenen Daten und Mengen aktualisieren
+//----------------------------------------------------------------------------------
 function renderMenu() {
     const menuDiv = document.getElementById('menu');
     let html = "";
@@ -249,6 +252,9 @@ function renderMenu() {
         const showPrice = !item.hidePrice && item.price && item.price !== "";
         const preisDisplay = showPrice ? `${item.price} €` : "";
 
+
+		//ÜBERSCHRIFT
+		//-----------------------------------------------
         if (item.type === 'header') {
 			currentCat = item.name.toUpperCase();
 			html += `
@@ -263,11 +269,14 @@ function renderMenu() {
 				</div>`;
 			return;
 		}
-
+       //Wegen bei Produkten in Extras keine Menge und keinen + - Button (ev. könnte Menge gezählt werden)
+	   //--------------------------------------------------------------------------------------------------
         const isExtra = currentCat.includes("EXTRAS") || currentCat.includes("ZUTATEN");
         const count = getCountForProduct(index, currentCat);
 
-        html += `
+		//PRODUKT mit + Anzahl -   addItem($index,$currentCat);   id=qty(-$index) $count   ;  removeItem($index,$currentCat)
+        //--------------------------------------------------------------------------------------------------------------------
+		html += `
         <div class="item">
             <div class="info">
                 <strong>${displayName}</strong>
@@ -292,19 +301,30 @@ function renderMenu() {
         </div>`;
     });
     menuDiv.innerHTML = html;
+	//menuDiv (Menükarte)
+	//----------------------------------------------------
 }
+
+
 function addItem_(index, category){
 	//alert(index+" "+category);
 	//openSelectionModal(index, category, -1); 
 	openCombinedModal(index);
 }
 
+
+//-------------------------------------------------
+//Produkt zum Warenkorb hinzufügen
+//-------------------------------------------------
 function addItem(index, category) {
     const item = items[index];
     const itemName = item.name;
     const priceStr = String(item.price);
 
-    const hasSorts = itemName.includes(',');
+    
+	//  Beistrich in name (Cola, Fanta)
+	const hasSorts = itemName.includes(',');
+    //  / in Preis (0.2 l/0.4 l)
     const hasVariants = priceStr.includes('/');
 
 	//alert("specialDescItems:"+index+" has:"+specialDescItems.has(index))
@@ -374,47 +394,209 @@ function cancelCustomization() {
     updateUI();
 }
 
-function removeItem(index, category) {
+//---------------------------------------------------------------------
+// wird in renderMenu mit - aufgerufen: wenn alle gleich belegt, bzw. gleiches Getränk und gleiche Größe bzw. Standardgetränk, dann löschen, somst
+// auf Warenkorb verweisen
+//---------------------------------------------------------------------
+function removeItem__(index, category) {
     const cat = category.toUpperCase();
-    //if (cat.includes("PIZZA") || cat.includes("KINDERPIZZA")|| cat.includes("PIZZE")) {
-    if (cat.includes(namePizza)) {
-        // Alle Pizzen finden, die zu diesem Index gehören
-        const passendePizzen = pizzaCart.filter(p => p.parentIdx === index);
+    
+    // 1. Check: Ist es eine Pizza ODER ein Getränk mit Varianten?
+    // Wir prüfen, ob das Item im pizzaCart (unserem Haupt-Warenkorb) liegt
+    const passendeItems = pizzaCart.filter(p => p.parentIdx === index);
 
-        if (passendePizzen.length === 0) return; // Nichts zu tun
-
-        // Prüfen, ob alle diese Pizzen identisch sind
-        const erstePizza = JSON.stringify({s: passendePizzen[0].size, e: passendePizzen[0].extras, r: passendePizzen[0].removals});
-        const alleGleich = passendePizzen.every(p => 
-            JSON.stringify({s: p.size, e: p.extras, r: p.removals}) === erstePizza
+    if (passendeItems.length > 0) {
+        // --- LOGIK FÜR ITEMS MIT VARIANTEN (Pizzen & spezielle Getränke) ---
+        
+        // Prüfen, ob alle gefundenen Exemplare exakt gleich sind (Name, Preis, etc.)
+        const erstesItem = JSON.stringify({
+            n: passendeItems[0].name, 
+            s: passendeItems[0].size, 
+            e: passendeItems[0].extras
+        });
+        
+        const alleGleich = passendeItems.every(p => 
+            JSON.stringify({n: p.name, s: p.size, e: p.extras}) === erstesItem
         );
 
         if (alleGleich) {
-            // Einfach die letzte gefundene Pizza dieses Typs löschen
+            // Wenn alle gleich sind: Lösche einfach das letzte von diesem Typ
             for (let i = pizzaCart.length - 1; i >= 0; i--) {
-                if (pizzaCart[i].parentIdx === index) {
+                if (pizzaCart[i] && pizzaCart[i].parentIdx === index) {
                     pizzaCart.splice(i, 1);
-                    break;
+                    break; 
                 }
             }
-            updateUI();
-            renderMenu();
         } else {
-            // Es gibt Unterschiede -> Auswahl-Fenster öffnen
-            openCorrectionModal(index);
+            // Wenn es Unterschiede gibt (z.B. "Wasser mit" vs "Wasser ohne"):
+            // Öffne das Korrektur-Modal, damit der Gast wählen kann
+            
+				// Es gibt Unterschiede -> Warenkorb öffnen statt Modal
+				toggleCart(true); // Sicherstellen, dass er AUF geht
+				highlightCartItem(index); // Die betroffenen Items markieren
+			
+			//openCorrectionModal(index);
         }
     } else {
-        // Standard-Logik für Getränke
+        // --- STANDARD-LOGIK (Für Items, die nur gezählt werden) ---
         if (standardCart[index] > 0) {
             standardCart[index]--;
             if (standardCart[index] === 0) delete standardCart[index];
         }
+    }
+
+    if (typeof updateUI === "function") updateUI();
+    if (typeof renderMenu === "function") renderMenu();
+}
+
+function removeItem_(row, category) {
+    const cat = category.toUpperCase();
+    
+    // Wir suchen im Warenkorb nach Artikeln, die aus dieser 'row' stammen
+    const passendeItems = pizzaCart.filter(p => p.parentIdx === row);
+
+    if (passendeItems.length > 1) {
+        // ES GIBT VARIANTEN (z.B. Salami mit Käse & Salami ohne Zwiebeln)
+        // -> Warenkorb öffnen
+        toggleCart(true); 
+        
+        // Den Gast darauf hinweisen, welche 'row' im Warenkorb gemeint ist
+        highlightCartRow(row); 
+    } else if (passendeItems.length === 1) {
+        // NUR EINE VARIANTE -> Direkt löschen (keine Nachfrage nötig)
+        const cartIndex = pizzaCart.findIndex(p => p.parentIdx === row);
+        pizzaCart.splice(cartIndex, 1);
         updateUI();
-        renderMenu();
+    } else {
+        // GETRÄNKE / STANDARD-LOGIK
+        if (standardCart[row] > 0) {
+            standardCart[row]--;
+            if (standardCart[row] === 0) delete standardCart[row];
+            updateUI();
+        }
     }
 }
 
+function removeItem(index, category) {
+    const cat = category.toUpperCase();
+    const passendeItems = pizzaCart.filter(p => p.parentIdx === index);
 
+    // Wenn es mehrere unterschiedliche Varianten gibt
+    if (passendeItems.length > 1) {
+        const erstePizza = JSON.stringify({s: passendeItems[0].size, e: passendeItems[0].extras, r: passendeItems[0].removals});
+        const alleGleich = passendeItems.every(p => 
+            JSON.stringify({s: p.size, e: p.extras, r: p.removals}) === erstePizza
+        );
+
+        if (!alleGleich) {
+            // WARENKORB ÖFFNEN & HIGHLIGHT
+            toggleCart(true); 
+            
+            // Kurz warten, bis das HTML gerendert ist
+            setTimeout(() => {
+                const elements = document.querySelectorAll(`[data-parent-idx="${index}"]`);
+                elements.forEach(el => {
+                    // Visueller Effekt
+                    el.style.transition = "all 0.5s";
+                    el.style.backgroundColor = "#443a00"; // Dunkelgelb/Gold Fokus
+                    el.style.transform = "scale(1.02)";
+                    
+                    // Nach 2 Sekunden zurücksetzen
+                    setTimeout(() => {
+                        el.style.backgroundColor = "#2a2a2a";
+                        el.style.transform = "scale(1)";
+                    }, 2000);
+                });
+            }, 100);
+            return; 
+        }
+    }
+
+    // --- STANDARD LÖSCH-LOGIK ---
+    if (cat.includes(namePizza) || passendeItems.length === 1) {
+        for (let i = pizzaCart.length - 1; i >= 0; i--) {
+            if (pizzaCart[i] && pizzaCart[i].parentIdx === index) {
+                pizzaCart.splice(i, 1);
+                break;
+            }
+        }
+    } else {
+        if (standardCart[index] > 0) {
+            standardCart[index]--;
+            if (standardCart[index] === 0) delete standardCart[index];
+        }
+    }
+    
+    updateUI();
+}
+
+
+/*
+ * Öffnet das Modal, wenn verschiedene Varianten einer Pizza existieren
+ * @param {number} parentIndex - Der Index aus der Speisekarte (parentIdx)
+ */
+function openCorrectionModal(parentIndex){
+	alert("verschiedene Belegung: im Warenkorb löschen")
+}
+function openCorrectionModal_(parentIndex) {
+    alert("in open");
+	const modal = document.getElementById('correction-modal');
+    const listContainer = document.getElementById('correction-list');
+
+    // 1. Alle Pizzen im Warenkorb finden, die diesen Ursprung haben
+    // WICHTIG: Wir speichern den echten cartIdx mit, damit wir wissen, welche wir löschen!
+    const varianten = [];
+    for (let i = 0; i < pizzaCart.length; i++) {
+        if (pizzaCart[i].parentIdx === parentIndex) {
+            varianten.push({ ...pizzaCart[i], cartIdx: i });
+        }
+    }
+
+    // 2. Liste leeren
+    listContainer.innerHTML = '';
+
+    // 3. Jede Variante als Zeile hinzufügen
+    varianten.forEach(p => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'correction-item';
+        
+        // Texte für Extras und weggelassene Zutaten aufbereiten
+        const extras = p.extras.length > 0 ? `<span class="extra-tag">+ ${p.extras.join(', ')}</span>` : '';
+        const removals = p.removals.length > 0 ? `<span class="remove-tag">- ohne ${p.removals.join(', ')}</span>` : '';
+
+        itemDiv.innerHTML = `
+            <div class="item-info">
+                <span class="item-name">${p.name} (${p.size})</span>
+                <div class="item-details">${extras} ${removals}</div>
+            </div>
+            <button class="btn-delete-small" onclick="removeSpecificVariant(${p.cartIdx})">
+                Löschen
+            </button>
+        `;
+        listContainer.appendChild(itemDiv);
+    });
+
+    modal.style.display = 'flex';
+}
+
+function removeSpecificVariant(cartIdx) {
+    // Genau dieses eine Element aus dem Warenkorb entfernen
+    pizzaCart.splice(cartIdx, 1);
+    
+    // UI aktualisieren
+    closeCorrectionModal();
+    if (typeof updateUI === "function") updateUI();
+    if (typeof renderMenu === "function") renderMenu();
+}
+
+function closeCorrectionModal() {
+    document.getElementById('correction-modal').style.display = 'none';
+}
+
+
+//-------------------------------------------------------------------------------------------------------
+//für Pizza Einfügen, Ändern, Löschen,  sowie für Getränke mit Sorte und Größe beim Ändern (u. Löschen).
+//--------------------------------------------------------------------------------------------------------
 function openCombinedModal(idx) {
 	//alert("openCombined");
     const bar = document.getElementById('cart-bar');
@@ -521,8 +703,9 @@ function closeCorrection_() {
 
 //let wurdeGeladen = false; // Diese Variable überlebt den Funktionsaufruf
 
-
-
+//----------------------------------
+//Warenkorb
+//-----------------------------------
 function updateUI() {
     const listDiv = document.getElementById('cart-items-list');
     const bar = document.getElementById('cart-bar');
@@ -583,7 +766,7 @@ function updateUI() {
         vorschauGruppen[drinkName] = (vorschauGruppen[drinkName] || 0) + qty;
 
         drinkHtml += `
-        <div class="cart-row" style="border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; margin-bottom: 8px; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="cart-row" data-parent-idx="${id}" style="border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; margin-bottom: 8px; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
             <span><strong>${qty}x ${drinkName}</strong></span>
             <div style="display: flex; gap: 4px; background: #1a1a1a; padding: 2px; border-radius: 6px;">
                 <button onclick="changeStdQty(${id}, -1)" style="width:34px; height:34px; background:#444; color:white; border:none; border-radius:4px; font-weight:bold;">–</button>
@@ -591,21 +774,6 @@ function updateUI() {
             </div>
         </div>`;
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // --- 3. PIZZA & SPEZIAL-DRINK HTML ---
@@ -619,7 +787,7 @@ function updateUI() {
         const aendernButton = !isSpecial 
             ? `<button onclick="openCombinedModal(${g.sampleIdx})" style="margin-top:8px; padding: 4px 12px; background:#444; color:white; border:none; border-radius:4px; font-size:0.75rem; cursor:pointer;">✎ ${lang.aendern}</button>` 
             : "";
-
+		const aendernButtonSorteGroesse=`<button onclick="openSelectionModal(${g.sampleIdx})" style="margin-top:8px; padding: 4px 12px; background:#444; color:white; border:none; border-radius:4px; font-size:0.75rem; cursor:pointer;">✎ ${lang.aendern}</button>`;
         // Escape helper für Strings in onclick-Attributen
         const escSize = (g.size || "").replace(/'/g, "\\'");
         const escExtras = g.extras.map(e => e.name.replace(/'/g, "\\'")).join(",");
@@ -628,7 +796,7 @@ function updateUI() {
         if (g.isSpecialDrink) {
             // --- GETRÄNKE LAYOUT (Blau) ---
             pizzaDetailHtml += `
-            <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
+            <div class="cart-row" data-parent-idx="${g.parentIdx}" style="margin-bottom: 8px; border-left: 4px solid #007bff; padding: 10px; background: #2a2a2a; border-radius: 8px; display:flex; justify-content:space-between; align-items:center;">
                 <div style="flex-grow:1;">
                     <strong style="color:white;">${g.qty}x ${g.name}</strong> 
                     <span style="color:#aaa; font-size:0.85rem;">${g.size ? g.size : ''}</span>
@@ -652,7 +820,7 @@ function updateUI() {
                 : "";
 
             pizzaDetailHtml += `
-            <div class="cart-row" style="margin-bottom: 8px; border-left: 4px solid #ffcc00; padding: 10px; background: #2a2a2a; border-radius: 8px;">
+            <div class="cart-row" data-parent-idx="${g.parentIdx}" style="margin-bottom: 8px; border-left: 4px solid #ffcc00; padding: 10px; background: #2a2a2a; border-radius: 8px;">
                 <div style="display:flex; justify-content:space-between; align-items: flex-start;">
                     <div style="flex-grow:1;">
                         <strong style="color:white;">${g.qty}x ${g.name}</strong> 
@@ -679,15 +847,39 @@ function updateUI() {
 
 // --- 4. FINALE STRUKTUR ---
     let cartHeader = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:12px;">
-            <h2 style="color:#ffcc00; margin:0; font-size:1.1rem; text-transform: uppercase; letter-spacing: 1px;">
-                ${lang.produkte || 'Warenkorb'}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid #333; padding-bottom:12px;">
+        
+        <div style="display:flex; align-items:center; gap:15px;">
+            <h2 style="color:#ffcc00; margin:0; font-size:1.1rem; text-transform: uppercase; letter-spacing: 1px; font-weight:900;">
+                ${lang.meineBestellung || 'Meine Bestellung'}
             </h2>
-            <div onclick="toggleCart(false)" style="cursor: pointer; width: 32px; height: 32px; background: #444; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <span style="color: white; font-size: 1.2rem;">✕</span>
-            </div>
+            
+            <button onclick="clearFullCart()" style="
+                background: #1a1a1a; 
+                color: #ff4757; 
+                border: 1px solid #444; 
+                padding: 4px 10px; 
+                border-radius: 6px; 
+                font-size: 0.65rem; 
+                cursor: pointer; 
+                text-transform: uppercase; 
+                display: flex; 
+                align-items: center; 
+                gap: 5px;
+                transition: all 0.2s;
+                letter-spacing: 0.5px;
+            " onmouseover="this.style.borderColor='#ff4757'; this.style.background='#222';" 
+               onmouseout="this.style.borderColor='#444'; this.style.background='#1a1a1a';">
+                <span style="font-size: 0.8rem;">🗑</span> ${lang.leeren || 'Leeren'}
+            </button>
         </div>
-    `;
+
+        <div onclick="toggleCart(false)" style="cursor: pointer; width: 32px; height: 32px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+            <span style="color: white; font-size: 1.1rem;">✕</span>
+        </div>
+    </div>
+`;
+
 let totalHtml="";
     // Warenkorb Summe hinzufügen
 /*    let totalHtml = `
@@ -739,6 +931,22 @@ if (absoluteProduktAnzahl === 0) {
 if (typeof renderMenu === "function") renderMenu();
 saveCart();
 }
+
+function clearFullCart() {
+    // Kurze Sicherheitsabfrage (optional, aber empfohlen)
+    if (confirm(currentLang === 'it' ? "Cancellare tutto?" : "Alles löschen?")) {
+        pizzaCart = [];
+        // Falls dein standardCart ein Objekt ist, leeren wir es so:
+        Object.keys(standardCart).forEach(key => delete standardCart[key]);
+        
+        updateUI(); // UI neu zeichnen
+        if (typeof renderMenu === "function") renderMenu(); // Zahlen im Menü nullen
+        saveCart(); // LocalStorage aktualisieren
+    }
+}
+
+
+
 
 function saveCart() {
     localStorage.setItem('meinWarenkorb_Pizza', JSON.stringify(pizzaCart));
@@ -842,7 +1050,12 @@ function changePizzaQty_(idx, change) {
     updateUI();
 }
 
-//Fenster 2 fpr Zutaten Extras und ohne (bei Pizzas)
+
+//"Zur Abwicklung Ihrer Bestellung und zur Anzeige der Abholzeit nutzen wir temporäre Identifikatoren (LocalStorage/Websockets). Diese dienen ausschließlich der Übermittlung des Bestellstatus während Ihres Besuchs."
+
+//-----------------------------------------------------------------------------------------------------------------------
+//Fenster für Elemente mit , in name (Cola, Fanta) und für / im Preis 2,3/4,6   und für / in mame Wasser mit/ohne/mittel)
+//-----------------------------------------------------------------------------------------------------------------------
 function openSelectionModal(itemIndex, category, cartIdx = -1) {
     const item = items[itemIndex];
     const modal = document.getElementById('modal');
@@ -861,36 +1074,56 @@ function openSelectionModal(itemIndex, category, cartIdx = -1) {
     };
 
     let html = "";
-
-     // TEIL A: SORTEN u Variants ("," in desc  Fanta,Cola oder "/" in Preis)
+     //-------------------------------------------------------------------------------------
+     // TEIL A: SORTEN u Variants ("," in desc  Fanta,Cola oder "/" in name Wasser mit/ohne) onclick="selectSorte(${i}, '${s}'
+	 //-------------------------------------------------------------------------------------
     if (item.name.includes(',') || item.name.includes('/')) {
         html += `<p style="color:#ffcc00; margin-bottom:10px;">Sorte wählen:</p>`;
         
         let sorten = [];
         
-        // Spezial-Logik für "Name mit/ohne"
-        if (item.name.includes('/') && !item.name.includes(',')) {
-            const parts = item.name.split('/');
-            const firstPart = parts[0].trim(); // z.B. "Wasser mit"
-            const secondPart = parts[1].trim(); // z.B. "ohne"
-            
-            // Wir nehmen das erste Wort vom ersten Teil als Basis (z.B. "Wasser")
-            const baseName = firstPart.split(' ')[0]; 
-            
-            // Falls der zweite Teil nur ein Wort ist (wie "ohne"), hängen wir den Basisnamen davor
-            if (!secondPart.includes(' ')) {
-                sorten = [firstPart, `${baseName} ${secondPart}`];
-            } else {
-                sorten = parts.map(s => s.trim());
-            }
+        // Spezial-Logik für "Name mit/ohne"  (Wasser mit/ohne)
+		//--------------------------------------------------------
+       // Spezial-Logik für "Name mit/ohne" (Wasser mit/ohne)
+if (item.name.includes('/') && !item.name.includes(',')) {
+    const parts = item.name.split('/');
+    const firstPart = parts[0].trim(); // z.B. "Wasser mit"
+    
+    // 1. Die erste Sorte (vor dem ersten /) direkt hinzufügen
+    sorten.push(firstPart);
+
+    // 2. Den Basisnamen extrahieren (das erste Wort, z.B. "Wasser")
+    const baseName = firstPart.split(' ')[0]; 
+
+    // 3. Alle weiteren Teile (nach dem ersten /) verarbeiten
+    // Wir fangen bei Index 1 an, da Index 0 schon in firstPart ist
+    for (let i = 1; i < parts.length; i++) {
+        const currentPart = parts[i].trim();
+        
+        // Wenn der Teil nur ein Wort ist (z.B. "ohne"), hängen wir "Wasser" davor
+        // Wenn er schon Leerzeichen hat (z.B. "stilles Wasser"), nehmen wir ihn so
+        if (!currentPart.includes(' ')) {
+            sorten.push(baseName + " " + currentPart);
         } else {
+            sorten.push(currentPart);
+        }
+    }
+}
+		//---------------------------------       
+		// Beistrich in name (Fanta,Cola)
+		//---------------------------------
+		else {
             // Standard-Verhalten für Komma-Listen
             sorten = item.name.split(/[,/]/).map(s => s.trim());
         }
 
         html += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:15px;">`;
-        sorten.forEach((s, i) => {
+        
+		//Sortenauswahl Auflistung im Fenster
+		//-------------------------------------
+		sorten.forEach((s, i) => {
             // WICHTIG: .trim() beim Vergleich, um Leerzeichen-Fehler zu vermeiden
+			//selectSorte($(i),'${s}')
             const active = s.trim() === window.currentChoice.sorte.trim() ? 'background:#ffcc00; color:black;' : 'background:#333; color:white;';
             html += `<button class="sorte-btn" id="sorte-${i}" onclick="selectSorte(${i}, '${s}')" 
                      style="padding:12px; border:1px solid #555; border-radius:8px; cursor:pointer; ${active}">
@@ -900,13 +1133,18 @@ function openSelectionModal(itemIndex, category, cartIdx = -1) {
         html += `</div>`;
     }
 
-    // TEIL B: GRÖSSEN
+    //-----------------------------------------------------------------------------------------
+	// TEIL B: GRÖSSEN onclick: selectSize
+	// 0.2l/0.4l       selectSize(${i}, ${pNum}, '${lText}')
+	//-----------------------------------------------------------------------------------------	
     const priceStr = String(item.price);
     if (priceStr.includes('/')) {
         html += `<p style="color:#ffcc00; margin:10px 0;">Größe wählen:</p>`;
         const preise = priceStr.split('/');
         const labels = (item.desc && item.desc.includes('/')) ? item.desc.split('/') : ["0,2l", "0,4l"];
         
+		//Auflistung im Fenster
+		//
         html += `<div style="display:flex; gap:10px; margin-bottom:20px;">`;
         preise.forEach((p, i) => {
             const pNum = parseFloat(p.trim().replace(',', '.')) || 0;
@@ -924,7 +1162,9 @@ function openSelectionModal(itemIndex, category, cartIdx = -1) {
     const btnText = isEditing ? "Änderung speichern" : "Hinzufügen ✓";
     html += `<button id="btnConfirmSelection" onclick="confirmSelection(${itemIndex}, '${category}', ${cartIdx})" style="width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:10px; font-weight:bold; font-size:1.1rem; cursor:pointer; margin-top:20px;">${btnText}</button>`;
 */
-    list.innerHTML = html;
+    // zur Liste im Fenster hinzufügen
+	//----------------------------------
+	list.innerHTML = html;
     modal.style.display = 'block';
     
     /*
@@ -934,6 +1174,9 @@ function openSelectionModal(itemIndex, category, cartIdx = -1) {
         footerBtn.style.display = "none"; 
     }*/
 	
+	
+	//footerButton   confirmSelection(itemIndex, category, cartIdx);
+	//---------------
 	const footerBtn = document.getElementById('btn-modal-done');
 
 	if (footerBtn) {
@@ -986,7 +1229,9 @@ function selectSize(idx, price, label) {
     }
 }
 
-
+//------------------------------------------------------------
+// wird in openSelectionModal am Ende aufgerufen SPEICHERN
+//------------------------------------------------------------
 function confirmSelection(itemIndex, category, cartIdx) {
     //alert("confirm");
 	const item = items[itemIndex];
@@ -1004,7 +1249,17 @@ function confirmSelection(itemIndex, category, cartIdx) {
     // C. ABBRUCH-CHECK (Validierung)
     if (brauchtSorte && !window.currentChoice.sorte) {
         alert("Bitte wählen Sie eine Sorte!");
-        return;
+        
+/*		// Statt alert("...");
+Swal.fire({
+  title: 'Hoppla!',
+  text: 'Bitte wählen Sie erst eine Sorte aus.',
+  icon: 'warning',
+  confirmButtonText: 'Ok',
+  confirmButtonColor: '#e67e22' // Deine Markenfarbe
+});*/
+		
+		return;
     }
     if (brauchtGroesse && (!window.currentChoice.preis || window.currentChoice.preis === 0)) {
         alert("Bitte wählen Sie eine Größe!");
@@ -1904,8 +2159,22 @@ function openExtrasSelection() {
             const price = parseFloat(String(item.price).replace(',', '.')) || 0;
 
             names.forEach(name => {
-                const isActive = pizza.extras.some(ex => ex.name === name);
-                
+               
+        //alert(pizza.kategorie);        
+		// 1. Prüfen: Ist es eine Kinderpizza?
+		// (Wir nutzen .kategorie, da dies direkt vom System kommt)
+		const istKinderpizza = pizza.kategorie && pizza.kategorie.toUpperCase().includes("KINDER PIZZA");
+
+		// 2. Prüfen: Ist die aktuelle Zutat "Kleine Pizza"?
+		const istOptionKleinePizza = name.toUpperCase().includes("KLEINE PIZZA");
+	//alert ( istKinderpizza+" k:"+istOptionKleinePizza);
+		// 3. Wenn beides zutrifft: Button überspringen
+		if (istKinderpizza && istOptionKleinePizza) {
+			return; 
+		}
+				
+	    const isActive = pizza.extras.some(ex => ex.name === name);			
+				
                 html += `
                     <button class="modal-btn ${isActive ? 'active-add' : ''}" 
 						style="height:auto; padding:12px 5px; font-size:0.9rem; transition: background 0.2s;
@@ -1921,7 +2190,7 @@ function openExtrasSelection() {
     });
 
     html += `</div>`;
-    html += `<button onclick="closeExtrasSelection()" style="margin-top:30px; width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold;">${isIT ? 'OK / CHIUDI' : 'FERTIG / SCHLIESSEN'}</button>`;
+    html += `<button onclick="closeExtrasSelection()" style="margin-top:30px; width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold;">${isIT ? 'SALVA' : 'SPEICHERN'}</button>`;
     
     extraOverlay.innerHTML = html;
 }
@@ -2019,7 +2288,7 @@ function openRemovalsSelection() {
     html += `</div>`;
 
     // --- 5. Fertig-Button ---
-    const buttonText = isIT ? 'OK / CHIUDI' : 'FERTIG / SPEICHERN';
+    const buttonText = isIT ? 'SALVA' : 'SPEICHERN';
     html += `<button onclick="closeExtrasSelection()" style="margin-top:30px; width:100%; padding:15px; background:#28a745; color:white; border:none; border-radius:8px; font-weight:bold;">${buttonText}</button>`;
     
     extraOverlay.innerHTML = html;
