@@ -158,7 +158,7 @@ app.get('/gast', (req, res) => res.sendFile(path.join(__dirname, 'public','beste
 app.get('/bar', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','bar.html')));
 app.get('/statistik', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','statistik.html')));
 app.get('/menue', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','menue.html')));
-app.get('/qr', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','qrCode.html')));
+app.get('/qr', (req, res) => res.sendFile(path.join(__dirname, 'public','bestelle1','qr.html')));
 
 // --- 6. API: WEBSEITE (PIZZERIA) ---
 //**************************************
