@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="warenkorb.css">
+</head>
+<body>
+<script src="warenkorb.js"></script>
+
+<div id="cart-sidebar">
+
+<div class="lang-switch">
+    <button onclick="changeLanguage('de')">DE 🇩🇪</button>
+    <button onclick="changeLanguage('it')">IT 🇮🇹</button>
+</div>
+    <div class="cart-header">
+        <h2 id="cartTitle" class="cart-title">MEINE BESTELLUNG</h2>
+        <button id="btnCartClearAll" class="btn-clear-all" onclick="clearFullCart()">🗑️ leeren</button>
+    </div>
+
+    <div id="cart-container"></div>
+
+    <div class="cart-footer">
+        <button id="btnCartClose" class="btn-close" onclick="toggleCart(false)">Schließen</button>
+        <button id="btnCartOrder" class="btn-checkout" onclick="processCheckout(this)">Jetzt bestellen</button>
+    </div>
+</div>
+
+<template id="template-item">
+    <div class="item">
+        <div class="info">
+            <div class="item-main-row">
+                <span class="qty-label"><span class="qty-display"></span>x</span>
+                <strong class="item-name"></strong>
+                <span class="item-desc"></span>
+            </div>
+
+            <div class="item-without">Ohne: <span class="without-list"></span></div>
+            <div class="item-extras">Extras: <span class="extras-list"></span></div>
+            <span class="item-price">0.00 €</span>>
+            <button class="btn-edit">Ändern</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn-minus">-</button>
+            <button class="btn-plus">+</button>
+        </div>
+    </div>
+</template>
+
+<div id="order-success-modal" class="modal-overlay">
+    <div class="modal-content success-box">
+        <div class="success-icon">✅</div>
+        <h3 id="success-title">Vielen Dank!</h3>
+        <p id="success-message">Deine Bestellung wurde erfolgreich abgeschickt.</p>
+        <button class="btn-checkout" onclick="closeSuccessModal()">OK</button>
+    </div>
+</div>
+
+
+</body>
+</html>

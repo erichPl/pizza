@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="stylesheet" href="chooseModal.css"> 
+
+</head>
+<body>
+<div id="branching-modal" class="selection-overlay black-bg">
+    <div class="selection-content black-bg">
+        
+        <div class="selection-header">
+            <h3 id="branch-title"><span id="text-anpassen">Anpassen</span>: Pizza Speziale</h3>
+        </div>
+
+        <div class="selection-body branch-wrapper">
+            
+            <div class="branch-section">
+                <button class="branch-btn btn-grey-action" onclick="goToCustomize('without')">
+                    <span id="btn-text-without">Zutaten entfernen</span>
+                </button>
+                <div id="display-without" class="selection-summary text-green"></div>
+            </div>
+            
+            <div class="branch-section">
+                <button class="branch-btn btn-grey-action" onclick="goToCustomize('extras')">
+                    <span id="btn-text-extras">Extras</span>
+                </button>
+                <div id="display-extras" class="selection-summary text-orange"></div>
+            </div>
+
+            <div class="branch-footer-row mt-auto">
+                <button class="branch-btn btn-save-green flex-2"> <!--onclick="saveBranch()">-->
+                    <span id="btn-text-save">Speichern</span>
+                </button>
+                <button class="branch-btn btn-cancel-light flex-1" onclick="closeBranchModal()">
+                    <span id="btn-text-cancel">Abbrechen</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

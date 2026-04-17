@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Bar-Monitor | Neue Bestellungen</title>
+	<script src="/socket.io/socket.io.js"></script>
+    <script src="bar.js"></script><!--muss nach socket sein-->
+	<style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #fff; padding: 20px; }
+        h1 { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #16213e; padding-bottom: 10px; }
+        
+       .order-grid { 
+			display: grid; 
+			/* Min-Breite von 350px auf 260px reduziert für schmalere Fenster */
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+			gap: 15px; 
+			margin-top: 20px; 
+		}
+
+		.order-card {
+			padding: 10px; /* Padding etwas reduziert */
+			background: #16213e; 
+			border-radius: 8px;
+		}
+
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #0f3460; padding-bottom: 5px; }
+        .tisch-num { font-size: 24px; font-weight: bold; color: #e94560; }
+        .uhrzeit { color: #888; font-size: 14px; }
+
+
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item-row { padding: 8px 0; border-bottom: 1px solid #0f3460; font-size: 18px; }
+        .item-row:last-child { border-bottom: none; }
+        
+        .extras { font-size: 14px; color: #00d2ff; display: block; margin-top: 4px; font-style: italic; }
+        
+        .done-btn { 
+            width: 100%; background: #0f3460; color: white; border: none; padding: 10px; 
+            /*margin-top: 15px; border-radius: 6px; cursor: pointer; font-weight: bold;*/
+            transition: 0.3s;
+        }
+        .done-btn:hover { background: #27ae60; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .no-orders { text-align: center; color: #555; margin-top: 100px; font-size: 24px; }
+		
+		
+		.price-tag {
+    background-color: #00ca4e;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    float: right; /* Schiebt den Preis nach rechts oben */
+}
+
+.order-header {
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+
+@keyframes text-flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.text-blink {
+    animation: text-flash 1.5s infinite;
+}
+/* Normaler Monitor-Stil (Checkboxen sichtbar) */
+.print-checkbox {
+    display: inline-block !important; /* Sicherstellen, dass sie da sind */
+    opacity: 1 !important;
+    visibility: visible !important;
+}	
+
+	
+@media print {
+    body { 
+        background: white !important; 
+        color: black !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+    }
+
+    /* Alles verstecken */
+    body * { 
+        display: none !important; 
+    }
+
+    /* Container und Druck-Karten einblenden */
+    #ordersContainer, 
+    .print-area, 
+    .print-area * {
+        display: block !important; /* Muss block sein, damit sie untereinander fließen */
+        visibility: visible !important;
+    }
+
+
+
+
+@media print {
+    /* Den Hauptcontainer für den Druck vorbereiten */
+    #ordersContainer {
+        display: flex !important;
+        flex-wrap: wrap !important; /* Erlaubt das Umbrechen in die nächste Zeile */
+        flex-direction: row !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    /* Die einzelnen Bons auf ca. 48% Breite setzen, damit 2 nebeneinander passen */
+    .order-card.print-area {
+        width: 48% !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid !important; /* Verhindert, dass ein Bon mitten im Blatt reißt */
+        margin-bottom: 20px !important;
+        border: 1px solid #000 !important; /* Optional: Rahmen für den Druck */
+        color: #000 !important;
+        background: #fff !important; /* Hintergrund weiß für Drucker */
+    }
+
+    /* Alles andere ausblenden */
+    body * { visibility: hidden; }
+    #ordersContainer, #ordersContainer * { visibility: visible; }
+    .print-checkbox, button { display: none !important; }
+}
+
+
+
+
+
+
+    .print-area {
+        /* WICHTIG: position darf NICHT absolute sein! */
+        position: relative !important; 
+        width: 80mm; /* Standardbreite Bondrucker */
+        border-bottom: 1px dashed #000 !important; /* Trennhilfe für die Schere */
+        background: white !important;
+        color: black !important;
+        padding: 5mm 0 !important;
+        margin: 0 auto !important;
+        
+        /* Verhindert, dass ein Bon auf zwei Seiten zerschnitten wird */
+        page-break-inside: avoid !important; 
+    }
+
+    /* Buttons und Checkboxen auf dem Papier ausblenden */
+    .print-area button, 
+    .print-area input, 
+    .print-area .btnPr {
+        display: none !important;
+    }
+}
+
+/* Dein Stil für den Monitor bleibt gleich */
+.order-card.is-printed {
+    opacity: 0.6;
+    border-left: 5px solid #555 !important;
+    filter: grayscale(0.5);
+}
+	
+.timer-val {
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+
+.blink {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+
+
+
+
+
+
+
+
+/* Das verdunkelte Hintergrund-Overlay */
+#loginOverlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    /*display: none;*/ /* Standardmäßig unsichtbar */
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+/* Die Login-Box */
+.login-box {
+    background: #16213e;
+    padding: 30px;
+    border-radius: 12px;
+    border: 2px solid #e94560;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+    width: 300px;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+    border: 1px solid #0f3460;
+    background: #1a1a2e;
+    color: white;
+    font-size: 16px;
+}
+
+.login-box button {
+    background: #e94560;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+
+
+
+	
+    </style>
+</head>
+<body>
+
+<div id="barLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;">
+    <h2 style="margin-bottom: 20px;">🔐 Bar-Zugang</h2>
+    <input type="password" id="barPasswordInput" placeholder="Passwort eingeben..." 
+           style="padding: 12px; border-radius: 5px; border: none; width: 250px; text-align: center; font-size: 1.2rem;">
+    <button onclick="checkBarLogin()" 
+            style="margin-top: 20px; padding: 10px 30px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        Anmelden
+    </button>
+    <p id="loginError" style="color: #e94560; margin-top: 15px; display: none;">Falsches Passwort!</p>
+</div>
+
+
+    <div id="loginOverlay" style="display: none;">
+        <div class="login-box">
+            <h3 style="color: #e94560; margin-top: 0;">Admin-Bereich</h3>
+            <p style="font-size: 14px; color: #888;">Bitte Passwort eingeben, um die Historie zu laden.</p>
+            <input type="password" id="adminPassword" placeholder="Passwort...">
+            <button onclick="submitLogin()">Einloggen</button>
+            <button onclick="closeLogin()" style="background: transparent; color: #555; margin-top: 10px; font-size: 12px;">Abbrechen</button>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #16213e; padding-bottom: 10px; margin-bottom: 15px;">
+       <h1>
+			<div style="display: flex; align-items: center; gap: 15px;">
+				<span>🍻 Bar-Monitor</span>
+				<div style="display: flex; gap: 8px; font-size: 0.9rem;">
+					<span id="count-neu" title="Noch nicht bestätigt" style="background: #e94560; padding: 2px 8px; border-radius: 12px; border: 1px solid #ff4b2b;">
+						A: 0
+					</span>
+					<span id="count-bestaetigt" title="Abholung bestätigt" style="background: #007bff; padding: 2px 8px; border-radius: 12px; border: 1px solid #00d2ff;">
+						B: 0
+					</span>
+					<span id="count-bar" title="Bestellungen im Lokal" style="background: #28a745; padding: 2px 8px; border-radius: 12px; border: 1px solid #00ca4e;">
+						C: 0
+					</span>
+				</div>
+			</div>
+		</h1>
+        <div style="text-align: right;">
+            <span id="clock" style="font-size: 1.2rem; color: #e94560; font-family: monospace;"></span>
+            <div style="margin-top: 5px;">
+                <button onclick="openLogin()" style="background: #16213e; color: #888; border: 1px solid #0f3460; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                    📜 Historie öffnen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; background: rgba(22, 33, 62, 0.5); padding: 10px; border-radius: 8px;">
+        <label class="switch">
+            <input type="checkbox" id="bon-toggle" onchange="setBon(this.checked)">
+            <span class="slider"></span>
+        </label>
+        <span style="color: #888; font-size: 0.9rem;">Automatischer Bon-Druck</span>
+    </div>
+
+    <div id="historyFilter" style="display: none; background: #16213e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #e94560; animation: fadeIn 0.3s ease;">
+    <!--    <button onclick="exitHistory()" style="background: #444; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+			✖ Schließen
+		</button>-->
+				
+		
+		
+		
+		<h3 style="margin-top: 0; color: #e94560;">📅 Historie abfragen</h3>
+        <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div>
+                <label style="display:block; font-size: 0.8rem; color: #888; margin-bottom: 4px;">Von:</label>
+                <input type="datetime-local" id="filterVon" value="2026-04-14T10:00" style="padding: 8px; border-radius: 4px; border: none; background: #1a1a2e; color: white;">
+            </div>
+            <div>
+                <label style="display:block; font-size: 0.8rem; color: #888; margin-bottom: 4px;">Bis:</label>
+                <input type="datetime-local" id="filterBis" value="2026-04-14T22:00" style="padding: 8px; border-radius: 4px; border: none; background: #1a1a2e; color: white;">
+            </div>
+			
+			
+		<div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
+	
+					
+										
+			</div>
+
+				<p style="font-size: 11px; color: #888; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; border-left: 3px solid #e94560;">
+					💡 <strong>Tipp:</strong> Wenn du das Feld <strong>"Tisch" leer lässt</strong>, werden automatisch <strong>ALLE</strong> Bestellungen im oben eingestellten Zeitraum (Von/Bis) auf den gewählten Status gesetzt.
+				</p>
+				
+				<label style="color: white; margin-left: 15px; cursor: pointer; font-size: 0.9rem;">
+				<input type="checkbox" id="checkPreise" onchange="updatePreiseSetting()" checked> 
+				Preise & Summen anzeigen
+			</label>
+			</div>
+			
+			 <button type="button" onclick="fetchHistory()" style="background: #e94560; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                Daten laden
+            </button>
+			
+		
+			
+			
+            <button onclick="exitHistory()" style="background: transparent; color: #555; border: 1px solid #333; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+                Schließen
+            </button>
+		</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+           
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+        <button class="btnPr" onclick="printAllMarked()" style="background: #007bff; color: white; padding: 12px; border: none; cursor: pointer; border-radius: 8px; font-weight: bold; grid-column: span 2;">
+            🖨️ Alle markierten Bons zusammen drucken
+        </button>
+        <button class="btnPr" onclick="selectAllCheckboxes()" style="padding: 8px; background: #16213e; color: #888; border: 1px solid #0f3460; border-radius: 5px;">Alle markieren</button>
+        <button class="btnPr" onclick="printSelected()" style="padding: 8px; background: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold;">Auswahl drucken</button>
+    </div>
+
+<div id="statusFilterContainer" style="padding: 10px; background: #1a1a2e; color: white; display: flex; gap: 15px; justify-content: center; border-bottom: 1px solid #444;">
+    <label><input type="checkbox" id="filterNeu" checked onchange="renderCurrentOrders()"> Neu</label>
+    <label><input type="checkbox" id="filterAngenommen" checked onchange="renderCurrentOrders()"> Angenommen</label>
+    <label><input type="checkbox" id="filterErledigt" onchange="renderCurrentOrders()"> Erledigt</label>
+</div>
+
+
+
+    <div id="ordersContainer" class="order-grid">
+        </div>
+
+
+</body>
+</html>
