@@ -889,3 +889,19 @@ const anonymizeOldOrders = async () => {
 // Alle 6 Stunden ausführen (21600000 ms)
 //setInterval(cleanupGuestData, 21600000);
 setInterval(anonymizeOldOrders, 21600000);
+
+
+app.post('/api/verify-chef-setup', (req, res) => {
+    const { password } = req.body;
+    
+    // Wir vergleichen das gesendete Passwort mit dem aus der .env
+    if (password === process.env.PW_STATISTIK) {
+        // Wenn es stimmt, schicken wir den geheimen Device-Key zurück
+        res.json({ 
+            success: true, 
+            deviceKey: process.env.DEVICE_SECRET_KEY 
+        });
+    } else {
+        res.status(401).json({ success: false, message: "Falsches Chef-Passwort" });
+    }
+});
