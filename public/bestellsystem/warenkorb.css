@@ -1,0 +1,207 @@
+/* 1. GRUND-LAYOUT */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* 2. SIDEBAR STRUKTUR */
+        #cart-sidebar {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            max-width: 100vw; 
+            height: 100%; 
+            background: #1a1a1a; 
+            z-index: 10000; 
+            flex-direction: column;
+        }
+
+        .cart-header {
+            padding: 15px; 
+            border-bottom: 1px solid #333; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #222;
+        }
+
+        .cart-title {
+            margin: 0; 
+            font-size: 1.2rem; 
+            color:  var(--sn);
+        }
+
+        .btn-clear-all {
+            background: #cc0000; 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 0.8rem;
+        }
+
+        /* 3. DER SCROLL-CONTAINER */
+        #cart-container {
+            flex-grow: 1; 
+            overflow-y: auto; 
+            min-height: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 2px;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #1a1a1a;
+        }
+
+        #cart-container::-webkit-scrollbar { width: 6px; }
+        #cart-container::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+        /* 4. DAS ITEM-DESIGN */
+        .item {
+            background: #262626;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 4px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+           /* border-left: 4px solid #00aaff;*/
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .info {        
+            display: flex; 
+            flex-direction: column; 
+            padding-left: 10px; 
+            overflow: hidden; 
+            flex-grow: 1;
+            align-items: flex-start;
+        }
+
+        .item-main-row {
+            display: flex; 
+            align-items: baseline; 
+            white-space: nowrap;
+        }
+
+        .qty-label { color: white; font-weight: bold; flex-shrink: 0; }
+        .item-name { color: white; font-size: 0.95rem; font-weight: bold; margin-left: 4px; flex-shrink: 0; }
+        .item-desc { color: #888; font-size: 0.8rem; margin-left: 6px; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; }
+
+        /* Ohne & Extras */
+        .item-without { color: #2ecc71; font-size: 0.75rem; margin-top: 0px; font-weight: 500; }
+        /*.item-extras { color: #e67e22; font-size: 0.75rem; margin-top: 0px; font-weight: 500; }*/
+		.item-extras { color: var(--sn); font-size: 0.75rem; margin-top: 0px; font-weight: 500; }
+        /* 5. BUTTON STYLES */
+        .btn-edit {
+            background: transparent;
+            color: #00aaff;
+            border: none;
+            cursor: pointer;
+            font-size: 0.65rem; 
+            padding: 0; 
+            text-align: left; 
+            width: fit-content; 
+            margin-top: 2px;
+        }
+        .btn-edit:hover { text-decoration: underline; }
+
+        .controls { display: flex; align-items: center; gap: 8px; padding-right: 10px; }
+
+        .btn-minus, .btn-plus {
+            color: white; 
+            border: 1px solid #444; 
+            width: 26px; 
+            height: 26px; 
+            border-radius: 4px; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .btn-minus { background: #333; }
+        .btn-plus { background: rgb(0,123,255); border: none; } /* Blau wie im Design gewünscht */
+
+        .btn-minus:hover, .btn-plus:hover { opacity: 0.8; transform: scale(1.05); }
+
+        /* FOOTER */
+        .cart-footer {
+            padding: 15px; 
+            border-top: 1px solid #333; 
+            background: #222; 
+            display: flex; 
+            gap: 10px;
+        }
+
+        .btn-close { flex: 1; background: #444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-checkout { flex: 2; background: rgb(2, 202, 78); color: #1a1a1a; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+
+
+.modal-overlay {
+    display: none; /* Wird per JS auf 'flex' gesetzt */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Halbdurchsichtiger Hintergrund */
+    
+    /* WICHTIG: Höher als die 10000 der Sidebar */
+    z-index: 20000; 
+    
+    /* Zentrierung des Inhalts */
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+
+/* Spezielles Styling für das Erfolgs-Fenster */
+.success-box {
+    text-align: center;
+    border-top: 5px solid rgb(2, 202, 78); /* Dein Grün-Ton */
+    animation: fadeIn 0.3s ease;
+}
+
+.success-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+#success-title {
+    color: #ffcc00;
+    margin: 10px 0;
+}
+
+#success-message {
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+/* Wenn diese Klasse am Body oder Container ist, werden Preise versteckt */
+.hide-cart-prices .item-price, 
+.hide-cart-prices .cart-total-row,
+.hide-cart-prices .price-tag {
+    display: none !important;
+}

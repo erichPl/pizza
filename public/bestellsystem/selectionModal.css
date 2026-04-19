@@ -1,0 +1,226 @@
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #333;
+        }
+
+
+.modal { /* Das dunkle Hintergrund-Element */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100dvh; /* Absolut fest auf den sichtbaren Bereich */
+    display: flex;
+    align-items: center; /* Zentriert das Modal vertikal */
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999999;
+    overflow: hidden; /* Verhindert Scrollen des Hintergrunds */
+}
+
+
+#selection-modal {
+    /* Grundzustand: Absolut versteckt */
+    display: none; 
+    
+    /* Über den gesamten Bildschirm legen */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    
+    /* Hintergrund & Stapelung */
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    z-index: 999999 !important; /* Extrem hoch ansetzen */
+    
+    /* Inhalt zentrieren */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Der weiße Kasten in der Mitte */
+.modal-content {
+    background-color: white !important;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 300px;
+    max-width: 90%;
+    position: relative;
+    z-index: 1000000; /* Noch ein Stück höher als der Hintergrund */
+	
+	/* --- NEU: FIX FÜR BROWSERLEISTE --- */
+    max-height: 85dvh;    /* Nutzt maximal 85% der dynamischen Viewport-Höhe */
+    display: flex;        /* Erlaubt uns, Kopf, Inhalt und Fuß zu trennen */
+    flex-direction: column;
+    overflow: hidden;     /* Verhindert, dass das Modal selbst ausbricht */
+}
+
+
+        /* SELECTION MODAL STYLES */
+        .selection-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            /* dvh berücksichtigt die Browser-Leisten auf Handys */
+            height: 100dvh; 
+            background: #1a1a1a;
+            z-index: 30000;
+            display: none; 
+            flex-direction: column;
+            overflow: hidden;
+            /* Verhindert das Ziehen des gesamten Fensters auf iOS */
+            touch-action: none; 
+        }
+
+        .selection-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .selection-header {
+            flex-shrink: 0;
+            padding: 20px;
+            background: #222;
+            border-bottom: 1px solid #333;
+            text-align: center;
+        }
+
+        .selection-header h3 {
+            margin: 0;
+            color:  var(--sn);
+        }
+
+        /* NUR DIESER BEREICH SCROLLT */
+        .selection-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px 15px;
+            -webkit-overflow-scrolling: touch;
+            /* Erlaubt vertikales Scrollen nur hier */
+            touch-action: pan-y; 
+        }
+
+        .selection-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .grid-comma {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .grid-slash {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Buttons im Modal */
+        .option-btn {
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn.selected {
+            border-color:  var(--sn);
+            background: #444;
+            box-shadow: 0 0 5px rgba(255, 204, 0, 0.4);
+        }
+
+        .option-btn-long {
+            text-align: left;
+        }
+
+        .option-btn-long.selected {
+            background: #00aaff;
+            border-color: #00aaff;
+        }
+
+        /* Fester Footer - IMMER sichtbar */
+        .selection-footer {
+            flex-shrink: 0;
+            padding: 15px;
+            background: #222;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-cancel, .btn-save {
+            flex: 1;
+            padding: 2px;
+            border: none;
+            border-radius: 4px;
+            /*font-weight: bold;*/
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-cancel { background: #444; color: white; }
+        .btn-save { background: #28a745; color: white; }
+		
+		
+		
+		
+		
+		
+		
+		
+.size-selector-mini {
+  display: flex;
+  width: 200px;
+   /* Nimmt nur so viel Platz wie nötig */
+  gap: 8px;
+  border: 1px solid #ccc;
+  overflow: hidden; /* Sorgt für saubere Ecken der inneren Labels */
+}
+
+.size-selector-mini input[type="radio"] {
+  display: none;
+}
+
+.size-selector-mini label {
+  flex: 1;             /* DAS IST DER SCHLÜSSEL: Alle Labels werden gleich breit */
+  text-align: center;  /* Text in der Mitte ausrichten */
+  padding: 5px 0;      /* Padding oben/unten, seitlich übernimmt flex: 1 */
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #555;
+  border-right: 1px solid #ccc;
+  transition: 0.2s;
+  color: #888;
+}
+
+/* Den letzten Strich rechts entfernen */
+.size-selector-mini label:last-child {
+  border-right: none;
+}
+
+/* Hover-Effekt */
+.size-selector-mini label:hover {
+  background-color: #eee;
+}
+
+/* Der aktive Zustand (Orange) */
+.size-selector-mini input[type="radio"]:checked + label {
+  background-color: #ffa500;
+  color: white;
+}

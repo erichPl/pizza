@@ -1,0 +1,104 @@
+/* Das äußere Modal */
+.selection-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    /* dvh ist der "Dynamic Viewport" – perfekt für Handys */
+    height: 100dvh; 
+    background-color: #000;
+    z-index: 30000;
+    /*display: none; /* Wird per JS auf flex gesetzt */
+    flex-direction: column;
+}
+
+/* Der innere Container */
+.selection-content {
+    width: 100%;
+    height: 100%; /* Bezieht sich auf 100dvh des Overlays */
+    display: flex;
+    flex-direction: column;
+    background-color: #000;
+}
+
+
+/* DEIN WRAPPER (Korrektur) */
+.branch-wrapper {
+    display: flex;
+    flex-direction: column;
+    /* flex: 1 sagt: Nimm allen verfügbaren Platz ein! */
+    flex: 1; 
+    padding: 20px;
+    gap: 20px;
+    box-sizing: border-box;
+    background-color: #000;
+}
+
+.branch-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Die Zusammenfassungs-Zeilen unter den Buttons */
+.selection-summary {
+    font-size: 0.9rem;
+    min-height: 1.2rem; /* Behält Platz frei, auch wenn leer */
+    padding-left: 5px;
+    word-wrap: break-word;
+}
+
+.text-green { color: red;}/* #28a745; }   /* Entfernte Zutaten */
+/*.text-orange { color: #ff8800; }  /* Extras */
+.text-orange { color: rgb(141,44,41);}
+/* Die Reihe für Speichern & Abbrechen */
+.branch-footer-row {
+    display: flex;
+    width: 100%;
+    gap: 12px;      /* Kleiner Abstand zwischen den Buttons */
+    margin-top: auto; 
+    padding-bottom: 20px;
+}
+
+/* Speichern Button (2/3 Breite) */
+.flex-2 {
+    flex: 2 !important; /* Erzwingt das 2-fache Gewicht */
+    width: 0;           /* WICHTIG: Setzt die Basisbreite auf 0, damit Flexbox rechnet */
+    min-width: 0;       /* Verhindert, dass der Button starr bleibt */
+}
+
+/* Abbrechen Button (1/3 Breite) */
+.flex-1 {
+    flex: 1.3 !important; /* Erzwingt das 1-fache Gewicht */
+    width: 0;           /* WICHTIG: Basis auf 0 */
+    min-width: 0;
+}
+
+/* Sicherstellen, dass die Buttons nicht rausragen */
+.branch-btn {
+    box-sizing: border-box; /* Padding wird in die Breite eingerechnet */
+    white-space: nowrap;    /* Verhindert Zeilenumbruch im Button-Text */
+    overflow: hidden;       /* Falls Text zu lang, wird er abgeschnitten */
+    text-overflow: ellipsis;
+
+}
+
+.btn-grey-action {
+    background-color: #333;
+    color: white;
+    border: 2px solid transparent;
+}
+
+.btn-grey-action:active {
+    border-color:  var(--sn);
+}
+
+.btn-save-green {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-cancel-light {
+    background-color: #555;
+    color: white;
+}

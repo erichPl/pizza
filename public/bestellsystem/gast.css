@@ -1,0 +1,152 @@
+       
+:root {
+    /* Variablen müssen immer mit zwei Bindestrichen -- beginnen */
+    --pizzeria-rot: rgb(154, 9, 35);  
+    --gold-akzent: #ffcc00;
+    --hintergrund-dunkel: #262626;
+    --text-weiss: #ffffff;
+	--sn:  rgb(141,44,41);/*rgb(154,9,35);/*Schrift name*/
+	--sd: /*desc*/
+	--sp: /*plus*/
+	--sq: /*qty*/
+	--sw:/*without*/
+	--se:/*extrass*/
+	--bp: /*backgroung plus*/
+	--bh: /*background hinzufügen Übernehmen abschicken*/
+	--WebSis: rgb(141,44,41) /*Webseite Sisinius*/
+}
+
+#pizzeria {
+    color: var(--pizzeria-rot);
+}
+
+
+	   /* 1. GRUND-LAYOUT */
+        html, body {
+            margin: 0;
+            padding: 0;
+            /*height: 100%;
+            width: 100%;*/
+            background-color: #1a1a1a;
+            color: #ffffff;
+            /*font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;*/
+            overflow: hidden;
+			
+			
+            font-family: sans-serif;
+            background-color: #333;
+        }
+
+
+
+
+	/* Neu: Der Wrapper übernimmt das Scrollen */
+	#main-scroll-wrapper {
+		height: 100vh;
+		overflow-y: auto;
+		background-color: #1a1a1a;
+	}
+
+
+        /* 2. DER SCROLL-CONTAINER (KOMPAKTER) */
+        #menu-container {
+            /*height: 100vh;*/
+            /*overflow-y: auto;*/
+            padding: 8px; /* Weniger Außenabstand */
+            display: flex;
+            flex-direction: column;
+            gap: 6px;    /* Halbiert: Abstand zwischen den Gerichten */
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 3. DAS ITEM-DESIGN (FLACHER) */
+        .item {
+            background: #262626;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 8px 12px; /* Reduziert von 15px */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /*border-left: 4px solid #00aaff;*/
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* 4. TEXT-STYLING (KOMPAKTER) */
+        .info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .item-name {
+            color: white;
+            font-size: 1rem; /* Leicht verkleinert */
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .item-desc {
+            color: #aaaaaa;
+            font-size: 0.75rem; /* Kleinerer Text */
+            line-height: 1.1;
+            margin: 2px 0;
+            max-width: 180px; /* Begrenzt, damit Buttons Platz haben */
+        }
+
+        .item-price {
+            color: var(--sn);/* rgb(154,9,35);/*#90292C;*//*rgb(2,202,78);*/
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* 5. STEUERUNG (KLEINER) */
+        .qty-wrapper {
+            display: flex;
+            align-items: center;
+            background: #333333;
+            border-radius: 6px;
+            padding: 2px;
+            gap: 6px;
+        }
+
+        .btn-plus, .btn-minus {
+            background: rgb(0,123,255);
+            color: white;
+            border: none;
+            width: 32px;  /* Verkleinert von 38px */
+            height: 32px; /* Verkleinert von 38px */
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-minus {
+		    background: rgb(68,68,68);
+		}
+        .qty-display {
+            color:   var(--sn);
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* KATEGORIE ÜBERSCHRIFTEN (FLACHER) */
+        .menu-category-header {
+            padding: 10px 0 2px 4px; /* Deutlich weniger Platzverschwendung */
+        }
+
+        .header-title {
+            color:   var(--sn);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
