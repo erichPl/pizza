@@ -13,7 +13,17 @@ const io = new Server(server, {
 
 // --- 1. MIDDLEWARE (Reihenfolge optimiert für Speed) ---
 // Zuerst statische Dateien, damit Bilder/CSS sofort laden
-app.use(express.static('public')); 
+//app.use(express.static('public')); 
+
+// --- 1. MIDDLEWARE ---
+// Erlaube Zugriff auf den Haupt-Public Ordner
+app.use(express.static(path.join(__dirname, 'public'))); 
+
+// Erlaube Zugriff direkt auf den Unterordner (wichtig für relative Pfade im HTML)
+app.use(express.static(path.join(__dirname, 'public', 'webseite')));
+app.use(express.static(path.join(__dirname, 'public', 'bestellsystem')));
+
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
