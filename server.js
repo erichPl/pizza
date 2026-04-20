@@ -945,9 +945,9 @@ const anonymizeOldOrders = async () => {
     });
 
     for (let order of ordersToAnonymize) {
-        order.vorname = anonymize(order.vorname, 'name');
-        order.nachname = anonymize(order.nachname, 'name');
-        order.telefon = anonymize(order.telefon, 'phone');
+        order.adresse.vorname = anonymize(order.vorname, 'name');
+        order.adresse.nachname = anonymize(order.nachname, 'name');
+        order.adresse.telefon = anonymize(order.telefon, 'phone');
         order.isAnonymized = true; // Markierung, damit wir sie nicht doppelt bearbeiten
         await order.save();
     }
