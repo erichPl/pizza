@@ -11,3 +11,19 @@ else{if(product.isStandard){product.orderDetails.variant=product.name;product.or
 else{if(product.isPizza){product.orderDetails.variant=product.name;product.orderDetails.price=product.price;activePizza=product;openBranchingModal();return;}
 else{openEditModal(product);return;}}}
 renderMenu();renderCart();}
+let countdownInterval=null;function aktualisiereStatusAnzeige(data){const quadrat=document.getElementById('status-quadrat');const anzeige=document.getElementById('bestellzeit-anzeige');const banner=document.getElementById('countdown-banner');const timerDisplay=document.getElementById('countdown-timer');const bereich=document.getElementById('online-status-bereich');if(!data||!data.heute)return;if(bereich)bereich.style.display='flex';const jetzt=new Date();const jetztHHMM=jetzt.getHours().toString().padStart(2,'0')+":"+
+jetzt.getMinutes().toString().padStart(2,'0');const startZeit=data.heute.start||"00:00";const reguläresEnde=data.heute.ende||"00:00";const schlussZeit=data.bestellStopManuell||reguläresEnde;const vorlaufMinuten=data.timerStartVorlauf||30;const[h,m]=schlussZeit.split(':');const zielZeit=new Date();zielZeit.setHours(parseInt(h),parseInt(m),0);const restMinuten=Math.floor((zielZeit-jetzt)/60000);if(banner)banner.style.display='none';if(countdownInterval)clearInterval(countdownInterval);if(data.heute.zu||data.zustand!=='offen'){updateUI('#e74c3c',data.meldung||"Heute geschlossen");}
+else if(jetztHHMM<startZeit){updateUI('#e74c3c',`Öffnet um ${startZeit} Uhr`);}
+else if(jetztHHMM>=schlussZeit){if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway tra ${startZeit} e ${schlussZeit}`);}
+else{updateUI('#e74c3c',`Takeaway Bestellung von ${startZeit} bis ${schlussZeit} Uhr`);}}
+else if(restMinuten<=vorlaufMinuten){if(currentLang==='it'){updateUI('#f39c12',`Ordinazione Takeaway tra ${startZeit} e ${schlussZeit}`);}
+else{updateUI('#f39c12',`Takeaway Bestellung von ${startZeit} bis ${schlussZeit} Uhr`);}
+if(banner)banner.style.display='block';starteEinheitlichenTimer(schlussZeit,timerDisplay);}
+else{if(currentLang==='it'){updateUI('#2ecc71',`Ordinazione Takeaway tra ${startZeit} e ${schlussZeit}`);}
+else{updateUI('#2ecc71',`Takeaway Bestellung von ${startZeit} bis ${schlussZeit} Uhr`);}}
+function updateUI(farbe,text){if(quadrat)quadrat.style.backgroundColor=farbe;if(anzeige)anzeige.innerText=text;}}
+function starteEinheitlichenTimer(zielUhrzeit,displayElement){if(!displayElement)return;const[h,m]=zielUhrzeit.split(':');function tick(){const jetzt=new Date();const ziel=new Date();ziel.setHours(parseInt(h),parseInt(m),0);const diff=ziel-jetzt;if(diff<=0){displayElement.innerText="00:00";clearInterval(countdownInterval);document.getElementById('status-quadrat').style.backgroundColor='#e74c3c';document.getElementById('bestellzeit-anzeige').innerText="Bestellannahme beendet";return;}
+const min=Math.floor(diff/60000);const sek=Math.floor((diff%60000)/1000);displayElement.innerText=`${min}:${sek.toString().padStart(2, '0')} Min.`;}
+tick();countdownInterval=setInterval(tick,1000);}
+socket.on('status-update',(data)=>{aktualisiereStatusAnzeige(data);});async function initialisiereStatus(){try{const response=await fetch('/api/status');if(!response.ok)throw new Error("Server-Antwort war nicht okay");const data=await response.json();const urlParams=new URLSearchParams(window.location.search);const aktuellerModus=urlParams.has('tisch')?'restaurant':'abholung';window.bestellModus=aktuellerModus;aktualisiereStatusAnzeige(data);console.log(`Initialer Status geladen (${aktuellerModus}):`,data);}catch(err){console.error("Fehler beim ersten Laden des Status:",err);document.getElementById('bestellzeit-anzeige').innerText="Status wird geladen...";}}
+document.addEventListener('DOMContentLoaded',initialisiereStatus);initialisiereStatus();setInterval(()=>{fetch('/api/status').then(res=>res.json()).then(data=>aktualisiereStatusAnzeige(data));},30000);
