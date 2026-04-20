@@ -11,17 +11,21 @@ const io = new Server(server, {
     cors: { origin: "*" }
 });
 
+
+
 // --- 1. MIDDLEWARE (Reihenfolge optimiert für Speed) ---
 // Zuerst statische Dateien, damit Bilder/CSS sofort laden
-//app.use(express.static('public')); 
-
 // --- 1. MIDDLEWARE ---
-// Erlaube Zugriff auf den Haupt-Public Ordner
-app.use(express.static(path.join(__dirname, 'public'))); 
+// Damit findet er Dateien direkt in public/ (z.B. favicon)
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Erlaube Zugriff direkt auf den Unterordner (wichtig für relative Pfade im HTML)
-app.use(express.static(path.join(__dirname, 'public', 'webseite')));
-app.use(express.static(path.join(__dirname, 'public', 'bestellsystem')));
+// WICHTIG: Damit findet er Dateien, die mit /bestellsystem/ aufgerufen werden
+app.use('/bestellsystem', express.static(path.join(__dirname, 'public', 'bestellsystem')));
+
+// Optional: Falls du das auch für die Webseite brauchst
+app.use('/webseite', express.static(path.join(__dirname, 'public', 'webseite'))); 
+
+
 
 
 app.use(express.json({ limit: '10mb' }));
@@ -40,7 +44,8 @@ const connectionOptions = {
 mongoose.connect(mongoURI, connectionOptions)
     .then(() => {
         console.log("==> MongoDB verbunden & vorgewärmt!");
-        startServer();
+        setupZeiten(); // <-- Dieser Aufruf legt das Dokument an, wenn es fehlt!
+		startServer();
     })
     .catch(err => console.error("Verbindungsfehler:", err));
 
@@ -91,8 +96,61 @@ const orderSchema = new mongoose.Schema({
         telefon: String
     }		
 });
+
+
+let shopStatus = {
+    zustand: 'offen',      // 'offen', 'pause', 'ausverkauft', 'geschlossen'
+    meldung: '',           // Individueller Text (z.B. "Frische-Garantie")
+    wiederOffenAb: null,   // Zeitstempel für den Countdown
+	bestellStopManuell: null, // Initial leer
+	timerStartVorlauf: 30, // Standard: 30 Minuten vorher wird es orange
+    serverZeit: Date.now() // Wichtig für den Abgleich der Client-Uhrzeit
+};
+
 const Order = mongoose.model('Order', orderSchema, 'orders');
 
+
+const oeffnungszeitenSchema = new mongoose.Schema({
+    _id: String,
+    wochentage: Object,
+    ausnahmen: Array, // WICHTIG: Hier hinzufügen, damit das Setup-Objekt passt
+	// NEU: Damit MongoDB dieses Feld akzeptiert
+    timerStartVorlauf: { type: Number, default: 30 }
+}, { collection: 'einstellungens' }); // ERZWINGT die Nutzung deiner "einstellungens" Collection
+
+const Einstellungen = mongoose.model('Einstellungen', oeffnungszeitenSchema);
+
+// Einmaliges Setup
+async function setupZeiten() {
+    try {
+        const existiert = await Einstellungen.findById("oeffnungszeiten_config");
+        if (!existiert) {
+            await Einstellungen.create({
+                _id: "oeffnungszeiten_config",
+                wochentage: {
+                    "1": { "name": "Montag", "start": "11:30", "ende": "22:00", "zu": false },
+                    "2": { "name": "Dienstag", "start": "11:30", "ende": "22:00", "zu": false },
+                    "3": { "name": "Mittwoch", "start": "11:30", "ende": "22:00", "zu": false },
+                    "4": { "name": "Donnerstag", "start": "11:30", "ende": "22:00", "zu": false },
+                    "5": { "name": "Freitag", "start": "11:30", "ende": "23:00", "zu": false },
+                    "6": { "name": "Samstag", "start": "11:30", "ende": "23:00", "zu": false },
+                    "0": { "name": "Sonntag", "start": "12:00", "ende": "21:00", "zu": false }
+                },
+                ausnahmen: [
+                    { "datum": "2024-12-24", "geschlossen": true, "grund": "Heiligabend" }
+                ]
+            });
+            console.log("Standard-Öffnungszeiten wurden in 'einstellungens' angelegt.");
+        } else {
+            console.log("Öffnungszeiten-Konfiguration bereits vorhanden.");
+        }
+    } catch (err) {
+        console.error("Fehler beim Setup der Zeiten:", err);
+    }
+}
+
+// Ruf die Funktion auf, nachdem die DB-Verbindung steht!
+setupZeiten();
 
 //Websocket Gast
 //===================
@@ -277,7 +335,8 @@ app.get('/api/backup-full', async (req, res) => {
             OrderMenu.find({}).lean(),
             Test1.find({}).lean()
         ]);
-        res.json({ pizzadatas: pizzas, orders, ordermenus: menus, test1: tests, exportDatum: new Date().toISOString() });
+        res.json({ pizzadatas: pizzas, orders, ordermenus: menus, test1: tests, exportDatum: new Date().toISOString() 
+		});
     } catch (e) { res.status(500).send(e.message); }
 });
 
@@ -915,3 +974,250 @@ app.post('/api/verify-chef-setup', (req, res) => {
         res.status(401).json({ success: false, message: "Falsches Chef-Passwort" });
     }
 });
+
+
+app.post('/api/bestellung', async (req, res) => {
+    const jetzt = new Date();
+    const heuteDatumString = jetzt.toISOString().split('T')[0];
+    const config = await Einstellungen.findById("oeffnungszeiten_config");
+    
+    // Aktuelle Uhrzeit im Format "HH:mm"
+    const aktuelleZeit = jetzt.getHours().toString().padStart(2, '0') + ":" + 
+                         jetzt.getMinutes().toString().padStart(2, '0');
+
+    // 0. Check auf Ausnahmen (Feiertage/Urlaub)
+    if (config.ausnahmen && config.ausnahmen.length > 0) {
+        const ausnahme = config.ausnahmen.find(a => a.datum === heuteDatumString);
+        if (ausnahme && ausnahme.geschlossen) {
+            return res.status(403).json({ error: ausnahme.grund || "Heute geschlossen." });
+        }
+    }
+
+    // 1. Check auf Wochentag
+    const tag = jetzt.getDay(); 
+    const heute = config.wochentage[tag];
+    if (heute.zu) return res.status(403).json({ error: "Heute haben wir Ruhetag." });
+
+    // --- NEU: LOGIK FÜR MANUELLEN BESTELL-STOPP ---
+    // Wenn in der Bar eine Zeit gesetzt wurde, überschreibt diese das normale Ende
+    const endZeit = shopStatus.bestellStopManuell || heute.ende;
+
+    // 2. Check ob die Uhrzeit passt (Startzeit bleibt immer gleich)
+    if (aktuelleZeit < heute.start || aktuelleZeit > endZeit) {
+        return res.status(403).json({ 
+            error: `Bestellungen aktuell nicht möglich. Geöffnet bis ${endZeit} Uhr.` 
+        });
+    }
+
+    // 3. Manueller Check (Ofen-Schalter / Pause)
+
+    // 3. Manueller Check (Ofen-Schalter / Pause / Ausverkauft)
+    if (shopStatus.zustand !== 'offen') {
+        if (shopStatus.zustand === 'pause' && shopStatus.wiederOffenAb) {
+            const jetztTime = Date.now();
+            if (jetztTime < shopStatus.wiederOffenAb) {
+                const restMinuten = Math.ceil((shopStatus.wiederOffenAb - jetztTime) / 60000);
+                return res.status(403).json({ 
+                    error: `Wir machen gerade eine kurze Pause. In ca. ${restMinuten} Min. sind wir wieder für dich da!` 
+                });
+            } else {
+                shopStatus.zustand = 'offen';
+            }
+        } else {
+            return res.status(403).json({ 
+                error: shopStatus.meldung || "Der Ofen ist aktuell aus. Wir nehmen gerade keine Bestellungen entgegen." 
+            });
+        }
+    }
+    // Wenn alles okay ist, Bestellung verarbeiten...
+    res.status(200).json({ status: "success" });
+});
+
+
+
+
+// Wenn du den Status änderst, sende auch die Tages-Info mit
+async function sendeStatusUpdate() {
+    const jetzt = new Date();
+    const config = await Einstellungen.findById("oeffnungszeiten_config");
+    const heute = config.wochentage[jetzt.getDay()];
+
+    io.emit('status-update', {
+        ...shopStatus,
+        heute: heute
+    });
+}
+
+app.get('/api/status', async (req, res) => {
+    try {
+        const jetzt = new Date();
+        const tag = jetzt.getDay(); // 0 (So) bis 6 (Sa)
+        const heuteDatumString = jetzt.toISOString().split('T')[0];
+
+        // 1. Config aus der DB laden
+        const config = await Einstellungen.findById("oeffnungszeiten_config");
+
+        // 2. Heute-Daten sicher extrahieren (als String oder Zahl-Key)
+        const heuteDaten = config ? (config.wochentage[tag.toString()] || config.wochentage[tag]) : null;
+
+        // 3. Suche nach Ausnahmen für heute (Urlaub, Feiertag)
+        const ausnahme = config && config.ausnahmen 
+            ? config.ausnahmen.find(a => a.datum === heuteDatumString) 
+            : null;
+
+		// 4. Alles in einer einzigen Antwort schicken
+		res.json({
+			// Daten vom manuellen Ofen-Schalter
+			zustand: shopStatus.zustand,
+			meldung: shopStatus.meldung,
+			wiederOffenAb: shopStatus.wiederOffenAb,
+
+			// Die manuell gesetzte Zeit für das Bestell-Ende
+			bestellStopManuell: shopStatus.bestellStopManuell, 
+
+			// NEU: Ab wie vielen Minuten vor Ende soll der Timer orange werden?
+			// Falls kein Wert gesetzt ist, senden wir 30 als Standard
+			timerStartVorlauf: shopStatus.timerStartVorlauf || 30,
+
+			// Daten für die aktuelle Anzeige beim Gast
+			heute: heuteDaten, 
+			ausnahmeHeute: ausnahme,
+			
+			// Daten für das Admin-Einstellungs-Fenster (das Modal)
+			kompletteConfig: config ? config : null 
+		});
+
+    } catch (err) {
+        console.error("Kritischer Fehler in /api/status:", err);
+        res.status(500).json({ error: "Interner Serverfehler" });
+    }
+});
+
+
+// Öffnungszeiten aus dem Admin-Modal speichern
+// 2. Die korrigierte Speicher-Route
+// --- Die korrigierte Speicher-Route ---
+app.post('/api/admin/oeffnungszeiten', async (req, res) => {
+    try {
+        // Hier ziehen wir die Daten aus dem verpackten Objekt
+        const { zeiten, pw } = req.body; 
+
+        // Passwort-Check gegen die .env Variable
+        if (pw !== process.env.PW_BAR) {
+            console.log("Falsches Passwort beim Zeit-Speichern");
+            return res.status(403).json({ success: false, error: "Falsches Passwort" });
+        }
+
+        if (!zeiten) {
+            return res.status(400).json({ success: false, error: "Keine Daten empfangen" });
+        }
+
+        // In Datenbank speichern
+        await Einstellungen.findByIdAndUpdate(
+            "oeffnungszeiten_config",
+            { $set: { wochentage: zeiten } },
+            { upsert: true, new: true }
+        );
+
+        // Sofort alle Handys aktualisieren und die neuen Daten mitschicken!
+        await broadcastStatusUpdate(zeiten); 
+
+		// --- DAS HIER FEHLT ---
+        // Wir schicken die neuen Zeiten sofort an alle verbundenen Clients
+        io.emit('status-update', { wochentage: zeiten });
+
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("DB-Fehler:", err);
+        res.status(500).json({ success: false });
+    }
+});
+
+//Dieses Feld überschreibt temporär die reguläre Öffnungszeit.
+// Route, um das Bestell-Ende heute manuell zu setzen
+
+
+
+app.post('/api/admin/set-bestell-ende', async (req, res) => { // async hinzufügen!
+    try {
+        const { uhrzeit, pw } = req.body;
+        if (pw !== process.env.PW_BAR) return res.status(403).json({ success: false });
+
+        // 1. Wert im RAM speichern
+        shopStatus.bestellStopManuell = uhrzeit;
+
+        // 2. DIE LÖSUNG: Nutze die zentrale Broadcast-Funktion
+        // Diese Funktion holt die Öffnungszeiten ("heute") dazu und sendet alles an den Gast
+        await broadcastStatusUpdate(); 
+
+        console.log("cc & Broadcast gesendet");
+        res.json({ success: true });
+    } catch (err) {
+        console.error("KRITISCHER ROUTEN-FEHLER:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route zum Speichern des Vorlaufs (server.js)
+app.post('/api/admin/set-timer-vorlauf', async (req, res) => {
+    try {
+        const { minuten, pw } = req.body;
+
+        // Passwort-Check gegen .env
+        if (pw !== process.env.PW_BAR) {
+            return res.status(403).json({ success: false, error: "Falsches Passwort" });
+        }
+
+        const vorlaufNum = parseInt(minuten) || 30;
+
+        // WICHTIG: Die ID muss exakt "oeffnungszeiten_config" sein!
+        await Einstellungen.findByIdAndUpdate(
+            "oeffnungszeiten_config", 
+            { $set: { timerStartVorlauf: vorlaufNum } },
+            { upsert: true, new: true }
+        );
+
+        // RAM-Variable für die Live-Anzeige aktualisieren
+        shopStatus.timerStartVorlauf = vorlaufNum;
+        io.emit('status-update', shopStatus); 
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("DB Fehler:", err);
+        res.status(500).json({ success: false });
+    }
+});
+
+// 1. Die verbesserte Hilfsfunktion (kann nun auch direkt Daten empfangen)
+// --- Die verbesserte Hilfsfunktion ---
+async function broadcastStatusUpdate(erzwingeDaten = null) {
+    try {
+        let alleZeiten = erzwingeDaten;
+        
+        // Falls keine Daten mitgegeben wurden (z.B. bei Zeit-Check-Intervall), aus DB laden
+        if (!alleZeiten) {
+            const config = await Einstellungen.findById("oeffnungszeiten_config");
+            alleZeiten = config ? config.wochentage : null;
+        }
+
+        const tag = new Date().getDay().toString();
+        // WICHTIG: Sicherstellen, dass heuteDaten existiert, sonst Standardwert
+        const heuteDaten = alleZeiten ? alleZeiten[tag] : null;
+
+        const payload = {
+            zustand: shopStatus.zustand,
+            meldung: shopStatus.meldung,
+            bestellStopManuell: shopStatus.bestellStopManuell,
+            timerStartVorlauf: shopStatus.timerStartVorlauf || 30,
+            heute: heuteDaten,
+            serverZeit: Date.now()
+        };
+
+        // Das Event muss 'status-update' heißen!
+        io.emit('status-update', payload);
+        console.log("Broadcast: Status-Update an alle gesendet.");
+    } catch (err) {
+        console.error("Broadcast Fehler:", err);
+    }
+}
