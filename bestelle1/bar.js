@@ -2,7 +2,7 @@
 // Oben im Script:
 let currentLoadedOrders = []; // Hier speichern wir die letzten gefetchten Daten
 setBon(false);
-
+let pwInput;
 // Ganz oben im Script:
 //if (!sessionStorage.getItem('userRole')) {
     sessionStorage.setItem('userRole', 'kellner'); // Standardmäßig Kellner
@@ -12,6 +12,9 @@ let zeigePreise = false; //für bar.html Auf false setzen, um Preise komplett au
 let currentPassword = ""; // Ganz oben im Script-Bereich definieren
 	let selectedOrderIds = new Set(); // Hier merken wir uns die IDs
 //Dasmit checkboxen für Bon Ddruck nach intervall erhalten bleiben
+
+
+let aktuellerStatus = {};
 
 // Diese Funktion rufst du mit dem 'onchange' der Checkbox auf
 function toggleSelection(orderId) {
@@ -37,8 +40,18 @@ const notificationSound = new Audio('/bestelle1/notification.mp3');
 const feedbackSound = new Audio('https://actions.google.com/sounds/v1/foley/drawbridge_teal.ogg');
 
 async function fetchOrders() {
-    const savedPw = sessionStorage.getItem('barPassword');
+    // PRÜFUNG: Wenn die Historie offen ist, brechen wir den automatischen Refresh ab
+    // PRÜFUNG: Ist die Historie gerade offen?
+    const isHistoryOpen = document.getElementById('historyFilter')?.style.display !== 'none';
     
+    if (isHistoryOpen) {
+        console.log("Historie ist offen - automatischer Live-Update gestoppt.");
+        return; // Hier bricht die Funktion ab, der Normalmodus wird NICHT geladen
+    }
+	
+	const savedPw = sessionStorage.getItem('barPassword');
+    const orderId = localStorage.getItem('orderId'); 
+	
     if (!savedPw) {
         if(document.getElementById('barLoginOverlay')) {
             document.getElementById('barLoginOverlay').style.display = 'flex';
@@ -48,7 +61,9 @@ async function fetchOrders() {
     
     try {
         const res = await fetch('/api/get-orders', {
-            headers: { 'x-bar-pw': savedPw }
+            headers: { 'x-bar-pw': savedPw,
+			'x-device-token': orderId 
+			}
         }); 
         
         if (res.status === 403) {
@@ -474,6 +489,34 @@ ${zeigePreise ? `
 		});
 				
 		
+		// NEU: Auf Status-Updates hören (Öffnungszeiten, Manuelle Zeit, Timer-Vorlauf)
+		socket.on('status-update', (data) => {
+			console.log("⚡ Live-Update Status empfangen:", data);
+			
+			// 1. Wenn dein Client eine Funktion hat, die den Shop-Status (Offen/Zu/Timer) prüft, 
+			// rufe sie hier SOFORT auf:
+			if (typeof initialisiereBarStatus === "function") {
+				initialisiereBarStatus(); 
+			}
+
+			// 2. Falls die manuelle Zeit Auswirkungen auf die Bestellliste hat:
+			fetchOrders(); 
+			
+			// 3. Falls du ein Modal offen hast, das die aktuellen Werte anzeigen soll:
+			if (data.bestellStopManuell !== undefined) {
+				console.log("Manuelle Zeit wurde geändert auf:", data.bestellStopManuell);
+				// Hier könntest du ein Element in der Bar-Ansicht direkt aktualisieren
+				const anzeigeEl = document.getElementById('aktuelle-manuelle-zeit-anzeige');
+				if (anzeigeEl) anzeigeEl.innerText = data.bestellStopManuell || "Keine";
+			}
+		});
+		
+		
+		
+		
+		
+		
+		
 		
 
 		// 5. Sicherheits-Netz: Falls das WLAN mal kurz weg ist, 
@@ -809,7 +852,7 @@ function submitLogin() {
 }
 
 async function submitBarLogin() {
-    const pwInput = document.getElementById('barPasswordInput').value;
+    pwInput = document.getElementById('barPasswordInput').value;
     
     // Wir speichern das Bar-PW unter 'barPassword' (wie von fetchOrders erwartet)
     sessionStorage.setItem('barPassword', pwInput);
@@ -1242,6 +1285,339 @@ function renderCurrentOrders() {
     // 4. Jetzt erst rendern
     renderOrders(filtered);
 }
+
+
+const tageNamen = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+
+async function openSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    const tbody = document.getElementById('zeiten-tabelle-body');
+    
+    modal.style.display = 'flex';
+    tbody.innerHTML = "<tr><td colspan='4'>Lade Daten...</td></tr>";
+
+    try {
+        const res = await fetch('/api/status');
+        if (!res.ok) throw new Error("Server-Antwort nicht OK");
+        
+        const data = await res.json();
+        const config = data.kompletteConfig;
+
+        if (!config) {
+            tbody.innerHTML = "<tr><td colspan='4'>Keine Konfiguration in DB gefunden!</td></tr>";
+            return;
+        }
+
+        // --- HIER IST DER ALERT ZUM EINLESEN ---
+        //alert("Daten vom Server empfangen. Timer-Vorlauf ist: " + config.timerStartVorlauf);
+
+        // 1. Tabelle für Wochentage aufbauen
+        tbody.innerHTML = "";
+        const tage = config.wochentage || config; // Fallback falls Struktur flach ist
+        for (let i = 0; i < 7; i++) {
+            const tag = tage[i] || tage[i.toString()] || { start: "11:00", ende: "22:00", zu: false };
+            
+            tbody.innerHTML += `
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:10px 0;">${tageNamen[i]}</td>
+                    <td><input type="time" id="start-${i}" value="${tag.start || '11:00'}" style="background:#333; color:white; border:1px solid #555; padding:5px; border-radius:3px;"></td>
+                    <td><input type="time" id="ende-${i}" value="${tag.ende || '22:00'}" style="background:#333; color:white; border:1px solid #555; padding:5px; border-radius:3px;"></td>
+                    <td style="text-align:center;"><input type="checkbox" id="zu-${i}" ${tag.zu ? 'checked' : ''}></td>
+                </tr>
+            `;
+        }
+
+        // 2. WICHTIG: Jetzt befüllen wir auch die restlichen Felder (wie den Timer)
+        befuelleModal(config);
+
+    } catch (err) {
+        console.error("Modal-Ladefehler:", err);
+        tbody.innerHTML = "<tr><td colspan='4' style='color:red;'>Fehler beim Laden: " + err.message + "</td></tr>";
+    }
+}
+
+function closeSettingsModal() {
+    document.getElementById('settings-modal').style.display = 'none';
+}
+
+// --- ALLGEMEINE ÖFFNUNGSZEITEN (Das Modal) ---
+
+async function speichereZeiten() {
+    // Wir nehmen exakt das Passwort, das auch fetchOrders erfolgreich nutzt
+     const pw = document.getElementById('barPasswordInput').value;; // Hol das PW aus dem Speicher
+   //alert("in zeiten"); 
+    //alert("zeiten:"+pw);
+	if (!pw) {
+        alert("Fehler: Kein Passwort im Speicher gefunden. Bitte lade die Seite neu.");
+        return;
+    }
+
+    const neueZeiten = {};
+    for (let i = 0; i < 7; i++) {
+        const startVal = document.getElementById(`start-${i}`).value;
+        const endeVal = document.getElementById(`ende-${i}`).value;
+        const istZu = document.getElementById(`zu-${i}`).checked;
+
+        neueZeiten[i] = {
+            name: tageNamen[i],
+            start: startVal,
+            ende: endeVal,
+            zu: istZu
+        };
+    }
+
+    // WICHTIG: Die Struktur muss { zeiten: ..., pw: ... } sein
+    const payload = {
+        zeiten: neueZeiten,
+        pw: pw
+    };
+
+    try {
+		//alert("Oeffn");
+        const response = await fetch('/api/admin/oeffnungszeiten', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+                // Falls dein Server auch hier die orderId im Header will, 
+                // kannst du sie hier wie bei fetchOrders hinzufügen:
+                // 'x-device-token': localStorage.getItem('orderId')
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            alert("✅ Gespeichert! Die Handys der Gäste wurden aktualisiert.");
+            closeSettingsModal();
+        } else {
+            // Wenn der Server "Falsches Passwort" schickt, landet es hier:
+            alert("❌ Fehler vom Server: " + (result.error || "Unbekannter Fehler"));
+        }
+    } catch (err) {
+        console.error("Netzwerkfehler:", err);
+        alert("❌ Verbindung zum Server fehlgeschlagen.");
+    }
+}
+
+
+
+// --- MANUELLE ZEIT STEUERUNG ---
+
+async function speichereManuelleZeit() {
+    const zeit = document.getElementById('input-bestell-ende').value;
+    const pw = document.getElementById('barPasswordInput').value;; // Hol das PW aus dem Speicher
+	if (!pw) {
+        alert("Fehler: Kein Passwort im Speicher gefunden. Bitte lade die Seite neu.");
+        return;
+    }
+
+
+
+    if (!zeit) return alert("Bitte erst eine Uhrzeit wählen!");
+
+    const response = await fetch('/api/admin/set-bestell-ende', { // Route angepasst an server.js
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uhrzeit: zeit, pw: pw }) // PW mitschicken!
+    });
+
+    if (response.ok) {
+        alert(`Manuelle Zeit (${zeit} Uhr) aktiv.`);
+    } else {
+        alert("Fehler beim Speichern. Passwort korrekt?");
+    }
+	
+}
+
+async function loescheManuelleZeit() {
+    const pw = document.getElementById('barPasswordInput').value;;
+    
+    const response = await fetch('/api/admin/set-bestell-ende', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uhrzeit: null, pw: pw }) 
+    });
+
+    if (response.ok) {
+        document.getElementById('input-bestell-ende').value = "";
+        alert("Manuelle Zeit entfernt. Reguläre Öffnungszeiten gelten wieder.");
+    }
+}
+
+
+
+// --- TIMER VORLAUF (Wann wird es orange?) ---
+async function setzeVorlauf() {
+    const min = document.getElementById('input-vorlauf').value;
+    // Passwort aus dem Speicher holen (wie beim Login/fetchOrders)
+    const pw = document.getElementById('barPasswordInput').value;;//sessionStorage.getItem('barPassword'); 
+//alert("vorlauf:"+pw);
+    if (!min) return alert("Bitte Minuten eingeben!");
+
+    try {
+        // Pfad muss EXAKT wie im Server sein: /api/admin/set-timer-vorlauf
+        const response = await fetch('/api/admin/set-timer-vorlauf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                minuten: min, 
+                pw: pw // Passwort mitschicken
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            alert(`✅ Timer-Vorlauf auf ${min} Minuten gesetzt.`);
+        } else {
+            alert("❌ Fehler: " + (result.error || "Passwort falsch oder Serverfehler"));
+        }
+    } catch (err) {
+        console.error("Netzwerkfehler:", err);
+        alert("❌ Verbindung zum Server fehlgeschlagen.");
+    }
+}
+
+// Diese Funktion füllt die Input-Felder im Modal mit den echten DB-Werten
+function befuelleModal(config) {
+    if (!config) return;
+
+    // 1. Die Wochentage stecken jetzt in config.wochentage
+    const tage = config.wochentage; 
+    if (tage) {
+        for (let i = 0; i < 7; i++) {
+            const tagDaten = tage[i.toString()] || tage[i];
+            if (tagDaten) {
+                if (document.getElementById(`start-${i}`)) document.getElementById(`start-${i}`).value = tagDaten.start;
+                if (document.getElementById(`ende-${i}`)) document.getElementById(`ende-${i}`).value = tagDaten.ende;
+                if (document.getElementById(`zu-${i}`)) document.getElementById(`zu-${i}`).checked = tagDaten.zu;
+            }
+        }
+    }
+
+    // 2. Der Timer-Vorlauf steckt direkt in config
+    const vorlaufInput = document.getElementById('input-vorlauf');
+    if (vorlaufInput && config.timerStartVorlauf !== undefined) {
+        vorlaufInput.value = config.timerStartVorlauf;
+        console.log("Timer-Wert erfolgreich geladen:", config.timerStartVorlauf);
+    }
+}
+
+// In deiner existierenden Initialisierungs-Funktion:
+async function initialisiereBarStatus() {
+    try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        
+        console.log("--- DIAGNOSE START ---");
+        console.log("Vom Server empfangene Daten:", data);
+        
+        if (data.kompletteConfig) {
+            console.log("kompletteConfig Inhalt:", data.kompletteConfig);
+            console.log("Timer-Wert im Paket:", data.kompletteConfig.timerStartVorlauf);
+            befuelleModal(data.kompletteConfig);
+        } else {
+            console.warn("ACHTUNG: kompletteConfig fehlt in der Server-Antwort!");
+        }
+        console.log("--- DIAGNOSE ENDE ---");
+    } catch (err) {
+        console.error("Fehler beim Laden:", err);
+    }
+}
+
+// Die Funktion, die den Countdown berechnet
+function updateBarTimer() {
+    const timerBalken = document.getElementById('timer-balken');
+    const timerAnzeige = document.getElementById('timer-countdown');
+    
+    // Info-Elemente
+    const infoStart = document.getElementById('info-start');
+    const infoReg = document.getElementById('info-regulaer');
+    const infoMan = document.getElementById('info-manuell');
+    const manuellHinweis = document.getElementById('manuell-hinweis');
+
+    if (!timerBalken || !aktuellerStatus) return;
+
+    // 1. Grund-Daten auslesen
+    const startZeit = aktuellerStatus.heute ? aktuellerStatus.heute.start : "--:--";
+    const regEnde = aktuellerStatus.heute ? aktuellerStatus.heute.ende : "--:--";
+    const manEnde = aktuellerStatus.bestellStopManuell;
+    const vorlauf = aktuellerStatus.timerStartVorlauf || 30;
+
+    // 2. Infos in der Bar-Anzeige setzen
+    if(infoStart) infoStart.innerText = startZeit;
+    if(infoReg) infoReg.innerText = regEnde;
+
+    // Manuelle Zeit Logik für die Bar-Info
+    if (manEnde) {
+        if(infoMan) infoMan.innerText = manEnde;
+        if(manuellHinweis) manuellHinweis.style.display = 'inline';
+    } else {
+        if(manuellHinweis) manuellHinweis.style.display = 'none';
+    }
+
+    // 3. Zielzeit für den Countdown bestimmen
+    const zielZeitStr = manEnde || (aktuellerStatus.heute ? aktuellerStatus.heute.ende : null);
+    
+    if (!zielZeitStr || zielZeitStr === "--:--") {
+        timerBalken.style.display = 'none';
+        return;
+    }
+
+    const jetzt = new Date();
+    const [stunden, minuten] = zielZeitStr.split(':');
+    const zielDatum = new Date();
+    zielDatum.setHours(parseInt(stunden), parseInt(minuten), 0, 0);
+
+    const diff = zielDatum - jetzt;
+    const gesamtSekunden = Math.floor(diff / 1000);
+
+    if (diff > 0) {
+        const minutenRest = Math.floor(gesamtSekunden / 60);
+        const sekundenRest = gesamtSekunden % 60;
+
+        // Nur einblenden, wenn im Vorlauf
+        if (minutenRest < vorlauf) {
+            timerBalken.style.display = 'block';
+            
+            // Farbanpassung je nach Dringlichkeit
+            if (minutenRest < 5) {
+                timerBalken.style.backgroundColor = '#c0392b'; // Rot
+            } else {
+                timerBalken.style.backgroundColor = '#e67e22'; // Orange
+            }
+
+            const displayMin = minutenRest < 10 ? '0' + minutenRest : minutenRest;
+            const displaySek = sekundenRest < 10 ? '0' + sekundenRest : sekundenRest;
+            timerAnzeige.innerText = `${displayMin}:${displaySek}`;
+        } else {
+            timerBalken.style.display = 'none'; 
+        }
+    } else {
+        // Zeit abgelaufen
+        timerBalken.style.display = 'block';
+        timerBalken.style.backgroundColor = '#2c3e50'; // Grau/Blau für beendet
+        timerAnzeige.innerText = "BESTELL-STOP AKTIV";
+    }
+}
+
+// In deinen Socket-Bereich in der Bar-Ansicht einfügen:
+socket.on('status-update', (data) => {
+    console.log("Bar-Ansicht: Status erhalten", data);
+    aktuellerStatus = data;
+    updateBarTimer(); // Sofort aktualisieren
+});
+
+// Zusätzlich jede Minute aktualisieren, damit der Countdown runterzählt
+setInterval(updateBarTimer, 1000);
+// Beim Laden der Bar-Seite
+async function initBar() {
+    const res = await fetch('/api/status');
+    aktuellerStatus = await res.json();
+    updateBarTimer();
+}
+initBar();
 
 
 
