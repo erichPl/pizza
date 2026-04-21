@@ -150,3 +150,58 @@
             margin: 0;
             letter-spacing: 0.5px;
         }
+		
+		
+		#status-quadrat {
+    transition: background-color 0.5s ease; /* Weicher Farbübergang */
+    box-shadow: 0 0 4px rgba(0,0,0,0.2);
+}
+
+/* Optional: Ein leichtes Pulsieren, wenn offen ist */
+.pulsieren {
+    animation: status-puls 2s infinite;
+}
+
+@keyframes status-puls {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.status-green { background-color: #2ecc71; color: white; } /* Offen */
+.status-orange { background-color: #f39c12; color: white; } /* Countdown läuft */
+.status-red { background-color: #e74c3c; color: white; } /* Geschlossen */
+
+.status-box {
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    transition: all 0.5s ease;
+}
+
+.oeffnungszeiten-container {
+    background-color: #ffffff; 
+    color: #333333; /* Dunkler Text */
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 20px auto 100px auto;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+    display: block !important; /* Sicherstellen, dass es nicht versteckt ist */
+}
+
+#zeiten-tabelle {
+    color: #333 !important; 
+    width: 100%;
+}
+
+#zeiten-tabelle td {
+    border-bottom: 1px solid #eee;
+}
+
+.heute-markiert {
+    background-color: #fff9c4; /* Leichtes Gelb für heute */
+    font-weight: bold;
+}
