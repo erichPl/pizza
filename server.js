@@ -127,6 +127,8 @@ async function setupZeiten() {
         if (!existiert) {
             await Einstellungen.create({
                 _id: "oeffnungszeiten_config",
+				// NEU: Den Vorlauf auch hier initial mitschreiben
+                timerStartVorlauf: 30,
                 wochentage: {
                     "1": { "name": "Montag", "start": "11:30", "ende": "22:00", "zu": false },
                     "2": { "name": "Dienstag", "start": "11:30", "ende": "22:00", "zu": false },
@@ -1094,17 +1096,18 @@ app.get('/api/status', async (req, res) => {
 });
 
 
-// Öffnungszeiten aus dem Admin-Modal speichern
-// 2. Die korrigierte Speicher-Route
-// --- Die korrigierte Speicher-Route ---
+
+//Dieses Feld überschreibt temporär die reguläre Öffnungszeit.
+// Route, um das Bestell-Ende heute manuell zu setzen
+
 app.post('/api/admin/oeffnungszeiten', async (req, res) => {
     try {
-        // Hier ziehen wir die Daten aus dem verpackten Objekt
-        const { zeiten, pw } = req.body; 
+        // 1. Hol alle NEUEN Daten aus dem Request-Body
+        // WICHTIG: timerStartVorlauf muss im Frontend-Payload so heißen!
+        const { zeiten, timerStartVorlauf, pw } = req.body; 
 
-        // Passwort-Check gegen die .env Variable
+        // Passwort-Check
         if (pw !== process.env.PW_BAR) {
-            console.log("Falsches Passwort beim Zeit-Speichern");
             return res.status(403).json({ success: false, error: "Falsches Passwort" });
         }
 
@@ -1112,30 +1115,37 @@ app.post('/api/admin/oeffnungszeiten', async (req, res) => {
             return res.status(400).json({ success: false, error: "Keine Daten empfangen" });
         }
 
-        // In Datenbank speichern
-        await Einstellungen.findByIdAndUpdate(
+        // 2. Nimm den NEUEN Wert vom Admin, nicht den alten aus der DB
+        const vorlaufNum = parseInt(timerStartVorlauf) || 30;
+console.log(vorlaufNum);
+        // 3. In Datenbank speichern (Überschreibt alt mit neu)
+        const updatedConfig = await Einstellungen.findByIdAndUpdate(
             "oeffnungszeiten_config",
-            { $set: { wochentage: zeiten } },
+            { 
+                $set: { 
+                    wochentage: zeiten, 
+                    timerStartVorlauf: vorlaufNum 
+                } 
+            },
             { upsert: true, new: true }
         );
+		// Übergib das komplette Dokument an den Broadcast
+await broadcastStatusUpdate(updatedConfig);
 
-        // Sofort alle Handys aktualisieren und die neuen Daten mitschicken!
+        // 4. RAM synchronisieren (damit der Server es sofort weiß)
+        shopStatus.timerStartVorlauf = updatedConfig.timerStartVorlauf;
+
+        // 5. Broadcast an alle Handys
         await broadcastStatusUpdate(zeiten); 
-
-		// --- DAS HIER FEHLT ---
-        // Wir schicken die neuen Zeiten sofort an alle verbundenen Clients
-        io.emit('status-update', { wochentage: zeiten });
-
 
         res.json({ success: true });
     } catch (err) {
-        console.error("DB-Fehler:", err);
+        console.error("Fehler:", err);
         res.status(500).json({ success: false });
     }
 });
 
-//Dieses Feld überschreibt temporär die reguläre Öffnungszeit.
-// Route, um das Bestell-Ende heute manuell zu setzen
+
 
 
 
@@ -1177,7 +1187,7 @@ app.post('/api/admin/set-timer-vorlauf', async (req, res) => {
             { $set: { timerStartVorlauf: vorlaufNum } },
             { upsert: true, new: true }
         );
-
+console.log("shop:"+JSON.strigify(shopStatus));
         // RAM-Variable für die Live-Anzeige aktualisieren
         shopStatus.timerStartVorlauf = vorlaufNum;
         io.emit('status-update', shopStatus); 
@@ -1191,7 +1201,7 @@ app.post('/api/admin/set-timer-vorlauf', async (req, res) => {
 
 // 1. Die verbesserte Hilfsfunktion (kann nun auch direkt Daten empfangen)
 // --- Die verbesserte Hilfsfunktion ---
-async function broadcastStatusUpdate(erzwingeDaten = null) {
+async function broadcastStatusUpdate_(erzwingeDaten = null) {
     try {
         let alleZeiten = erzwingeDaten;
         
@@ -1211,7 +1221,8 @@ async function broadcastStatusUpdate(erzwingeDaten = null) {
             bestellStopManuell: shopStatus.bestellStopManuell,
             timerStartVorlauf: shopStatus.timerStartVorlauf || 30,
             heute: heuteDaten,
-            serverZeit: Date.now()
+            serverZeit: Date.now(),
+			kompletteConfig: aktuelleConfig
         };
 
         // Das Event muss 'status-update' heißen!
@@ -1219,5 +1230,47 @@ async function broadcastStatusUpdate(erzwingeDaten = null) {
         console.log("Broadcast: Status-Update an alle gesendet.");
     } catch (err) {
         console.error("Broadcast Fehler:", err);
+    }
+}
+
+async function broadcastStatusUpdate(erzwingeDaten = null) {
+    try {
+        let kompletteConfig = null;
+        
+        // 1. Daten beschaffen
+        if (erzwingeDaten) {
+            // Wenn Daten erzwungen werden (vom Post-Request), nutzen wir diese
+            kompletteConfig = erzwingeDaten;
+        } else {
+            // Sonst frisch aus der DB holen
+            kompletteConfig = await Einstellungen.findById("oeffnungszeiten_config");
+        }
+
+        // Sicherheitscheck: Falls gar nichts gefunden wurde
+        if (!kompletteConfig) {
+            console.error("Broadcast abgebrochen: Keine Konfiguration gefunden.");
+            return;
+        }
+
+        // 2. Heute-Daten ermitteln
+        const tagIndex = new Date().getDay().toString();
+        const heuteDaten = kompletteConfig.wochentage ? kompletteConfig.wochentage[tagIndex] : null;
+
+        // 3. Payload zusammenbauen
+        const payload = {
+            zustand: shopStatus.zustand,
+            meldung: shopStatus.meldung,
+            bestellStopManuell: shopStatus.bestellStopManuell,
+            timerStartVorlauf: kompletteConfig.timerStartVorlauf || 30,
+            heute: heuteDaten,
+            serverZeit: Date.now(),
+            // WICHTIG: Hier muss das ganze Objekt rein, damit der Gast-Pfad stimmt
+            kompletteConfig: kompletteConfig 
+        };
+
+        io.emit('status-update', payload);
+        console.log("Broadcast: Status-Update inkl. Wochenplan erfolgreich gesendet.");
+    } catch (err) {
+        console.error("Kritischer Broadcast Fehler:", err);
     }
 }
