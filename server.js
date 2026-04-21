@@ -450,12 +450,13 @@ app.get('/api/get-orders', async (req, res) => {
 const PW_MENU = process.env.PW_MENU;
 
 // 2. DAS SPEICHERN (Nur für den Admin-Button)
-app.put('/api/order-menu', async (req, res,pw) => {
+app.put('/api/order-menu', async (req, res) => {
     // Falls du das Passwort im Frontend mitschickst:
     // const { items, pw } = req.body;
-    if (pw !== PW_MENU) return res.status(403).send("Falsches Passwort");
+    // 1. Alle Daten aus dem Body holen
+    const { items, isGeolocation, pw } = req.body;
 	
-	const { items } = req.body; 
+	if (pw !== PW_MENU) return res.status(403).send("Falsches Passwort");
 	
 	try {
         // Hier speicherst du das Menü. 
