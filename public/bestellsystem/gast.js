@@ -15,8 +15,8 @@ let countdownInterval=null;function aktualisiereStatusAnzeige(data){const quadra
 jetzt.getMinutes().toString().padStart(2,'0');const startZeit=data.heute.start||"00:00";const reguläresEnde=data.heute.ende||"00:00";const schlussZeit=data.bestellStopManuell||reguläresEnde;let zusatz="";let zusatzIt="";if(schlussZeit&&schlussZeit>reguläresEnde){zusatz=" - Heute Verlängerung";zusatzIt=" - Oggi prolungato fino ";}
 const vorlaufMinuten=data.timerStartVorlauf||30;const[h,m]=schlussZeit.split(':');const zielZeit=new Date();zielZeit.setHours(parseInt(h),parseInt(m),0);const restMinuten=Math.floor((zielZeit-jetzt)/60000);if(banner)banner.style.display='none';if(countdownInterval)clearInterval(countdownInterval);if(data.heute.zu||data.zustand!=='offen'){if(currentLang==='it'){updateUI('#e74c3c',data.meldung||"Oggi chiuso");}
 else{updateUI('#e74c3c',data.meldung||"Heute geschlossen");}}
-else if(jetztHHMM<startZeit){if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway da Ore ${startZeit} (fino ${reguläresEnde})`);}
-else{updateUI('#e74c3c',`Takeaway Bestellung ab ${startZeit} Uhr (bis ${reguläresEnde})`);}}
+else if(jetztHHMM<startZeit){if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`);}
+else{updateUI('#e74c3c',`Takeaway Bestellung von ${startZeit} bis ${reguläresEnde}`);}}
 else if(jetztHHMM>=schlussZeit){if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`);}
 else{updateUI('#e74c3c',`Takeaway Bestellung von ${startZeit} bis ${reguläresEnde} Uhr`);}}
 else if(restMinuten<=vorlaufMinuten){if(currentLang==='it'){updateUI('#f39c12',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`+zusatzIt+`${schlussZeit}`);}
