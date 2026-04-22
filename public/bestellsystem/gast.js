@@ -11,22 +11,26 @@ else{if(product.isStandard){product.orderDetails.variant=product.name;product.or
 else{if(product.isPizza){product.orderDetails.variant=product.name;product.orderDetails.price=product.price;activePizza=product;openBranchingModal();return;}
 else{openEditModal(product);return;}}}
 renderMenu();renderCart();}
-let countdownInterval=null;function aktualisiereStatusAnzeige(data){const quadrat=document.getElementById('status-quadrat');const anzeige=document.getElementById('bestellzeit-anzeige');const banner=document.getElementById('countdown-banner');const timerDisplay=document.getElementById('countdown-timer');const bereich=document.getElementById('online-status-bereich');if(!data||!data.heute)return;if(bereich)bereich.style.display='flex';const jetzt=new Date();const jetztHHMM=jetzt.getHours().toString().padStart(2,'0')+":"+
-jetzt.getMinutes().toString().padStart(2,'0');const startZeit=data.heute.start||"00:00";const reguläresEnde=data.heute.ende||"00:00";const schlussZeit=data.bestellStopManuell||reguläresEnde;let zusatz="";let zusatzIt="";if(schlussZeit&&schlussZeit>reguläresEnde){zusatz=" - Heute Verlängerung";zusatzIt=" - Oggi prolungato fino ";}
-const vorlaufMinuten=data.timerStartVorlauf||30;const[h,m]=schlussZeit.split(':');const zielZeit=new Date();zielZeit.setHours(parseInt(h),parseInt(m),0);const restMinuten=Math.floor((zielZeit-jetzt)/60000);if(banner)banner.style.display='none';if(countdownInterval)clearInterval(countdownInterval);if(data.heute.zu||data.zustand!=='offen'){if(currentLang==='it'){updateUI('#e74c3c',data.meldung||"Oggi chiuso");}
+let countdownInterval=null;function aktualisiereStatusAnzeige(data){const quadrat=document.getElementById('status-quadrat');const anzeige=document.getElementById('bestellzeit-anzeige');const banner=document.getElementById('countdown-banner');const timerDisplay=document.getElementById('countdown-timer');const bereich=document.getElementById('online-status-bereich');let bestellungMoeglich=false;if(!data||!data.heute)return;if(bereich){bereich.style.display=(tischNr==="Abholung")?'flex':'none';}
+const jetzt=new Date();const jetztHHMM=jetzt.getHours().toString().padStart(2,'0')+":"+
+jetzt.getMinutes().toString().padStart(2,'0');const startZeit=data.heute.start||"00:00";const regulaeresEnde=data.heute.ende||"00:00";let schlussZeit;schlussZeit=regulaeresEnde;if(data.bestellStopManuell&&data.bestellStopManuell>regulaeresEnde){schlussZeit=data.bestellStopManuell;}
+let zusatz="";let zusatzIt="";if(schlussZeit&&schlussZeit>regulaeresEnde){zusatz=" - Heute Verlängerung";zusatzIt=" - Oggi prolungato fino ";}
+const vorlaufMinuten=data.timerStartVorlauf||30;const[h,m]=schlussZeit.split(':');const zielZeit=new Date();zielZeit.setHours(parseInt(h),parseInt(m),0);const restMinuten=Math.floor((zielZeit-jetzt)/60000);if(banner)banner.style.display='none';if(countdownInterval)clearInterval(countdownInterval);if(data.heute.zu||data.zustand!=='offen'){bestellungMoeglich=false;if(currentLang==='it'){updateUI('#e74c3c',data.meldung||"Oggi chiuso");}
 else{updateUI('#e74c3c',data.meldung||"Heute geschlossen");}}
-else if(jetztHHMM<startZeit){if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`);}
-else{updateUI('#e74c3c',`Takeaway Bestellung von ${startZeit} bis ${reguläresEnde}`);}}
-else if(jetztHHMM>=schlussZeit){if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`);}
-else{updateUI('#e74c3c',`Takeaway Bestellung von ${startZeit} bis ${reguläresEnde} Uhr`);}}
-else if(restMinuten<=vorlaufMinuten){if(currentLang==='it'){updateUI('#f39c12',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`+zusatzIt+`${schlussZeit}`);}
-else{updateUI('#f39c12',`Takeaway Bestellung von ${startZeit} -  ${reguläresEnde}`+zusatz+` bis ${schlussZeit} Uhr`);}
-if(banner)banner.style.display='block';starteEinheitlichenTimer(schlussZeit,timerDisplay);}
-else{if(currentLang==='it'){updateUI('#2ecc71',`Ordinazione Takeaway tra ${startZeit} e ${reguläresEnde}`+zusatzIt+`${schlussZeit}`);}
-else{updateUI('#2ecc71',`Takeaway Bestellung von ${startZeit} -  ${reguläresEnde}`+zusatz+` bis ${schlussZeit} Uhr`);}}
-function updateUI(farbe,text){if(quadrat)quadrat.style.backgroundColor=farbe;if(anzeige)anzeige.innerText=text;}}
-function starteEinheitlichenTimer(zielUhrzeit,displayElement){if(!displayElement)return;const[h,m]=zielUhrzeit.split(':');function tick(){const jetzt=new Date();const ziel=new Date();ziel.setHours(parseInt(h),parseInt(m),0);const diff=ziel-jetzt;if(diff<=0){displayElement.innerText="00:00";clearInterval(countdownInterval);document.getElementById('status-quadrat').style.backgroundColor='#e74c3c';document.getElementById('bestellzeit-anzeige').innerText="Bestellannahme beendet";return;}
-const min=Math.floor(diff/60000);const sek=Math.floor((diff%60000)/1000);displayElement.innerText=`${min}:${sek.toString().padStart(2, '0')} Min.`;}
+else if(jetztHHMM<startZeit||jetztHHMM>=schlussZeit){console.log("<startZeit u >schlusszeit:<"+startZeit+" >"+schlussZeit);if(currentLang==='it'){updateUI('#e74c3c',`Ordinazione Takeaway tra ${startZeit} e ${regulaeresEnde}`);}
+else{updateUI('#e74c3c',`Takeaway Bestellung von ${startZeit} bis ${regulaeresEnde}`);}
+bestellungMoeglich=false;}
+else if(restMinuten<=vorlaufMinuten){console.log("restMinuten <= vorlaufMinuten::"+restMinuten+" <= "+vorlaufMinuten);if(currentLang==='it'){updateUI('#f39c12',`Ordinazione Takeaway tra ${startZeit} e ${regulaeresEnde}`+zusatzIt+`${schlussZeit}`);}
+else{updateUI('#f39c12',`Takeaway Bestellung von ${startZeit} -  ${regulaeresEnde}`+zusatz+` bis ${schlussZeit} Uhr`);}
+if(tischNr=="Abholung"){if(banner)banner.style.display='block';starteEinheitlichenTimer(schlussZeit,timerDisplay,data);}
+bestellungMoeglich=true;}
+else{console.log("Normalbetrieb");if(currentLang==='it'){updateUI('#2ecc71',`Ordinazione Takeaway tra ${startZeit} e ${regulaeresEnde}`+zusatzIt+`${schlussZeit}`);}
+else{updateUI('#2ecc71',`Takeaway Bestellung von ${startZeit} -  ${regulaeresEnde}`+zusatz+` bis ${schlussZeit} Uhr`);}
+bestellungMoeglich=true;}
+updateButtonStates(bestellungMoeglich);function updateUI(farbe,text){if(quadrat)quadrat.style.backgroundColor=farbe;if(anzeige)anzeige.innerText=text;}}
+function starteEinheitlichenTimer(zielUhrzeit,displayElement,data){if(!displayElement)return;const[h,m]=zielUhrzeit.split(':');function tick(){const jetzt=new Date();const ziel=new Date();ziel.setHours(parseInt(h),parseInt(m),0);const diff=ziel-jetzt;if(diff<=0){const banner=document.getElementById('countdown-banner');if(banner)banner.style.display='none';clearInterval(countdownInterval);if(data){aktualisiereStatusAnzeige(data);}else{document.getElementById('status-quadrat').style.backgroundColor='#e74c3c';}
+return;}
+const min=Math.floor(diff/60000);const sek=Math.floor((diff%60000)/1000);displayElement.innerText=`${min}:${sek.toString().padStart(2, '0')}`;}
 tick();countdownInterval=setInterval(tick,1000);}
 socket.on('status-update',(data)=>{if(letzteStatusDaten){letzteStatusDaten=Object.assign({},letzteStatusDaten,data);}else{letzteStatusDaten=data;}
 if(typeof aktualisiereStatusAnzeige==="function"){aktualisiereStatusAnzeige(letzteStatusDaten);}
@@ -43,5 +47,6 @@ const isIt=(currentLang==='it');const tageNamen=isIt?["Domenica","Lunedì","Mart
                     <td style="padding: 5px; text-align: left;">${name}:</td>
                     <td style="padding: 5px; text-align: right;">${zeiten}</td>
                  </tr>`;}
-tabelle.innerHTML=html;const footer=document.getElementById('oeffnungszeiten-footer');if(footer){footer.style.display='block';}}
+tabelle.innerHTML=html;const footer=document.getElementById('oeffnungszeiten-footer');if(footer){if(tischNr==="Abholung"){footer.style.display='block';}else{footer.style.display='none';}}}
+function updateButtonStates(isPossible){const allPlusButtons=document.querySelectorAll('.btn-plus');allPlusButtons.forEach(btn=>{if(isPossible){btn.classList.remove('btn-disabled');}else{btn.classList.add('btn-disabled');}});const orderBtn=document.getElementById('btnCartOrder');if(orderBtn){orderBtn.disabled=!isPossible;orderBtn.style.opacity=isPossible?"1":"0.5";}}
 document.addEventListener('DOMContentLoaded',initialisiereStatus);initialisiereStatus();setInterval(()=>{fetch('/api/status').then(res=>res.json()).then(data=>aktualisiereStatusAnzeige(data));},30000);

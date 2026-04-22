@@ -180,28 +180,54 @@
     transition: all 0.5s ease;
 }
 
-.oeffnungszeiten-container {
-    background-color: #ffffff; 
-    color: #333333; /* Dunkler Text */
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin: 20px auto 100px auto;
-    width: 90%;
-    max-width: 400px;
-    border-radius: 10px;
-    display: block !important; /* Sicherstellen, dass es nicht versteckt ist */
+
+/* Erzeuge einen Puffer am Ende des Scroll-Bereichs */
+#main-scroll-wrapper {
+    height: 100vh;
+    overflow-y: auto;
+    /* Ein satter Abstand unten, damit URL-Leisten nichts verdecken */
+    padding-bottom: 30px !important; 
+    box-sizing: border-box;
 }
 
-#zeiten-tabelle {
-    color: #333 !important; 
+/* Container für die Öffnungszeiten */
+.oeffnungszeiten-container {
     width: 100%;
+    max-width: 100vw; /* Verhindert das Überbreite-Scrollen */
+    box-sizing: border-box;
+    padding: 10px;    /* Kleinerer Innenabstand */
+    margin-top: 5px;  /* Verringert Abstand nach oben zum Menü */
+	margin-bottom: 0px;
+}
+
+/* Die Überschrift "Takeaway Bestellzeiten" */
+#titel-bestelleiten {
+    margin-top: 0;     /* Entfernt den Standard-Abstand oben */
+    margin-bottom: 5px; /* Verringert Abstand zur Tabelle (Sonntag etc.) */
+    font-size: 1.1rem;
+}
+
+/* Die Tabelle selbst */
+#zeiten-tabelle {
+    width: 100%;       /* Nutzt genau die Containerbreite */
+    table-layout: fixed; /* Zwingt die Tabelle, nicht überzulaufen */
+    border-collapse: collapse;
 }
 
 #zeiten-tabelle td {
-    border-bottom: 1px solid #eee;
+    padding: 4px 2px;  /* Engere Zeilenabstände */
+    font-size: 0.9rem;
 }
 
 .heute-markiert {
     background-color: #fff9c4; /* Leichtes Gelb für heute */
     font-weight: bold;
+}
+
+
+
+.btn-disabled {
+    opacity: 0.3;
+    pointer-events: none; /* Macht den Button unklickbar */
+    filter: grayscale(1);
 }
