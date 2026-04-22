@@ -1130,14 +1130,15 @@ console.log(vorlaufNum);
             },
             { upsert: true, new: true }
         );
+		
 		// Übergib das komplette Dokument an den Broadcast
-await broadcastStatusUpdate(updatedConfig);
+		await broadcastStatusUpdate(updatedConfig);
 
         // 4. RAM synchronisieren (damit der Server es sofort weiß)
         shopStatus.timerStartVorlauf = updatedConfig.timerStartVorlauf;
 
         // 5. Broadcast an alle Handys
-        await broadcastStatusUpdate(zeiten); 
+        //await broadcastStatusUpdate(zeiten); 
 
         res.json({ success: true });
     } catch (err) {
