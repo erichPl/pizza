@@ -31,7 +31,7 @@ else{updateUI('#2ecc71',`Ordinazione Takeaway tra ${startZeit} e ${regulaeresEnd
 else{if(schlussZeit>regulaeresEnde){updateUI('#2ecc71',`Takeaway Bestellung von ${startZeit} -  ${regulaeresEnde}`+zusatz+` bis ${schlussZeit} Uhr`);}
 else{updateUI('#2ecc71',`Takeaway Bestellung von ${startZeit} -  ${regulaeresEnde}`);}}
 bestellungMoeglich=true;}
-updateButtonStates(bestellungMoeglich);function updateUI(farbe,text){if(quadrat)quadrat.style.backgroundColor=farbe;if(anzeige)anzeige.innerText=text;}}
+const finalMoeglich=(tischNr!=="Abholung")?true:bestellungMoeglich;updateButtonStates(finalMoeglich);function updateUI(farbe,text){if(quadrat)quadrat.style.backgroundColor=farbe;if(anzeige)anzeige.innerText=text;}}
 function starteEinheitlichenTimer(zielUhrzeit,displayElement,data){if(!displayElement)return;const[h,m]=zielUhrzeit.split(':');function tick(){const jetzt=new Date();const ziel=new Date();ziel.setHours(parseInt(h),parseInt(m),0);const diff=ziel-jetzt;if(diff<=0){const banner=document.getElementById('countdown-banner');if(banner)banner.style.display='none';clearInterval(countdownInterval);if(data){aktualisiereStatusAnzeige(data);}else{document.getElementById('status-quadrat').style.backgroundColor='#e74c3c';}
 return;}
 const min=Math.floor(diff/60000);const sek=Math.floor((diff%60000)/1000);displayElement.innerText=`${min}:${sek.toString().padStart(2, '0')}`;}
