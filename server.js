@@ -213,10 +213,35 @@ io.on('connection', (socket) => {
     });
 
 
-   socket.on('join-bar', () => {
+	/*socket.on('join-bar', () => {
         socket.join('bar-room');
         console.log("Bar-Monitor verbunden.");
+    });*/
+	
+	// Bar-Logik JETZT MIT PASSWORT-CHECK
+    socket.on('join-bar', (data) => {
+        const correctPw = process.env.PW_BAR;
+        
+        if (data && data.password === correctPw) {
+            socket.join('bar-room');
+            console.log("Bar-Monitor erfolgreich authentifiziert und verbunden.");
+        } else {
+            console.log("ACHTUNG: Unbefugter Versuch dem Bar-Room beizutreten!");
+            // Optional: socket.disconnect(); 
+        }
     });
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 });
 
 
@@ -852,8 +877,8 @@ function startServer() {
 }
 
 //http://localhost:10000/api/delete-orders-range?von=2026-01-01&bis=2026-04-13T23:59:59&pw
-app.get('/api/delete-orders-range', async (req, res) => {
-//app.delete('/api/delete-orders-range', async (req, res) => {
+app.delete('/api/delete-orders-range', async (req, res) => {
+//app.get('/api/delete-orders-range', async (req, res) => {
     // Parameter aus der URL holen: ?von=...&bis=...&pw=...
     const { von, bis, pw } = req.query;
 
@@ -943,14 +968,14 @@ const anonymizeOldOrders = async () => {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const ordersToAnonymize = await Order.find({ 
-        createdAt: { $lt: twentyFourHoursAgo },
+        erstelltAm: { $lt: twentyFourHoursAgo },
         isAnonymized: { $ne: true } // Nur die bearbeiten, die noch "echt" sind
     });
 
     for (let order of ordersToAnonymize) {
-        order.adresse.vorname = anonymize(order.vorname, 'name');
-        order.adresse.nachname = anonymize(order.nachname, 'name');
-        order.adresse.telefon = anonymize(order.telefon, 'phone');
+        order.adresse.vorname = anonymize(order.adresse.vorname, 'name');
+        order.adresse.nachname = anonymize(order.adresse.nachname, 'name');
+        order.adresse.telefon = anonymize(order.adresse.telefon, 'phone');
         order.isAnonymized = true; // Markierung, damit wir sie nicht doppelt bearbeiten
         await order.save();
     }
