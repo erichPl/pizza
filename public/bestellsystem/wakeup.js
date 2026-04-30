@@ -1,26 +1,24 @@
- const wakeup=true;
- const wakeBtn = document.getElementById('wakeUpBtn');
-
-  function activateVideoFallback() {
-    // 2. Methode: Video-Hack für alte Samsung-Browser
-    let video = document.createElement('video');
-    video.loop = true;
+function activateVideoFallback() {
+    // 1. Element suchen oder erstellen (unsichtbar im Hintergrund)
+    let video = document.getElementById('wakeLockVideo') || document.createElement('video');
+    
+    video.id = 'wakeLockVideo';
     video.muted = true;
+    video.loop = true;
     video.playsInline = true;
-    video.style.display = 'none';
-    
-    // Ein winziges, fast leeres Video
-    video.src = "https://githubusercontent.com"; 
-    
-    video.play().then(() => {
-      wakeBtn.innerText = "✅ Wach (Video-Mode)";
-      wakeBtn.style.background = "#1e7e34";
-    }).catch(e => {
-      //alert("Bitte noch einmal klicken!");
-    });
-    document.body.appendChild(video);
-  }
-  
-  //if (wakeup==true){
-  //  activateVideoFallback();
-  //}
+    video.autoplay = true;
+    video.style.display = 'none'; // Versteckt das Element komplett
+
+    // 2. Die Video-Daten (Base64)
+    video.src = "data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28yYXZjMQAAAAhfreeOAQAAAA5tb292AAAAbG12aGQAAAAA3u9S5N7vUuQAAAPoAAAAKAABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAGGlvZHMAAAAAEAH/AQACABAAAAAAbXVkdAAAADptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyAAAAAAAAAAAAAAAAYXBwbAAAAAAAAAAAAAAAACVpbHRzAAAAH2NoZWNrAAAAAAAAAAAIAAAAFGNvbnRyb2xsZXIAAAAAAAAAAAAAYXRyYwAAABh0cmFrAAAAXHRraGQAAAAD3u9S5N7vUuQAAAABAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAFAAAABQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAAoAAAAAAABAAAAAABybWRpYQAAACBtZGhkAAAAAN7vUuTe71LkAAA8AAAAKABVUAABAAAAAAAhaZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAAIhtZGluZgAAABhjbmZyAAAAEGF2YzEAAAAAAAD/AAAAGGhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAbm1oZAAAABR2bWRoAAAAAQAAAAAAAAAAAAAAJGRpbmYAAAAccmRscgAAAAAAAAAAYWxpcwAAAAAAAAAAAAAAHHRyZWYAAAAIdm9sdQAAAAAAGXN0YmwAAABMc3RzZAAAAAAAAAABAAAAPGF2YzEAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAKABQAEAAAAAAABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABjvu/8AAAAfYXZjQwH0AAr/4QAZYfQACvSAsP9AAAMAAQAAAwAyDxIBAAALaW9vbwAAAAAoc3R0cwAAAAAAAAABAAAAAQAAACgAAAAOc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAAAAAAAAAIAAAAUc3RjbwAAAAAAAAABAAAALAAAAGJ1Z3MAAAAsdHJhbgAAACR0cmFmAAAAHHRmZHRhAAAAAAAAAAIAAAAoAAAAAAAAdHJ1bgAAABxlZHN0AAAAAAAAAAEAAAAoAAAAAAABAAAAAAA=";
+
+    // 3. Abspielen triggern
+    video.play()
+        .then(() => console.log("Wake-Lock im Hintergrund aktiv."))
+        .catch(e => console.error("Monitor-Wachhalten fehlgeschlagen:", e));
+
+    // 4. In den DOM einfügen, falls noch nicht geschehen (nötig für manche Browser)
+    if (!video.parentElement) {
+        document.body.appendChild(video);
+    }
+}
