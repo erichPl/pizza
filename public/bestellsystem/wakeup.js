@@ -11,7 +11,8 @@ function activateVideoFallback() {
     video.style.display = 'none'; // Versteckt das Element komplett
 
     // 2. Die Video-Daten (Base64)
-     video.src = video.src = "data:video/webm;base64,GkXfo6NChoEBQveBAUf3gQUqyQFAuqADveBAUKOjgQFC+4EBQYqBAUL7gQFCloEBQveBAUf3gQUqyQFAuqADveBAUKOjgQFC+4EBQYqBAUL7gQFCloEBQveBAUf3gQUqyQFAuqADveBAUf3gQUqyQFAuqADveBAUf3gQUqyQFAuqADveBAUf3gQUqyQFAuqA";
+    //video.src = "data:video/webm;base64,GkXfo6NChoEBQveBAUf3gQUqyQFAuqADveBAUKOjgQFC+4EBQYqBAUL7gQFCloEBQveBAUf3gQUqyQFAuqADveBAUKOjgQFC+4EBQYqBAUL7gQFCloEBQveBAUf3gQUqyQFAuqADveBAUf3gQUqyQFAuqADveBAUf3gQUqyQFAuqADveBAUf3gQUqyQFAuqA";
+    video.src = "data:audio/wav;base64,UklGRigAAABXQVZFRm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
     // 3. Abspielen triggern
     video.play()
         .then(() => console.log("Wake-Lock im Hintergrund aktiv."))
