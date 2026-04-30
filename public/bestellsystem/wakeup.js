@@ -1,3 +1,4 @@
+const wakeup=true;
 function activateVideoFallback() {
     // 1. Element suchen oder erstellen (unsichtbar im Hintergrund)
     let video = document.getElementById('wakeLockVideo') || document.createElement('video');
