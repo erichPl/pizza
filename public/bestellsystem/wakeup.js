@@ -1,33 +1,27 @@
 const wakeup=true;
 function activateVideoFallback() {
-    let wakeAudio = document.getElementById('wakeLockAudio');
+    // 1. Element im Hintergrund suchen oder erstellen
+    let wakeAudio = document.getElementById('wakeLockAudio') || document.createElement('audio');
     
-    if (!wakeAudio) {
-        wakeAudio = document.createElement('audio');
-        wakeAudio.id = 'wakeLockAudio';
-        document.body.appendChild(wakeAudio);
-    }
-
+    wakeAudio.id = 'wakeLockAudio';
     wakeAudio.loop = true;
-    wakeAudio.muted = false; // Manche Browser blockieren lautlose Streams, wir stellen Volume auf fast 0
-    wakeAudio.volume = 0.01; 
-    wakeAudio.style.display = 'none';
+    wakeAudio.style.display = 'none'; // Damit es auf der Seite niemals sichtbar ist
 
-    // Ein robusterer Base64-String für eine lautlose WAV-Datei (1 Sekunde)
-    // Dieser String enthält korrekte Header-Informationen, die den Metadata-Fehler verhindern.
-    wakeAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFRm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+    // 2. Pfad zur echten Datei (Stelle sicher, dass silent.mp3 im Ordner liegt!)
+    wakeAudio.src = "silent.mp3"; 
 
-    // Wir laden die Ressource explizit neu, bevor wir abspielen
-    wakeAudio.load();
-
+    // 3. Abspielen starten
+    // Da dies durch den Login-Button-Klick ausgelöst wird, erlaubt der Browser das Audio
     wakeAudio.play()
         .then(() => {
-            console.log("✅ Monitor-Wachhalten aktiv (Audio-Mode)");
+            console.log("✅ Monitor-Wachhalten aktiv (Datei-Modus)");
         })
         .catch(e => {
-            console.warn("⚠️ Audio fehlgeschlagen, versuche alternativen Video-Trick...");
-            // Letzter Rettungsanker: Ein Video mit einer echten (sehr kurzen) Quelle
-            // Falls du irgendwo eine winzige mp4 liegen hast, wäre hier der Platz für die URL
-            // video.src = "https://deine-domain.de/silent.mp4"; 
+            console.error("❌ Fehler beim Abspielen der Datei:", e);
         });
+
+    // 4. Nur hinzufügen, falls es noch nicht im HTML existiert
+    if (!wakeAudio.parentElement) {
+        document.body.appendChild(wakeAudio);
+    }
 }
