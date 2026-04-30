@@ -21,6 +21,6 @@
     document.body.appendChild(video);
   }
   
-  if (wakeup==true){
-    activateVideoFallback();
-  }
+  //if (wakeup==true){
+  //  activateVideoFallback();
+  //}
