@@ -16,7 +16,7 @@
       wakeBtn.innerText = "✅ Wach (Video-Mode)";
       wakeBtn.style.background = "#1e7e34";
     }).catch(e => {
-      alert("Bitte noch einmal klicken!");
+      //alert("Bitte noch einmal klicken!");
     });
     document.body.appendChild(video);
   }
