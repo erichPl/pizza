@@ -103,9 +103,9 @@ async function init() {
 function processData(allProducts) {
     
     let readOnlyPizza = false;
-    if (typeof onlyPizza !== 'undefined' && onlyPizza && tischNr === "Abholung") {
+    /*if (typeof onlyPizza !== 'undefined' && onlyPizza && tischNr === "Abholung") {
         readOnlyPizza = true;
-    }
+    }*/
 
     // 1. Zuerst alle Extras sammeln
     allProducts.forEach(item => {
