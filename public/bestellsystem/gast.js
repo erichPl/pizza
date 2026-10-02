@@ -11,6 +11,7 @@ var mockData = [
 
 
 
+
 function renderMenu() {
     const container = document.getElementById('menu-container');
     const itemTemplate = document.getElementById('template-item');
