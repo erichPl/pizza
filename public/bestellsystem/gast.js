@@ -17,123 +17,80 @@ function renderMenu() {
     const itemTemplate = document.getElementById('template-item');
     const headerTemplate = document.getElementById('template-header');
     
-	// Wir holen uns NICHT den Haupt-Container, sondern nur die Liste
-   // const itemsList = document.getElementById('template-item');
-	
-	// Nur die Produkte löschen, der Header (darüber) bleibt erhalten
-    //itemsList.innerHTML = '';
     container.innerHTML = ""; 
     let lastCategory = "";
 
-
-    // 1. Aktuelle Ansicht aus der URL ermitteln:
-    // Wenn 'tisch' in der URL steht (?tisch=5) -> 'b' (Bar/Tisch)
-    // Wenn KEIN Tisch da ist -> 't' (Takeaway)
+    // 1. Aktuelle Ansicht ermitteln: 'b' für Tisch, 't' für Takeaway
     const urlParams = new URLSearchParams(window.location.search);
     const currentView = urlParams.has('tisch') ? 'b' : 't';
 
-
-
-
-
     menuCart.forEach(product => {
-		
-		// DER ENTSCHEIDENDE FILTER:
+        
+        // --- 1. HARTER ISVISIBLE-FILTER ---
         if (product.isVisible === false) return;
-		
-		
-		// --- 2. DER NEUE VIEW-FILTER (b vs. t) ---
-        // Falls im Produkt eine 'view' definiert ist (z.B. "b", "t" oder "b,t"):
+
+        // --- 2. VIEW-FILTER PRÜFUNG ---
         if (product.view) {
-            // Wir trennen den String bei Kommas auf und entfernen Leerzeichen
-            const allowedViews = product.view.split(',').map(v => v.trim());
+            // Wandelt z. B. "b, t" in ein sauberes Array ['b', 't'] um
+            const allowedViews = product.view.split(',').map(v => v.trim().toLowerCase());
             
             // Wenn die aktuelle Ansicht ('b' oder 't') NICHT erlaubt ist -> überspringen
             if (!allowedViews.includes(currentView)) {
                 return;
             }
         }
-		
-		
-		
-        if (product.category !== lastCategory) {
-            lastCategory = product.category;            
+
+        // --- 3. KATEGORIE-HEADER RENDERN ---
+        if (product.type === "header") {
+            const headerClone = headerTemplate.content.cloneNode(true);
+            headerClone.querySelector('.header-title').innerText = product['name' + suffix] || product.name;
+            container.appendChild(headerClone);
+            return; // WICHTIG: Damit der Header nicht in den Item-Code darunter rutscht!
+        }
+
+        // --- 4. NORMALE PRODUKTE RENDERN ---
+        const itemClone = itemTemplate.content.cloneNode(true);
+        const itemDiv = itemClone.querySelector('.item'); 
+        
+        let displayQty = product.quantity;
+
+        // Extras-Berechnung bei Pizzen
+        if (product.category === 'extra') {
+            orderCart.forEach(cartItem => {
+                if (cartItem.orderDetails && cartItem.orderDetails.extras) {
+                    if (cartItem.orderDetails.extras.includes(product.name)) {
+                        displayQty += (cartItem.orderDetails.quantity || 1);
+                    }
+                }
+            });
         }
         
-        if (product.type == "header") {
-            const headerClone = headerTemplate.content.cloneNode(true);
-            headerClone.querySelector('.header-title').innerText = product['name'+ suffix] || product.name;
-            container.appendChild(headerClone);
-        } else {
-            const itemClone = itemTemplate.content.cloneNode(true);
-            const itemDiv = itemClone.querySelector('.item'); 
-            
-			let displayQty = product.quantity; // Standardmenge (direkt bestellt)
-			
-			//let count=0;
-			// Wenn das aktuelle Produkt ein Extra ist, scannen wir alle Pizzen
-			if (product.category === 'extra') {
-				orderCart.forEach(cartItem => {
-					// 1. Hat dieses Warenkorb-Item Extras?
-					if (cartItem.orderDetails && cartItem.orderDetails.extras) {
-						
-						// 2. Suche in den Extras der Pizza nach dem Namen des aktuellen Produkts
-						// Wir nutzen 'includes', da deine Extras Strings sind
-						if (cartItem.orderDetails.extras.includes(product.name)) {
-							// Wir addieren die Menge der Pizza (wenn 2 Pizzen mit Käse, dann +2 Käse)
-							displayQty += (cartItem.orderDetails.quantity || 1);
-							//alert(displayQty);
-						}
-					}
-				});
-			}
-			
-            
-			// --- DER ENTSCHEIDENDE ANKER FÜR SYNC ---
-            itemDiv.setAttribute('data-id', product.id); 
-			//Anzeige Weihenstephaner Weizen 0,3 l / 0,5 l 3,50 / 5,50 €
-            itemClone.querySelector('.item-name').innerText = product['name'+ suffix] || product.name;		 //Weihenstephaner Weizen
-            itemClone.querySelector('.item-desc').innerText = product['desc'+ suffix] || product.desc;  		 //0,3 l / 0,5 l
-            itemClone.querySelector('.item-price').innerText = product.price + " €"; //3,50 / 5,50
-           
-			itemClone.querySelector('.qty-display').innerText=displayQty;  //Menge  - 2 +
-		  
-			// + Button
-			itemClone.querySelector('.btn-plus').onclick = () => {
-				//changeQuantity(product, 1, qtyLabel);//   ==========================================
-				plusMinusMenu(product,1);   //               plusMinusMenu(product,1) wird aufgerufen
-			};                              //              ==========================================
-			
-			// - Button
-			itemClone.querySelector('.btn-minus').onclick = () => {
-				//changeQuantity(product, -1, qtyLabel);
-				plusMinusMenu(product,-1);
-			};
-			
-			
-			
-			
-				
-			if(product.category=='extra'){
-				    itemClone.querySelector('.btn-plus').style.visibility='hidden';
-					//itemClone.querySelector('.qty-display').innerText=product.quantity;
-					itemClone.querySelector('.btn-minus').style.visibility='hidden';
-					//console.log(product.name+" "+product.quantity+" "+count);
-			}
-       
-       
-			container.appendChild(itemClone);
-			
-	
-	
-		
-		
-		
-		
-		
-		}
+        // Werte ins HTML-Template eintragen
+        itemDiv.setAttribute('data-id', product.id); 
+        itemClone.querySelector('.item-name').innerText = product['name' + suffix] || product.name;         
+        itemClone.querySelector('.item-desc').innerText = product['desc' + suffix] || product.desc;           
+        itemClone.querySelector('.item-price').innerText = product.price + " €";
+        itemClone.querySelector('.qty-display').innerText = displayQty;
+      
+        // Plus / Minus Buttons
+        itemClone.querySelector('.btn-plus').onclick = () => {
+            plusMinusMenu(product, 1);
+        };            
+        
+        itemClone.querySelector('.btn-minus').onclick = () => {
+            plusMinusMenu(product, -1);
+        };
+        
+        // Buttons bei Extras ausblenden
+        if (product.category === 'extra') {
+            itemClone.querySelector('.btn-plus').style.visibility = 'hidden';
+            itemClone.querySelector('.btn-minus').style.visibility = 'hidden';
+        }
+   
+        container.appendChild(itemClone);
     });
-	renderWochenplan();
+
+    renderWochenplan();
 }
 
 
