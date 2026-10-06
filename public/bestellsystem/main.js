@@ -126,7 +126,8 @@ const translations = {
 		saveContact: "Jetzt bestellen",
 	    cancelContact: "Zurück",
 		titelBestellzeiten: "Takeaway Bestellzeiten",
-		gesamtsumme: "Gesamtsumme:"//06.10.26
+		gesamtsumme: "Gesamtsumme:",//06.10.26
+		zurSpeisekarte: "Zur Speisekarte"//06.10.26
     },
     it: {
 		//menue
@@ -171,7 +172,8 @@ const translations = {
 		saveContact: "Ordina ora",
 	    cancelContact: "Indietro",
 		titelBestellzeiten: "Takeaway Orari di prenotazione",
-		gesamtsumme: "Totale:"//06.10.26
+		gesamtsumme: "Totale:",//06.10.26
+		zurSpeisekarte: "Al menu"//06.10.26
     }
 };
 
@@ -209,7 +211,7 @@ function changeLanguage_(lang) {
     document.getElementById('cartTitle').innerText = t.title;
 	document.getElementById('lblCartTotal').innerText=t.gesamtsumme;//06.10.26
     document.getElementById('btnCartClearAll').innerText = t.clear;
-    document.getElementById('btnCartClose').innerText = t.cancel; 	
+    document.getElementById('btnCartClose').innerText = t.zurSpeisekarte; 	
 	document.getElementById('btnCartOrder').innerText = t.order;
 		
 	document.getElementById('vorname').innerText = t.vorname;	
