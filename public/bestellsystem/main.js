@@ -289,7 +289,7 @@ function changeLanguage(lang) {
     // 4. STATISCHE TEXTE IN DER SIDEBAR (WARENKORB)
     setText('cartTitle', t.title);
     setText('btnCartClearAll', t.clear);
-    setText('btnCartClose', t.cancel); 	
+    setText('btnCartClose', t.zurSpeisekarte); 	//06.10.26 t.cancel abgeändert 	
     setText('btnCartOrder', t.order);
     setText('lblCartTotal', t.gesamtsumme); // 06.10.26 - Läuft jetzt garantiert durch!
 		
